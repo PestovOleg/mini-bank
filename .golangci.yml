@@ -1,0 +1,47 @@
+# # Options for analysis running.
+# run:
+#   # See the dedicated "run" documentation section.
+#   option: value
+# # output configuration options
+# output:
+#   # See the dedicated "output" documentation section.
+#   option: value
+# # All available settings of specific linters.
+# linters-settings:
+#   # See the dedicated "linters-settings" documentation section.
+#   option: value
+linters:
+  # See the dedicated "linters" documentation section.
+  enable-all: true
+  disable:
+    - exhaustivestruct
+    - forbidigo
+    - gomnd
+    - godot
+    - exhaustruct
+    - gofmt
+    - gofumpt
+    - godox
+    - varnamelen
+    # are deprecated by authors
+    - maligned
+    - ifshort
+    - golint
+    - scopelint
+    - interfacer
+    - varcheck
+    - deadcode
+    - nosnakecase
+    # are disabled because of generics
+    - contextcheck
+    - rowserrcheck
+    - sqlclosecheck
+    - structcheck
+    - wastedassign
+
+# issues:
+#   # See the dedicated "issues" documentation section.
+#   #option: value
+# severity:
+#   # See the dedicated "severity" documentation section.
+#   option: value
