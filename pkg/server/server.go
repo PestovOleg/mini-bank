@@ -43,21 +43,18 @@ func NewServer(config Config, handler http.Handler) *HTTPServer {
 }
 
 func (s *HTTPServer) Run() error {
-	s.logger.Info("Start server")
+	s.logger.Info("Start server on " + s.server.Addr)
 	err := s.server.ListenAndServe()
-	s.logger.Info("Server is started")
 
-	if err != nil {
-		s.logger.Error("Not error")
+	if err != nil && err != http.ErrServerClosed {
+		s.logger.Error("Server error " + err.Error())
 	}
-
-	s.logger.Info("Server stopped")
 
 	return nil
 }
 
-func (s *HTTPServer) Stop(ctx context.Context) {
-	s.logger.Info("Start to stop")
+func (s *HTTPServer) Stop(ctx context.Context) error {
+	s.logger.Info("Initiating server shutdown.")
 	cancelCtx, cancel := context.WithTimeout(context.Background(), s.config.ShutDownTime)
 
 	var err error
@@ -74,13 +71,14 @@ func (s *HTTPServer) Stop(ctx context.Context) {
 
 	select {
 	case <-cancelCtx.Done():
-		s.logger.Error("Shutdown failed- Timeout")
+		s.logger.Error("Shutdown failed: Timeout.")
 	case <-stop:
 		if err != nil {
-			s.logger.Error("one more error")
+			s.logger.Error("An error occurred while stopping server: ", zap.Error(err))
 		} else {
 			s.logger.Info("Shutdown finished")
 		}
 	}
-	s.logger.Info("Finish to stop")
+	s.logger.Info("Server is stopped")
+	return nil
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/PestovOleg/mini-bank/pkg/handler"
@@ -12,6 +11,7 @@ import (
 )
 
 func main() {
+	logger := *util.Getlogger("server")
 	config := server.Config{
 		Addr:              ":3333",
 		ReadTimeout:       5 * time.Second,
@@ -21,6 +21,7 @@ func main() {
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
+	//отлавливаем сигналы завершения для сервера с помощью контекста
 	ctx := util.NewSignalContextHandle(unix.SIGINT, unix.SIGTERM)
 	errChan := make(chan error)
 	api := handler.NewRouter()
@@ -29,9 +30,11 @@ func main() {
 	go func() {
 		errChan <- server.Run()
 	}()
+
 	select {
 	case err := <-errChan:
-		fmt.Println(err)
+		logger.Error("There is error on server's side")
+		logger.Error(err.Error())
 	case <-ctx.Done():
 		server.Stop(context.Background())
 	}
