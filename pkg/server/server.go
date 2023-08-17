@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -46,7 +47,7 @@ func (s *HTTPServer) Run() error {
 	s.logger.Info("Start server on " + s.server.Addr)
 	err := s.server.ListenAndServe()
 
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		s.logger.Error("Server error " + err.Error())
 	}
 
@@ -80,5 +81,6 @@ func (s *HTTPServer) Stop(ctx context.Context) error {
 		}
 	}
 	s.logger.Info("Server is stopped")
+
 	return nil
 }

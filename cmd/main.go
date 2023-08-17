@@ -21,7 +21,6 @@ func main() {
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	//отлавливаем сигналы завершения для сервера с помощью контекста
 	ctx := util.NewSignalContextHandle(unix.SIGINT, unix.SIGTERM)
 	errChan := make(chan error)
 	api := handler.NewRouter()
@@ -36,6 +35,9 @@ func main() {
 		logger.Error("There is error on server's side")
 		logger.Error(err.Error())
 	case <-ctx.Done():
-		server.Stop(context.Background())
+		err := server.Stop(context.Background())
+		if err != nil {
+			logger.Fatal("Unexpected error: " + err.Error())
+		}
 	}
 }

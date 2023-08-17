@@ -6,9 +6,22 @@ run:
 #   # See the dedicated "output" documentation section.
 #   option: value
 # # All available settings of specific linters.
-# linters-settings:
-#   # See the dedicated "linters-settings" documentation section.
-#   option: value
+linters-settings:
+  depguard:
+    rules:
+      main:
+        files:
+          - $all
+          - "!$test"
+        allow:
+          - $gostd
+          - github.com/ # all github packages
+      test:
+        files:
+          - "$test"
+        allow:
+          - $gostd
+          - github.com/stretchr
 linters:
   # See the dedicated "linters" documentation section.
   enable-all: true
@@ -22,6 +35,9 @@ linters:
     - gofumpt
     - godox
     - varnamelen
+    - revive
+    - paralleltest
+    - testpackage
     # are deprecated by authors
     - maligned
     - ifshort
