@@ -21,3 +21,10 @@
 go.work
 /build
 /.vscode
+
+# Logs
+*.log 
+/log 
+
+#envoirements
+*.env

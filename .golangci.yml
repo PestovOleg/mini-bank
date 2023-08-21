@@ -38,6 +38,7 @@ linters:
     - revive
     - paralleltest
     - testpackage
+    - tagalign
     # are deprecated by authors
     - maligned
     - ifshort

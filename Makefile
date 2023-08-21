@@ -7,7 +7,9 @@ build:
 	mkdir -p build/; go build -o build/minibank cmd/main.go
 
 run:
-	rm -rf build/ && mkdir -p build/; go build -o build/minibank cmd/main.go && build/minibank
+	rm -rf build/ && mkdir -p build/
+	go build -o build/minibank cmd/main.go
+	cd build && ./minibank
 
 clean:
 	rm -rf build/

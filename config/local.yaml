@@ -1,0 +1,12 @@
+#конфигурация HTTP-сервера
+http_server:
+  address: ":3333"
+  read_timeout: 5s
+  write_timeout: 5s
+  max_header_bytes: 1000
+  shutdown_time: 5s
+  read_header_timeout: 5s
+  idle_timeout: 120s
+
+log_file_path: "./my.log" #путь к логам
+env: "local" #окружение local/prod

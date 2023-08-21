@@ -4,35 +4,26 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"time"
 
+	"github.com/PestovOleg/mini-bank/internal/config"
 	"github.com/PestovOleg/mini-bank/pkg/util"
 	"go.uber.org/zap"
 )
 
-type Config struct {
-	Addr              string
-	ReadTimeout       time.Duration
-	WriteTimeout      time.Duration
-	MaxHeadersBytes   int
-	ShutDownTime      time.Duration
-	ReadHeaderTimeout time.Duration
-}
-
 type HTTPServer struct {
 	server *http.Server
-	config Config
+	config config.HTTPServerConfig
 	logger *zap.Logger
 }
 
-func NewServer(config Config, handler http.Handler) *HTTPServer {
+func NewServer(config config.HTTPServerConfig, handler http.Handler) *HTTPServer {
 	server := &http.Server{
 		Addr:              config.Addr,
 		Handler:           handler,
 		ReadTimeout:       config.ReadTimeout,
 		WriteTimeout:      config.WriteTimeout,
 		MaxHeaderBytes:    config.MaxHeadersBytes,
-		IdleTimeout:       120 * time.Second,
+		IdleTimeout:       config.IdleTimeout,
 		ReadHeaderTimeout: config.ReadHeaderTimeout,
 	}
 

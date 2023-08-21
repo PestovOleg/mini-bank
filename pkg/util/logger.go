@@ -26,7 +26,7 @@ var logCfg = zap.Config{
 		Thereafter: 200,
 	},
 	Encoding:         "console",
-	OutputPaths:      []string{"stdout"},
+	OutputPaths:      []string{"stdout", "my.log"},
 	ErrorOutputPaths: []string{"stderr"},
 }
 

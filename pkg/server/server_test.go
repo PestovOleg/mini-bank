@@ -7,16 +7,19 @@ import (
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/PestovOleg/mini-bank/internal/config"
 )
 
 func TestHTTPServer_Run(t *testing.T) {
-	config := Config{
+	config := config.HTTPServerConfig{
 		Addr:              ":3333",
 		ReadTimeout:       5 * time.Second,
 		WriteTimeout:      5 * time.Second,
 		MaxHeadersBytes:   1000,
 		ShutDownTime:      5 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Server test request")
@@ -67,13 +70,14 @@ func TestHTTPServer_Run(t *testing.T) {
 }
 
 func TestHTTPServerStop(t *testing.T) {
-	config := Config{
+	config := config.HTTPServerConfig{
 		Addr:              ":3333",
 		ReadTimeout:       5 * time.Second,
 		WriteTimeout:      5 * time.Second,
 		MaxHeadersBytes:   1000,
 		ShutDownTime:      5 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Server test request")
