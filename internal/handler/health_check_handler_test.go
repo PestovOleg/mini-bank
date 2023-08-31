@@ -6,9 +6,17 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/PestovOleg/mini-bank/pkg/util"
 )
 
 func TestHealthCheckHandler_ServeHTTP(t *testing.T) {
+	err := util.InitMockLogger()
+
+	if err != nil {
+		t.Fatalf("Cannot initialize logger, %v", err)
+	}
+
 	handler := NewHealthCheckHandler()
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil)
@@ -29,7 +37,7 @@ func TestHealthCheckHandler_ServeHTTP(t *testing.T) {
 	bodyBytes, err := io.ReadAll(rr.Body)
 
 	if err != nil {
-		t.Fatalf("Cant read Body, err: %v", err)
+		t.Fatalf("Can't read Body, err: %v", err)
 	}
 
 	bodyString := string(bodyBytes)

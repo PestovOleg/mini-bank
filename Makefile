@@ -9,7 +9,7 @@ build:
 run:
 	rm -rf build/ && mkdir -p build/
 	go build -o build/minibank cmd/main.go
-	cd build && ./minibank
+	CONFIG_PATH=./config/local.yaml build/minibank
 
 clean:
 	rm -rf build/

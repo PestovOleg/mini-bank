@@ -8,7 +8,7 @@ import (
 )
 
 func NewRouter() http.Handler {
-	log := util.Getlogger("API")
+	log := util.GetLogger("API")
 	r := mux.NewRouter()
 	subRouter := r.PathPrefix("/v1").Subrouter()
 	SetHandler(subRouter, BaseRoutes(log))

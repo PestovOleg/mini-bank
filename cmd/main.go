@@ -4,20 +4,34 @@ import (
 	"context"
 
 	"github.com/PestovOleg/mini-bank/internal/config"
-	"github.com/PestovOleg/mini-bank/pkg/handler"
+	"github.com/PestovOleg/mini-bank/internal/handler"
 	"github.com/PestovOleg/mini-bank/pkg/server"
 	"github.com/PestovOleg/mini-bank/pkg/util"
 	"golang.org/x/sys/unix"
 )
 
 func main() {
-	logger := *util.Getlogger("server")
 	cfg := config.LoadConfig()
+	err := util.InitLogger(&cfg)
 
+	if err != nil {
+		panic("Logger cannot be initialized")
+	}
+
+	logger := util.GetLogger("server")
+	srvCfg := server.HTTPServerConfig{
+		Addr:              cfg.HTTPServerAppConfig.Addr,
+		ReadTimeout:       cfg.HTTPServerAppConfig.ReadTimeout,
+		WriteTimeout:      cfg.HTTPServerAppConfig.WriteTimeout,
+		MaxHeadersBytes:   cfg.HTTPServerAppConfig.MaxHeadersBytes,
+		ShutDownTime:      cfg.HTTPServerAppConfig.ShutDownTime,
+		ReadHeaderTimeout: cfg.HTTPServerAppConfig.ReadHeaderTimeout,
+		IdleTimeout:       cfg.HTTPServerAppConfig.IdleTimeout,
+	}
 	ctx := util.NewSignalContextHandle(unix.SIGINT, unix.SIGTERM)
 	errChan := make(chan error)
 	api := handler.NewRouter()
-	server := server.NewServer(cfg.HTTPServerConfig, api)
+	server := server.NewServer(srvCfg, api)
 
 	go func() {
 		errChan <- server.Run()

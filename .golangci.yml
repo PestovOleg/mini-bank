@@ -7,6 +7,18 @@ run:
 #   option: value
 # # All available settings of specific linters.
 linters-settings:
+  tagliatelle:
+    # Check the struck tag name case.
+    case:
+      # Use the struct field name to check the name of the struct tag.
+      # Default: false
+      use-field-name: true
+      rules:
+        # Any struct tag type can be used.
+        # Support string case: `camel`, `pascal`, `kebab`, `snake`, `upperSnake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`, `header`.
+        json: camel
+        yaml: snake
+        xml: camel
   depguard:
     rules:
       main:
@@ -18,10 +30,10 @@ linters-settings:
           - github.com/ # all github packages
       test:
         files:
-          - "$test"
+          - $all
         allow:
           - $gostd
-          - github.com/stretchr
+          - github.com/
 linters:
   # See the dedicated "linters" documentation section.
   enable-all: true

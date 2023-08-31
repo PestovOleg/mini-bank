@@ -1,11 +1,19 @@
 package util
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetLogger(t *testing.T) {
-	logger1 := Getlogger("server1")
-	logger2 := Getlogger("server2")
-	logger1Again := Getlogger("server1")
+	err := InitMockLogger()
+
+	if err != nil {
+		t.Fatalf("Cannot initialize logger, %v", err)
+	}
+
+	logger1 := GetLogger("server1")
+	logger2 := GetLogger("server2")
+	logger1Again := GetLogger("server1")
 
 	if logger1 == logger2 {
 		t.Errorf("Expected different loggers for different system names")
@@ -17,6 +25,12 @@ func TestGetLogger(t *testing.T) {
 }
 
 func TestSugaredLogger(t *testing.T) {
+	err := InitMockLogger()
+
+	if err != nil {
+		t.Fatalf("Cannot initialize logger, %v", err)
+	}
+
 	logger1 := GetSugaredLogger("server")
 	if logger1 == nil {
 		t.Errorf("Expected Sugared Logger not nil")

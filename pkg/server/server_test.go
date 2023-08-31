@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/PestovOleg/mini-bank/internal/config"
+	"github.com/PestovOleg/mini-bank/pkg/util"
 )
 
 func TestHTTPServer_Run(t *testing.T) {
-	config := config.HTTPServerConfig{
+	config := HTTPServerConfig{
 		Addr:              ":3333",
 		ReadTimeout:       5 * time.Second,
 		WriteTimeout:      5 * time.Second,
@@ -24,6 +24,11 @@ func TestHTTPServer_Run(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Server test request")
 	})
+	err := util.InitMockLogger()
+
+	if err != nil {
+		t.Fatalf("Cannot initialize logger, %v", err)
+	}
 
 	t.Logf("Testing running HTTP server with config: %v", config)
 	server := NewServer(config, handler)
@@ -70,7 +75,7 @@ func TestHTTPServer_Run(t *testing.T) {
 }
 
 func TestHTTPServerStop(t *testing.T) {
-	config := config.HTTPServerConfig{
+	config := HTTPServerConfig{
 		Addr:              ":3333",
 		ReadTimeout:       5 * time.Second,
 		WriteTimeout:      5 * time.Second,
@@ -83,12 +88,18 @@ func TestHTTPServerStop(t *testing.T) {
 		fmt.Fprintf(w, "Server test request")
 	})
 
+	err := util.InitMockLogger()
+
+	if err != nil {
+		t.Fatalf("Cannot initialize logger, %v", err)
+	}
+
 	server := NewServer(config, handler)
 	t.Logf("HTTP server is running with config: %v", config)
 	time.Sleep(1 * time.Second)
 	t.Log("Testing stopping HTTP server")
 
-	err := server.Stop(context.Background())
+	err = server.Stop(context.Background())
 	if err != nil {
 		t.Fatalf("Failed to stop server: %v", err)
 	}
