@@ -16,3 +16,6 @@ clean:
 
 docker:
 	docker build -t minibank:0.0.1 .
+
+gitlog:
+	git log --pretty=format:"%H [%cd]: %an - %s" --graph --date=format:%c

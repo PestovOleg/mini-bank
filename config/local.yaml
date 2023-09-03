@@ -11,6 +11,7 @@ http_server_app_config:
 log_file_path: "./my.log" #путь к логам
 env: "local" #окружение local/prod
 
+#конфигурация логгера
 logger_cfgs:
   - encoding: "console"
     output: "stdout"
