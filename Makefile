@@ -15,7 +15,7 @@ clean:
 	rm -rf build/
 
 docker:
-	docker build -t minibank:0.0.1 .
+	docker build -t minibank:0.1.0 .
 
 gitlog:
 	git log --pretty=format:"%H [%cd]: %an - %s" --graph --date=format:%c
