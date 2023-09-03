@@ -1,17 +1,21 @@
 name: CD 
 
 on:
-  push:
-    branches:
-      - "main"
-    tags:
-      - "*.*.*"
+  #push:
+  #  branches:
+  #    - "main"
+  #  tags:
+  #    - "*.*.*"
   workflow_dispatch:
     inputs:
       reason:
         description: "Name the reason"
         default: "Just because"
         required: true
+      version:
+        description: 'Docker image version'
+        required: true
+        default: 'latest'
   
 jobs:
   build:
@@ -44,5 +48,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{github.ref_name}}"
-          labels: ${{github.ref_name}}
+          tags: ${{ github.event.inputs.version }}
+          labels: ${{ github.event.inputs.version }}
