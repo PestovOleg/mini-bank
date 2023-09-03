@@ -48,5 +48,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ github.event.inputs.version }}
-          labels: ${{ github.event.inputs.version }}
+          tags: pistollo/minibank:${{ github.event.inputs.version }}
+          labels: pistollo/minibank:${{ github.event.inputs.version }}
