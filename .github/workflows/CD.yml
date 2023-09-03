@@ -30,9 +30,10 @@ jobs:
         run: mkdir -p build/; go build -o build/minibank cmd/main.go
 
       #вывести тег для использования в версии image
-      - name: Get latest tag
-        id: gettag
-        run: echo ::set-output name=tag::$(git describe --tags --abbrev=0)
+      - name: Versioning
+        uses: nowsprinting/check-version-format-action@v3
+        id: version
+      - run: echo "Version is $${{ steps.version.outputs.full }}"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -43,4 +44,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: pistollo/minibank:${{ steps.gettag.outputs.tag }}
+          tags: pistollo/minibank:$${{ steps.version.outputs.full }}"
