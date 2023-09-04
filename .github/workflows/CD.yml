@@ -37,7 +37,10 @@ jobs:
         with:
           name: minibank
           path: build/
-
+      - name: List files in build directory
+        run: |
+          echo "проверка наличия сборки"
+          ls -al build/
       #вывести тег для использования в версии image
       - name: Versioning        
         run: echo "Version is ${{ github.event.inputs.version }}"
@@ -52,6 +55,10 @@ jobs:
         with:
           name: minibank
           path: build/
+      - name: List files in build directory
+        run: |
+          echo "проверка наличия сборки на шаге сборки образа"
+          ls -al build
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
