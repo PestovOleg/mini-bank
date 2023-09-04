@@ -75,6 +75,7 @@ jobs:
           script: |
             cd /opt/mini-bank
             git pull origin main
+            export CONFIG_PATH=${{ vars.CONFIG_PATH }}
             echo "CONFIG_PATH: $CONFIG_PATH"
             docker pull pistollo/minibank:${{ github.event.inputs.version }}
             docker run -v $CONFIG_PATH:/app/$CONFIG_PATH -e CONFIG_PATH=$CONFIG_PATH pistollo/minibank:${{ github.event.inputs.version }}
