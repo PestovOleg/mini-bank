@@ -73,6 +73,7 @@ jobs:
           labels: pistollo/minibank:${{ github.event.inputs.version }}
   
   deploy:
+    needs: build
     name: Deploy 
     runs-on: ubuntu-20.04
     env:
