@@ -55,7 +55,7 @@ jobs:
     name: Deploy 
     runs-on: ubuntu-20.04
     env:
-      MY_SECRET_ENV: ${{ vars.CONFIG_PATH }}
+      CONFIG_PATH: ${{ vars.CONFIG_PATH }}
     steps:
       - name: SSH connect
         uses: appleboy/ssh-action@v1.0.0
@@ -64,8 +64,9 @@ jobs:
           username: ${{ secrets.SSH_SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd opt/mini-bank
+            cd /opt/mini-bank
             git pull origin main
             ll
             echo "CONFIG_PATH: $CONFIG_PATH"
             docker pull pistollo/minibank:${{ github.event.inputs.version }}
+            docker run -it pistollo/minibank:${{ github.event.inputs.version }}
