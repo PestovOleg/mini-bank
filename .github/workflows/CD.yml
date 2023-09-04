@@ -59,6 +59,10 @@ jobs:
         run: |
           echo "проверка наличия сборки на шаге сборки образа"
           ls -al build
+          ls
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
