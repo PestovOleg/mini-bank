@@ -30,8 +30,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Build
-        run: mkdir -p build/; go build -o build/minibank cmd/main.go
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
@@ -62,7 +60,8 @@ jobs:
           ls
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
+      - name: Build
+        run: mkdir -p build/; go build -o build/minibank cmd/main.go
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
