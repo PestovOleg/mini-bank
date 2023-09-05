@@ -76,4 +76,4 @@ jobs:
             export CONFIG_PATH=${{ vars.CONFIG_PATH }}
             echo "CONFIG_PATH: $CONFIG_PATH"
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
-            docker run -p 80:3333 -v $CONFIG_PATH:/app/$CONFIG_PATH -e CONFIG_PATH=$CONFIG_PATH ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+            docker run -p 80:3333 -e CONFIG_PATH=$CONFIG_PATH ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
