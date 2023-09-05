@@ -1,6 +1,6 @@
 #конфигурация HTTP-сервера
 http_server_app_config:
-  addr: ":3333"
+  addr: "0.0.0.0:3333"
   read_timeout: 5s
   write_timeout: 5s
   max_headers_bytes: 1000
@@ -8,7 +8,7 @@ http_server_app_config:
   read_header_timeout: 5s
   idle_timeout: 120s
 
-env: "local" #окружение local/prod
+env: "prod" #окружение local/prod
 
 #конфигурация логгера
 logger_cfgs:

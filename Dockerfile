@@ -1,7 +1,6 @@
 FROM golang:1.20-alpine
 
 WORKDIR /app
-COPY build/minibank ./
-COPY ./config/local.yaml ./
-ENV CONFIG_PATH=./local.yaml
-ENTRYPOINT ["./minibank"]
+COPY ./ ./
+RUN mkdir -p build/; go build -o build/minibank cmd/main.go
+ENTRYPOINT ["./build/minibank"]
