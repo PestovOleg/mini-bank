@@ -1,5 +1,6 @@
 name: CD 
 
+# Автосборка приостановлена //TODO: включить после полной настройки CD
 on:
   #push:
   #  branches:
@@ -21,62 +22,47 @@ jobs:
   build:
     name: Build and push Docker image to Dockerhub
     runs-on: ubuntu-20.04
+
+# заливаем исходники
     steps:
-      - name: Setup Go
+      - name: Check out code                        
+        uses: actions/checkout@v3
+
+# ставим Go
+      - name: Setup Go                              
         uses: actions/setup-go@v4
         with:
           go-version: 1.20.6
 
-      - name: Check out code
-        uses: actions/checkout@v3
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: minibank
-          path: build/
-      - name: List files in build directory
-        run: |
-          echo "проверка наличия сборки"
-          ls -al build/
-      #вывести тег для использования в версии image
+# вывести тег для использования в версии image (//TODO: вывод версии при пуше)
       - name: Versioning        
         run: echo "Version is ${{ github.event.inputs.version }}"
-      
+
+# логинимся в докерхаб      
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: minibank
-          path: build/
-      - name: List files in build directory
-        run: |
-          echo "проверка наличия сборки на шаге сборки образа"
-          ls -al build
-          ls
+
+# собираем образ и пушим в докерхаб      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Build
-        run: mkdir -p build/; go build -o build/minibank cmd/main.go
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: pistollo/minibank:${{ github.event.inputs.version }}
-          labels: pistollo/minibank:${{ github.event.inputs.version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+          labels: ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
   
   deploy:
     needs: build
     name: Deploy 
     runs-on: ubuntu-20.04
-    env:
-      CONFIG_PATH: ${{ vars.CONFIG_PATH }}
+    
+# коннектимся по SSH,скачиваем образ и запускаем //TODO: запуск образа сменить на запуск скрипта swap.sh для blue-green деплоя
     steps:
       - name: SSH connect
         uses: appleboy/ssh-action@v1.0.0
@@ -89,5 +75,5 @@ jobs:
             git pull origin main
             export CONFIG_PATH=${{ vars.CONFIG_PATH }}
             echo "CONFIG_PATH: $CONFIG_PATH"
-            docker pull pistollo/minibank:${{ github.event.inputs.version }}
-            docker run -v $CONFIG_PATH:/app/$CONFIG_PATH -e CONFIG_PATH=$CONFIG_PATH pistollo/minibank:${{ github.event.inputs.version }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+            docker run -p 80:3333 -v $CONFIG_PATH:/app/$CONFIG_PATH -e CONFIG_PATH=$CONFIG_PATH ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
