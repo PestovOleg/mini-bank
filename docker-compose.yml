@@ -1,0 +1,76 @@
+services:
+  
+  db:
+    image: postgres:15.4-alpine
+    container_name: db
+    volumes:
+      - pgdata:/var/lib/postgresql/data_minibank
+    environment:
+      POSTGRES_DB: postgres_db
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+    secrets:
+      - db_secret
+    ports:
+      - 5432:5432
+    networks:
+      minibank_net:
+    restart: unless-stopped
+
+  blue-backend:
+    image: pistollo/minibank:${APP_VERSION}
+    container_name: blue-backend
+    hostname: blue-backend
+    environment:
+      CONFIG_PATH: ${CONFIG_PATH}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log
+    depends_on:
+      - db
+    networks:
+      minibank_net:
+    restart: unless-stopped
+
+  green-backend:
+    image: pistollo/minibank:${APP_VERSION}
+    container_name: green-backend
+    hostname: green-backend
+    environment:
+      CONFIG_PATH: ${CONFIG_PATH}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log
+    depends_on:
+      - db
+    networks:
+      minibank_net:
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.25.2-alpine
+    container_name: nginx
+    volumes:
+      - /var/log/nginx:/var/log/nginx
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    ports:
+        - 80:80
+    hostname: nginx
+    depends_on:
+      - db
+    networks:
+      minibank_net:
+    restart: unless-stopped
+
+secrets:
+  db_secret:
+    file: ${SECRET_PATH}
+
+volumes:
+  pgdata:
+
+networks:
+  minibank_net:
