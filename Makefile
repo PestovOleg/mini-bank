@@ -19,3 +19,15 @@ docker:
 
 gitlog:
 	git log --pretty=format:"%H [%cd]: %an - %s" --graph --date=format:%c
+
+createdb:
+	docker exec -it db createdb --username=postgres --owner=postgres p2pexchange
+
+dropdb:
+	docker exec -it db dropdb simple_bank
+
+migrateup:
+	migrate -path db/migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose up
+
+migratedown:
+	migrate -path db/migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose down

@@ -24,3 +24,12 @@ logger_cfgs:
   - encoding: "json"
     output: "error.log"
     level: "error"
+
+#конфиг postgresql_db
+postgres_db:
+  user: "minibank_user"
+  password: "minibank_pass"
+  host: "db"
+  port: "5432"
+  name: "minibank_db"
+  ssl_mode: "off"

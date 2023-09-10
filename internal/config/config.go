@@ -17,6 +17,7 @@ type AppConfig struct {
 	Env                 string              `yaml:"env" env-default:"development"`
 	HTTPServerAppConfig HTTPServerAppConfig `yaml:"http_server_app_config"`
 	LoggerCfgs          []LoggerConfig      `yaml:"logger_cfgs"`
+	PostgresDBConfig    PostgresDBConfig    `yaml:"postgres_db"`
 }
 
 type HTTPServerAppConfig struct {
@@ -33,6 +34,15 @@ type LoggerConfig struct {
 	Encoding string `yaml:"encoding" env-default:"console"`
 	Output   string `yaml:"output" env-default:"stdout"`
 	Level    string `yaml:"level" env-default:"debug"`
+}
+
+type PostgresDBConfig struct {
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Host     string `yaml:"host" env-default:"0.0.0.0"`
+	Port     string `yaml:"port" env-default:"5432"`
+	Name     string `yaml:"name"`
+	SSLMode  string `yaml:"ssl_mode"`
 }
 
 func LoadConfig() AppConfig {

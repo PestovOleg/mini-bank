@@ -51,6 +51,7 @@ linters:
     - paralleltest
     - testpackage
     - tagalign
+    - wrapcheck
     # are deprecated by authors
     - maligned
     - ifshort
