@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"go.uber.org/zap"
+	_ "github.com/lib/pq" // working with driver
 )
 
 type dbcon struct {
@@ -32,33 +32,32 @@ func NewDBCon(user, password, host, port, name, sslMode string) *dbcon {
 var sConns *sql.DB
 var sConnsMx sync.Mutex
 
-func GetDBCon() *sql.DB {
+func GetDBCon(conn *dbcon) (*sql.DB, error) {
 	sConnsMx.Lock()
 	defer sConnsMx.Unlock()
-
 	if sConns == nil {
-		connStr := getConString()
+		connStr := getConString(conn)
 		sConns, err := sql.Open("postgres", connStr)
 
 		if err != nil {
-			fmt.Println("Error at opening database connection", zap.Error(err))
+			return nil, err
 		}
 
-		return sConns
+		return sConns, nil
 	}
 
-	return sConns
+	return sConns, nil
 }
 
-// return connection string
-func getConString() string {
+// возврат строки коннекта
+func getConString(conn *dbcon) string {
 
 	return fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s",
-		con.User,
-		con.Password,
-		con.Host,
-		con.Port,
-		con.Name,
-		con.SSLMode,
+		conn.User,
+		conn.Password,
+		conn.Host,
+		conn.Port,
+		conn.Name,
+		conn.SSLMode,
 	)
 }

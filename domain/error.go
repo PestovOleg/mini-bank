@@ -1,6 +1,5 @@
 // Сборник однотипных ошибок
-
-package entity
+package domain
 
 import "errors"
 

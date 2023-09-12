@@ -1,9 +1,10 @@
-package entity
+package user
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/PestovOleg/mini-bank/domain"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -37,7 +38,7 @@ func NewUser(userName, email, name, lastName, patronymic, password string) (*Use
 
 	err := u.ValidateUser()
 	if err != nil {
-		return nil, ErrMustBeFilledIn
+		return nil, domain.ErrMustBeFilledIn
 	}
 
 	hash, err := generateHash(u.Password)
@@ -50,10 +51,10 @@ func NewUser(userName, email, name, lastName, patronymic, password string) (*Use
 	return u, nil
 }
 
-// TODO: сделать проверки дополнительные(regex)
+// TODO: сделать проверки дополнительные
 func (u *User) ValidateUser() error {
 	if u.Username == "" || u.Email == "" || u.Name == "" || u.LastName == "" || u.Patronymic == "" {
-		return ErrMustBeFilledIn
+		return domain.ErrMustBeFilledIn
 	}
 
 	return nil
@@ -77,4 +78,41 @@ func (u *User) CheckPassword(pwd string) error {
 	}
 
 	return nil
+}
+
+// Reader
+// Get - информация о записи клиента
+// List - вернуть все записи
+type Reader interface {
+	Get(id uuid.UUID) (*User, error)
+	List() ([]*User, error)
+}
+
+// Writer
+// Create - создать запись с пользователем
+// Update - обновить пользователя новыми значениями
+// Delete - установить признак удаления (пользователь не может быть удален)
+type Writer interface {
+	Create(u *User) (uuid.UUID, error)
+	Update(u *User) error
+}
+
+// Repository -композиция интерфейсов Writer и Reader
+type Repository interface {
+	Reader
+	Writer
+}
+
+// Usecase интерфейс
+// GetUser - поиск пользователя
+// ListUsers - список пользователей
+// CreateUser - создание пользователя
+// UpdateUser - обновление данных пользователя
+
+type UseCase interface {
+	GetUser(id uuid.UUID) (*User, error)
+	ListUsers() ([]*User, error)
+	CreateUser(username, email, name, lastName, patronymic, password string) (uuid.UUID, error)
+	UpdateUser(u *User) error
+	DeleteUser(uuid.UUID) error
 }

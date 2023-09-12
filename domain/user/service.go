@@ -4,7 +4,7 @@ package user
 import (
 	"time"
 
-	"github.com/PestovOleg/mini-bank/entity"
+	"github.com/PestovOleg/mini-bank/domain"
 	"github.com/google/uuid"
 )
 
@@ -20,18 +20,18 @@ func NewService(r Repository) *Service {
 }
 
 // GetUser Поиск пользователя
-func (s *Service) GetUser(id uuid.UUID) (*entity.User, error) {
+func (s *Service) GetUser(id uuid.UUID) (*User, error) {
 	return s.repo.Get(id)
 }
 
 // ListUsers Список пользователей
-func (s *Service) ListUsers() ([]*entity.User, error) {
+func (s *Service) ListUsers() ([]*User, error) {
 	return s.repo.List()
 }
 
 // CreateUser Создать пользователя
 func (s *Service) CreateUser(username, email, name, lastName, patronymic, password string) (uuid.UUID, error) {
-	u, err := entity.NewUser(username, email, name, lastName, patronymic, password)
+	u, err := NewUser(username, email, name, lastName, patronymic, password)
 	if err != nil {
 		return u.ID, err
 	}
@@ -40,7 +40,7 @@ func (s *Service) CreateUser(username, email, name, lastName, patronymic, passwo
 }
 
 // UpdateUser Обновить пользователя
-func (s *Service) UpdateUser(u *entity.User) error {
+func (s *Service) UpdateUser(u *User) error {
 	err := u.ValidateUser()
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (s *Service) UpdateUser(u *entity.User) error {
 func (s *Service) DeleteUser(id uuid.UUID) error {
 	u, err := s.GetUser(id)
 	if err == nil {
-		return entity.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	if err != nil {
