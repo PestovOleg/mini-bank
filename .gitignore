@@ -28,3 +28,6 @@ go.work
 
 #envoirements
 *.env
+
+*.helper
+*.back

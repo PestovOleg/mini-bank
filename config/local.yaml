@@ -24,3 +24,18 @@ logger_cfgs:
   - encoding: "json"
     output: "error.log"
     level: "error"
+
+#конфиг postgresql_db_config
+postgres_db_config:
+  user: "minibank_user"
+  password: "minibank_password"
+  host: "db"
+  port: "5432"
+  name: "minibank_db"
+  ssl_mode: "disable"
+
+#конфиг unleash сервера
+unleash_server_config:
+  app_name: "minibank"
+  URL: "http://unleash:4242/api/"
+  api_token: "*:development.d786e3da415cebb19f1db10701b7bf7a244472e8c39ce130ad263974"
