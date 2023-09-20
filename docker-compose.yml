@@ -22,20 +22,20 @@ services:
 
   adminer:
     image: adminer:4.8.1
-    restart: always
     ports:
       - 8002:8080
     networks:
       minibank_net:
-    links: 
+    depends_on: 
       - db
+    restart: unless-stopped
 
   migrate:
     image: migrate/migrate
     networks:
       minibank_net:  
     volumes:
-      - ./internal/migrations:/migrations
+      - ./backend/internal/migrations:/migrations
     command: ["-path", "/migrations", "-database",  "postgres://${MINIBANK_USER}:${MINIBANK_PASSWORD}@db:5432/${MINIBANK_DB}?sslmode=disable", "up", "5"]
     depends_on: 
       - db
@@ -54,10 +54,11 @@ services:
       - 4242:4242
     depends_on:
       - db
+    restart: unless-stopped
 
   swagger:    
     image: swaggerapi/swagger-ui
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./docs:/docs
     environment:

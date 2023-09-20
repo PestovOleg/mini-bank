@@ -92,7 +92,7 @@ func generateHash(pwd string) (string, error) {
 }
 
 // проверка пароля
-func (u *User) CheckPassword(pwd string) error {
+func (u *User) VerifyPassword(pwd string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(pwd))
 	if err != nil {
 		return fmt.Errorf("password is incorrect %w", err)

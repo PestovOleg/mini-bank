@@ -54,6 +54,7 @@ linters:
     - wrapcheck
     - tagliatelle
     - cyclop
+    - funlen
     # are deprecated by authors
     - maligned
     - ifshort

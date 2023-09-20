@@ -38,4 +38,4 @@ postgres_db_config:
 unleash_server_config:
   app_name: "minibank"
   URL: "http://0.0.0.0:4242/api/"
-  api_token: "*:development.be6360e3b2b14a88bd2aa93c523e4d9a02f1948d82d5f00089c15f11"
+  api_token: "*:production.b67bce39458a02e39bea6bc52c1e571b944b1dffe10c4e61d43303ee"

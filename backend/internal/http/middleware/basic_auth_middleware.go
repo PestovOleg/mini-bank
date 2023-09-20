@@ -25,7 +25,7 @@ func BasicAuthMiddleware(s *user.Service) mux.MiddlewareFunc {
 				return
 			}
 
-			err = u.CheckPassword(pass)
+			err = u.VerifyPassword(pass)
 			if err != nil {
 				unauthorized(w)
 
