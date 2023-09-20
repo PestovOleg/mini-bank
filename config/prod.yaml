@@ -14,7 +14,7 @@ env: "prod" #окружение local/prod
 logger_cfgs:
   - encoding: "console"
     output: "stdout"
-    level: "debug"
+    level: "info"
   - encoding: "console"
     output: "stderr"
     level: "error"
@@ -25,11 +25,17 @@ logger_cfgs:
     output: "error.log"
     level: "error"
 
-#конфиг postgresql_db
-postgres_db:
+#конфиг postgresql_db_config
+postgres_db_config:
   user: "minibank_user"
-  password: "minibank_pass"
+  password: "minibank_password"
   host: "db"
   port: "5432"
   name: "minibank_db"
-  ssl_mode: "off"
+  ssl_mode: "disable"
+
+#конфиг unleash сервера
+unleash_server_config:
+  app_name: "minibank"
+  URL: "http://0.0.0.0:4242/api/"
+  api_token: "*:development.be6360e3b2b14a88bd2aa93c523e4d9a02f1948d82d5f00089c15f11"

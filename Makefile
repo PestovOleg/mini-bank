@@ -4,15 +4,15 @@ lint:
 	golangci-lint run ./...
 
 build:
-	mkdir -p build/; go build -o build/minibank cmd/main.go
+	go build -o backend/build/minibank backend/cmd/main.go
 
 run:
-	rm -rf build/ && mkdir -p build/
-	go build -o build/minibank cmd/main.go
-	CONFIG_PATH=./config/local.yaml build/minibank
+	rm -rf backend/build/ && mkdir -p backend/build/
+	go build -o backend/build/minibank backend/cmd/main.go
+	CONFIG_PATH=./config/local.yaml backend/build/minibank
 
 clean:
-	rm -rf build/
+	rm -rf backend/build/
 
 docker:
 	docker build -t minibank:0.1.0 .
@@ -27,7 +27,7 @@ dropdb:
 	docker exec -it db dropdb simple_bank
 
 migrateup:
-	migrate -path db/migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose up
+	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose up
 
 migratedown:
-	migrate -path db/migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose down
+	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose down

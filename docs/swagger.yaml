@@ -1,0 +1,151 @@
+basePath: /api/v1
+definitions:
+  mapper.User:
+    properties:
+      created_at:
+        example: "2023-09-19T10:58:00.000Z"
+        type: string
+      email:
+        example: Ivanych@gmail.com
+        type: string
+      id:
+        example: fdee7aae-f79f-4653-8a16-9207e6805b93
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      last_name:
+        example: Ivanov
+        type: string
+      name:
+        example: Ivan
+        type: string
+      patronymic:
+        example: Ivanych
+        type: string
+      updated_at:
+        example: "2023-09-19T10:58:00.000Z"
+        type: string
+      username:
+        example: Ivanych
+        type: string
+    type: object
+  user.UserCreateRequest:
+    properties:
+      email:
+        example: Ivanych@gmail.com
+        type: string
+      lastName:
+        example: Ivanov
+        type: string
+      name:
+        example: Ivan
+        type: string
+      password:
+        example: mypass
+        type: string
+      patronymic:
+        example: Ivanych
+        type: string
+      username:
+        description: |-
+          the name for this user
+          required: true
+          min length: 3
+        example: Ivanec
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:3333
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: minibank.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: minibank
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Returns the server's health status.
+      responses:
+        "200":
+          description: Service is healthy - Hello from Health Check Handler Endpoint"
+            "StatusOK
+          schema:
+            type: string
+        "500":
+          description: StatusInternalError
+          schema:
+            type: string
+      summary: Check the health status of the server
+      tags:
+      - server
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user unsing the provided details
+      parameters:
+      - description: User details for creation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 'A new user has been created with ID: {id}'
+          schema:
+            type: uuid
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch the user details using the provided user ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved user details
+          schema:
+            $ref: '#/definitions/mapper.User'
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Retrieve user details based on the provided ID.
+      tags:
+      - users
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
