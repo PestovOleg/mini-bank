@@ -1,0 +1,83 @@
+name: CDTest 
+
+# Автосборка приостановлена //TODO: включить после полной настройки CD
+on:
+  #push:
+  #  branches:
+  #    - "main"
+  #  tags:
+  #    - "*.*.*"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Name the reason"
+        default: "Just because"
+        required: true
+      version:
+        description: 'Docker image version'
+        required: true
+        default: 'latest'
+  
+jobs:
+  build:
+    name: Build and push Docker image to Dockerhub
+    runs-on: ubuntu-20.04
+
+# заливаем исходники
+    steps:
+      - name: Check out code                        
+        uses: actions/checkout@v3
+
+# ставим Go
+      - name: Setup Go                              
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.6
+
+# вывести тег для использования в версии image (//TODO: вывод версии при пуше)
+      - name: Versioning        
+        run: echo "Version is ${{ github.event.inputs.version }}"
+
+# логинимся в докерхаб      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+# собираем образ и пушим в докерхаб      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+          labels: ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+  
+  deploy:
+    needs: build
+    name: Deploy 
+    runs-on: ubuntu-20.04
+    
+# коннектимся по SSH,скачиваем образ и запускаем //TODO: запуск образа сменить на запуск скрипта swap.sh для blue-green деплоя
+    steps:
+      - name: SSH connect
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_SERVER_IP_TEST }}
+          username: ${{ secrets.SSH_SERVER_USER_TEST }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_TEST }}
+          script: |
+            cd /opt/mini-bank
+            git pull origin main
+            export CONFIG_PATH=${{ vars.CONFIG_PATH }}
+            export SECRET_PATH=${{ vars.SECRET_PATH }}
+            echo "CONFIG_PATH: $CONFIG_PATH"
+            echo "SECRET_PATH: $SECRET_PATH"
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+            /bin/bash deploy.sh
+# docker run -p 80:3333 -e CONFIG_PATH=$CONFIG_PATH ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+            

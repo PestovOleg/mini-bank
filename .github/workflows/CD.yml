@@ -74,6 +74,10 @@ jobs:
             cd /opt/mini-bank
             git pull origin main
             export CONFIG_PATH=${{ vars.CONFIG_PATH }}
+            export SECRET_PATH=${{ vars.SECRET_PATH }}
             echo "CONFIG_PATH: $CONFIG_PATH"
+            echo "SECRET_PATH: $SECRET_PATH"
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
-            docker run -p 80:3333 -e CONFIG_PATH=$CONFIG_PATH ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+            /bin/bash deploy.sh
+# docker run -p 80:3333 -e CONFIG_PATH=$CONFIG_PATH ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+            

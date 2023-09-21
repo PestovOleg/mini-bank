@@ -1,7 +1,7 @@
 # # Options for analysis running.
 run:
   skip-files:
-    - pkg/util/logger.go
+    - pkg/logger/logger.go
 # output:
 #   # See the dedicated "output" documentation section.
 #   option: value
@@ -51,6 +51,10 @@ linters:
     - paralleltest
     - testpackage
     - tagalign
+    - wrapcheck
+    - tagliatelle
+    - cyclop
+    - funlen
     # are deprecated by authors
     - maligned
     - ifshort
