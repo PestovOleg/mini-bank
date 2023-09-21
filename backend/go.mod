@@ -1,4 +1,4 @@
-module github.com/PestovOleg/mini-bank
+module github.com/PestovOleg/mini-bank/backend
 
 go 1.20
 
@@ -10,7 +10,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/rs/cors v1.10.0
 	github.com/swaggo/swag v1.16.2
-	go.uber.org/zap v1.25.0
+	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.13.0
 	golang.org/x/sys v0.12.0
 )
@@ -31,7 +31,7 @@ require (
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/twmb/murmur3 v1.1.5 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect

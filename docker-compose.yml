@@ -80,6 +80,7 @@ services:
       - /var/log/minibank/debug.log:/app/debug.log    
     depends_on:
       - db
+      - unleash
     networks:
       minibank_net:
     restart: unless-stopped
@@ -96,6 +97,7 @@ services:
       - /var/log/minibank/debug.log:/app/debug.log
     depends_on:
       - db
+      - unleash
     networks:
       minibank_net:
     restart: unless-stopped
