@@ -4,11 +4,11 @@ lint:
 	golangci-lint run ./...
 
 build:
-	go build -o backend/build/minibank backend/cmd/main.go
+	cd backend && go build -o build/minibank cmd/main.go
 
 run:
 	rm -rf backend/build/ && mkdir -p backend/build/
-	go build -o backend/build/minibank backend/cmd/main.go
+	cd backend && go build -o build/minibank cmd/main.go
 	CONFIG_PATH=./config/local.yaml backend/build/minibank
 
 clean:
@@ -20,14 +20,9 @@ docker:
 gitlog:
 	git log --pretty=format:"%H [%cd]: %an - %s" --graph --date=format:%c
 
-createdb:
-	docker exec -it db createdb --username=postgres --owner=postgres p2pexchange
-
-dropdb:
-	docker exec -it db dropdb simple_bank
-
 migrateup:
-	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose up
+	docker compose up -d migrate
 
 migratedown:
-	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/p2pexchange?sslmode=disable" -verbose down
+	docker run -v ./backend/internal/migrations:/migrations --network mini-bank_minibank_net migrate/migrate \
+    -path=/migrations/ -database postgres://${MINIBANK_USER}:${MINIBANK_PASSWORD}@db:5432/${MINIBANK_DB}?sslmode=disable up 2 

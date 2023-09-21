@@ -22,6 +22,11 @@ echo "Removing old container ..."
 docker compose rm -f -s -v $NEXT_BACKEND
 printf "%s\n" "Done"
 
+echo "Migrating database ..."
+docker compose up -d migrate
+printf "%s\n" "Done...waiting 5 sec"
+sleep 5
+
 echo "Starting $NEXT_BACKEND"
 docker compose up -d $NEXT_BACKEND
 echo "Waiting 5 sec"

@@ -77,9 +77,11 @@ services:
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
-      - /var/log/minibank/debug.log:/app/debug.log    
+      - /var/log/minibank/debug.log:/app/debug.log 
+      - /opt/secrets/config.yaml:./backend/config/config.yaml   
     depends_on:
       - db
+      - unleash
     networks:
       minibank_net:
     restart: unless-stopped
@@ -94,8 +96,10 @@ services:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
       - /var/log/minibank/debug.log:/app/debug.log
+      - /opt/secrets/config.yaml:./backend/config/config.yaml
     depends_on:
       - db
+      - unleash
     networks:
       minibank_net:
     restart: unless-stopped
