@@ -1,6 +1,6 @@
 #конфигурация HTTP-сервера
 http_server_app_config:
-  addr: "0.0.0.0:3333"
+  addr: ":3333"
   read_timeout: 5s
   write_timeout: 5s
   max_headers_bytes: 1000
@@ -8,13 +8,13 @@ http_server_app_config:
   read_header_timeout: 5s
   idle_timeout: 120s
 
-env: "prod" #окружение local/prod
+env: "local" #окружение local/prod
 
 #конфигурация логгера
 logger_cfgs:
   - encoding: "console"
     output: "stdout"
-    level: "info"
+    level: "debug"
   - encoding: "console"
     output: "stderr"
     level: "error"
@@ -38,4 +38,4 @@ postgres_db_config:
 unleash_server_config:
   app_name: "minibank"
   URL: "http://unleash:4242/api/"
-  api_token: "*:production.b67bce39458a02e39bea6bc52c1e571b944b1dffe10c4e61d43303ee"
+  api_token: "*:*.d23ad96007215c59333d254228ced1a439aa5b7b812a4d9067c2e786"
