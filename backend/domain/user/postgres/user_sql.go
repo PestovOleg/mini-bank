@@ -178,6 +178,7 @@ func (r *UserSQL) Update(u *user.User) error {
 	return nil
 }
 
+// TODO: переделать входные параметры
 func (r *UserSQL) Delete(u *user.User) error {
 	rec, err := r.db.Prepare(`
 		update users set is_active=$1,updated_at=$2 where id=$3`)

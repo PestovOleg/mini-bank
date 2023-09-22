@@ -52,7 +52,7 @@ func (s *Service) ListUsers() ([]*User, error) {
 	return s.repo.List()
 }
 
-// CreateUser Создать пользователя
+// CreateUser Создать пользователя TODO: переделать на возврат User?
 func (s *Service) CreateUser(username, email, name, lastName, patronymic, password string) (uuid.UUID, error) {
 	fmt.Printf("%s %s %v %v %v %v", username, email, name, lastName, patronymic, password)
 	u, err := NewUser(username, email, name, lastName, patronymic, password)
