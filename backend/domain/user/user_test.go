@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+//nolint:gochecknoglobals
 var mockUser = &User{
 	ID:         uuid.New(),
 	Username:   "vasyan",
@@ -28,6 +29,7 @@ func TestNewUserTableDriven(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot generate a hash %v", err)
 	}
+
 	mockUser.Password = string(hash)
 
 	tests := []struct {
