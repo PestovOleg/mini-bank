@@ -17,4 +17,13 @@ var (
 
 	// ErrUserIDMustBeEntered User ID must be entered
 	ErrUserIDMustBeEntered = errors.New("user ID must be entered")
+
+	// ErrMustBePositiveOrZero Sum must be positive or more then 0
+	ErrMustBePositiveOrZero = errors.New("sum must be positive or more then 0")
+
+	// ErrNotEnoughMoney Not enough money
+	ErrNotEnoughMoney = errors.New("вам нужно больше зарабатывать,чтобы столько снимать")
+
+	// ErrNotFound Account not found
+	ErrNotFound = errors.New("account not found")
 )

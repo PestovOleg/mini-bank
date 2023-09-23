@@ -107,7 +107,6 @@ func (u *User) VerifyPassword(pwd string) error {
 type Reader interface {
 	GetByID(id uuid.UUID) (*User, error)
 	GetByUName(username string) (*User, error)
-	List() ([]*User, error)
 }
 
 // Writer
@@ -137,7 +136,6 @@ type Repository interface {
 type UseCase interface {
 	GetUserByID(id uuid.UUID) (*User, error)
 	GetUserByUName(username string) (*User, error)
-	ListUsers() ([]*User, error)
 	CreateUser(username, email, name, lastName, patronymic, password string) (uuid.UUID, error)
 	UpdateUser(id uuid.UUID, email, name, lastName, patronymic string) error
 	DeleteUser(id uuid.UUID) error

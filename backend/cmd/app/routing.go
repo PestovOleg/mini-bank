@@ -8,6 +8,7 @@ package app
 import (
 	"net/http"
 
+	handlerAccount "github.com/PestovOleg/mini-bank/backend/internal/http/handler/v1/account"
 	"github.com/PestovOleg/mini-bank/backend/internal/http/handler/v1/health"
 	handlerUser "github.com/PestovOleg/mini-bank/backend/internal/http/handler/v1/user"
 	"github.com/PestovOleg/mini-bank/backend/internal/http/middleware"
@@ -29,7 +30,7 @@ func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 		"/users": {
 			http.MethodPost: {
 				Handler: handlerUser.NewUserHandler(s.UserService).CreateUser(),
-				//				Feature: "CreateUserToggle",
+				Feature: "CreateUserToggle",
 			},
 		},
 	}
@@ -49,6 +50,12 @@ func BaseRoutesL(s *Services) map[string]map[string]RouteConfig {
 			http.MethodDelete: {
 				Handler: handlerUser.NewUserHandler(s.UserService).DeleteUser(),
 				Feature: "DeleteUserToggle",
+			},
+		},
+		"/users/{id}/accounts": {
+			http.MethodPost: {
+				Handler: handlerAccount.NewAccountHandler(s.AccountService).CreateAccount(),
+				Feature: "CreateAccountToggle",
 			},
 		},
 	}

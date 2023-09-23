@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/PestovOleg/mini-bank/backend/domain/account"
+	"github.com/PestovOleg/mini-bank/backend/domain/account/postgres"
 	"github.com/PestovOleg/mini-bank/backend/domain/user"
-	"github.com/PestovOleg/mini-bank/backend/domain/user/postgres"
+	repoUser "github.com/PestovOleg/mini-bank/backend/domain/user/postgres"
 	"github.com/PestovOleg/mini-bank/backend/internal/config"
 	"github.com/PestovOleg/mini-bank/backend/internal/http/middleware"
 	postgresConnect "github.com/PestovOleg/mini-bank/backend/pkg/database/postgres"
@@ -18,12 +20,14 @@ import (
 )
 
 type Services struct {
-	UserService *user.Service
+	UserService    *user.Service
+	AccountService *account.Service
 }
 
-func NewServices(u *user.Service) *Services {
+func NewServices(u *user.Service, a *account.Service) *Services {
 	return &Services{
-		UserService: u,
+		UserService:    u,
+		AccountService: a,
 	}
 }
 
@@ -79,10 +83,12 @@ func NewApp(cfg *config.AppConfig) App {
 		panic(err.Error())
 	}
 
-	userRepo := postgres.NewUserSQL(pgClient)
+	userRepo := repoUser.NewUserSQL(pgClient)
 	userService := user.NewService(userRepo)
 
-	s := NewServices(userService)
+	accountRepo := postgres.NewAccountSQL(pgClient)
+	accountService := account.NewService(accountRepo)
+	s := NewServices(userService, accountService)
 
 	api := NewRouter(s)
 

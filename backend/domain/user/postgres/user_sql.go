@@ -146,10 +146,6 @@ func (r *UserSQL) GetByUName(username string) (*user.User, error) {
 	return &u, nil
 }
 
-func (r *UserSQL) List() ([]*user.User, error) {
-	return nil, nil
-}
-
 func (r *UserSQL) Update(u *user.User) error {
 	rec, err := r.db.Prepare(`
 		update users set email=$1, name=$2, last_name=$3, patronymic=$4,updated_at=$5 where id=$6`)
