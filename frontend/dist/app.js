@@ -1,2 +1,2 @@
-import { FeatureToggles } from "./components/FeatureToggles.js";
-document.querySelector('app').innerHTML = FeatureToggles();
+import { Enter } from "./pages/Enter.js";
+document.querySelector('app').innerHTML = Enter();
