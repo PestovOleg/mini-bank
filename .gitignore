@@ -31,3 +31,6 @@ go.work
 
 *.helper
 *.back
+
+frontend/node_modules
+frontend/dist

@@ -1,0 +1,13 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && rm -rf /opt/minibank-web/* && cp -r ./dist/* /opt/minibank-web/ && cp ./index.html /opt/minibank-web/index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
