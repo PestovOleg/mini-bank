@@ -20,7 +20,7 @@ func NewAccountSQL(db *sql.DB) *AccountSQL {
 
 func (r *AccountSQL) GetByID(id uuid.UUID) (*account.Account, error) {
 	rec, err := r.db.Prepare(`
-		select id, account, currency, amount, interest_rate, user_id, created_at,updated_at,is_active
+		select id, account, currency,name, amount, interest_rate, user_id, created_at,updated_at,is_active
 		from accounts where id=$1 and is_active=true`)
 
 	if err != nil {
@@ -41,6 +41,7 @@ func (r *AccountSQL) GetByID(id uuid.UUID) (*account.Account, error) {
 			&a.ID,
 			&a.Account,
 			&a.Currency,
+			&a.Name,
 			&a.Amount,
 			&a.InterestRate,
 			&a.UserID,
@@ -67,7 +68,7 @@ func (r *AccountSQL) GetByID(id uuid.UUID) (*account.Account, error) {
 
 func (r *AccountSQL) GetByNumber(acc string) (*account.Account, error) {
 	rec, err := r.db.Prepare(`
-		select id, account, currency, amount, interest_rate, user_id, created_at,updated_at,is_active
+		select id, account, currency,name, amount, interest_rate, user_id, created_at,updated_at,is_active
 		from accounts where account=$1 and is_active=true`)
 
 	if err != nil {
@@ -88,6 +89,7 @@ func (r *AccountSQL) GetByNumber(acc string) (*account.Account, error) {
 			&a.ID,
 			&a.Account,
 			&a.Currency,
+			&a.Name,
 			&a.Amount,
 			&a.InterestRate,
 			&a.UserID,
@@ -114,7 +116,7 @@ func (r *AccountSQL) GetByNumber(acc string) (*account.Account, error) {
 
 func (r *AccountSQL) List(userID uuid.UUID) ([]*account.Account, error) {
 	rec, err := r.db.Prepare(`
-		select id, account, currency, amount, interest_rate, user_id, created_at,updated_at,is_active 
+		select id, account, currency,name, amount, interest_rate, user_id, created_at,updated_at,is_active 
 		from accounts where user_id=$1 and is_active=true`)
 
 	if err != nil {
@@ -131,7 +133,7 @@ func (r *AccountSQL) List(userID uuid.UUID) ([]*account.Account, error) {
 	var accounts []*account.Account
 	for rows.Next() {
 		var a account.Account
-		err = rows.Scan(a.ID, a.Account, a.Currency, a.Amount, a.InterestRate, a.UserID, a.CreatedAt, a.UpdatedAt, a.IsActive)
+		err = rows.Scan(&a.ID, &a.Account, &a.Currency, &a.Name, &a.Amount, &a.InterestRate, &a.UserID, &a.CreatedAt, &a.UpdatedAt, &a.IsActive)
 		if err != nil {
 			return nil, err
 		}
@@ -151,22 +153,15 @@ func (r *AccountSQL) List(userID uuid.UUID) ([]*account.Account, error) {
 }
 
 func (r *AccountSQL) Update(a *account.Account) error {
-	rec, err := r.db.Prepare(`
-		update amount, updated_at,is_active 
-		from accounts where id=$1 and is_active=true`)
-
-	if err != nil {
-		return err
-	}
-
-	rows, err := rec.Query(a.ID)
-
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	err = rec.Close()
+	_, err := r.db.Exec(`
+    update accounts set name=$1, interest_rate=$2, updated_at=$3,amount=$4
+    where id=$5 and is_active=true`,
+		a.Name,
+		a.InterestRate,
+		a.UpdatedAt,
+		a.Amount,
+		a.ID,
+	)
 	if err != nil {
 		return err
 	}
@@ -178,7 +173,7 @@ func (r *AccountSQL) GetLastOpenedAccount(currency string) (string, error) {
 	var account string
 
 	rec, err := r.db.Prepare(`
-		select account from accounts where currency=$1 order by account limit 1`)
+		select account from accounts where currency=$1 order by account desc limit 1`)
 
 	if err != nil {
 		return "", err
@@ -191,11 +186,14 @@ func (r *AccountSQL) GetLastOpenedAccount(currency string) (string, error) {
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		err = rows.Scan(account)
-		if err != nil {
-			return "", err
-		}
+	if !rows.Next() {
+		// rows is empty, return ""
+		return "", nil
+	}
+
+	err = rows.Scan(&account) // добавлен амперсанд перед account
+	if err != nil {
+		return "", err
 	}
 
 	if err = rows.Err(); err != nil {
@@ -210,34 +208,37 @@ func (r *AccountSQL) GetLastOpenedAccount(currency string) (string, error) {
 	return account, nil
 }
 
-func (r *AccountSQL) Create(a *account.Account) (uuid.UUID, error) {
+func (r *AccountSQL) Create(a *account.Account) error {
 	rec, err := r.db.Prepare(`
-		insert into users (id, account, currency, amount, interest_rate, user_id, created_at,updated_at,is_active)
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9)`)
+		insert into accounts (id, account, currency,name, amount, interest_rate, user_id, created_at,updated_at,is_active)
+		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`)
 
 	if err != nil {
-		return uuid.Nil, err
+		return err
 	}
 
 	_, err = rec.Exec(
 		a.ID,
 		a.Account,
 		a.Currency,
+		a.Name,
+		a.Amount,
+		a.InterestRate,
 		a.UserID,
 		a.CreatedAt,
 		a.UpdatedAt,
 		a.IsActive,
 	)
 	if err != nil {
-		return uuid.Nil, err
+		return err
 	}
 
 	err = rec.Close()
 	if err != nil {
-		return uuid.Nil, err
+		return err
 	}
 
-	return a.ID, nil
+	return nil
 }
 
 func (r *AccountSQL) Delete(id uuid.UUID) error {

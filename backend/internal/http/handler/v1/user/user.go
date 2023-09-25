@@ -28,15 +28,26 @@ func NewUserHandler(s *user.Service) *UserHandler {
 // UserCreateRequest represents the request payload for user creation.
 // swagger:model
 type UserCreateRequest struct {
-	// the name for this user
-	// required: true
-	// min length: 3
 	Username   string `json:"username" example:"Ivanec"`
 	Email      string `json:"email" example:"Ivanych@gmail.com"`
 	Name       string `json:"name" example:"Ivan"`
 	LastName   string `json:"lastName" example:"Ivanov"`
 	Patronymic string `json:"patronymic" example:"Ivanych"`
 	Password   string `json:"password" example:"mypass"`
+}
+
+// UserUpdateRequest represents the request payload for user update.
+// swagger:model
+type UserUpdateRequest struct {
+	Email      string `json:"email" example:"Ivanych@gmail.com"`
+	Name       string `json:"name" example:"Ivan"`
+	LastName   string `json:"lastName" example:"Ivanov"`
+	Patronymic string `json:"patronymic" example:"Ivanych"`
+}
+
+type EnterWithCredentials struct {
+	Username   string `json:"username" example:"username"`
+	Patronymic string `json:"password" example:"password"`
 }
 
 // CreateUser godoc
@@ -48,7 +59,7 @@ type UserCreateRequest struct {
 // @Accept  json
 // @Produce  json
 // @Param user body UserCreateRequest true "User details for creation"
-// @Success 201 {uuid} string "A new user has been created with ID: {id}"
+// @Success 201 {string} string "A new user has been created with ID: {id}"
 // @Error 404 {string} "Page not found"
 // @Failure 500 {string} string "Internal server error"
 // @Router /users [post]
@@ -86,6 +97,21 @@ func (u *UserHandler) CreateUser() http.Handler {
 			}
 
 			return
+		}
+
+		toJSON := &struct {
+			ID string `json:"id"`
+		}{
+			ID: id.String(),
+		}
+
+		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
+			u.logger.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Error while reading ID"))
+			if err != nil {
+				u.logger.Error(err.Error())
+			}
 		}
 		u.logger.Sugar().Infof("New user was created with ID: ", id.String())
 		w.WriteHeader(http.StatusCreated)
@@ -168,6 +194,21 @@ func (u *UserHandler) GetUser() http.Handler {
 	})
 }
 
+// UpdateUser godoc
+// @title Update User by ID
+// @version 1.0
+// @summary Update user details based on the provided ID.
+// @description Update the user details using the provided user ID.
+// @tags users
+// @accept json
+// @produce json
+// @param id path string true "User ID"
+// @param body body UserUpdateRequest true "User Update Payload"
+// @success 200 {string} string "Successfully updated user details"
+// @failure 500 {string} string "Internal server error"
+// @failure 404 {string} string "User not found"
+// @Security BasicAuth
+// @router /users/{id} [put]
 func (u *UserHandler) UpdateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -216,6 +257,20 @@ func (u *UserHandler) UpdateUser() http.Handler {
 	})
 }
 
+// DeleteUser godoc
+// @title Delete User by ID
+// @version 1.0
+// @summary Delete user based on the provided ID.
+// @description Delete the user using the provided user ID.
+// @tags users
+// @accept json
+// @produce json
+// @param id path string true "User ID"
+// @success 200 {string} string "Successfully deleted user"
+// @failure 500 {string} string "Internal server error"
+// @failure 404 {string} string "User not found"
+// @Security BasicAuth
+// @router /users/{id} [delete]
 func (u *UserHandler) DeleteUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -243,5 +298,40 @@ func (u *UserHandler) DeleteUser() http.Handler {
 			return
 		}
 		u.logger.Sugar().Infof("User %v was deleted", id)
+	})
+}
+
+// Enter godoc
+// @title Enter with credentials
+// @version 1.0
+// @summary Get User ID with credentials.
+// @description Get User ID with credentials.
+// @tags users
+// @accept json
+// @produce json
+// @success 200 {string} ID "Successfully retrieved User ID"
+// @failure 500 {string} string "Internal server error"
+// @failure 404 {string} string "User not found"
+// @Security BasicAuth
+// @router /users [get]
+func (u *UserHandler) Enter() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		username, _, _ := r.BasicAuth()
+		user, _ := u.service.GetUserByUName(username)
+
+		w.Header().Set("Content-Type", "application/json")
+		toJSON := &struct {
+			ID string `json:"id"`
+		}{
+			ID: user.ID.String(),
+		}
+		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
+			u.logger.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Error while reading ID"))
+			if err != nil {
+				u.logger.Error(err.Error())
+			}
+		}
 	})
 }

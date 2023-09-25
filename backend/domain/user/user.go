@@ -136,6 +136,7 @@ type Repository interface {
 type UseCase interface {
 	GetUserByID(id uuid.UUID) (*User, error)
 	GetUserByUName(username string) (*User, error)
+	Enter(username, password string) (uuid.UUID, error)
 	CreateUser(username, email, name, lastName, patronymic, password string) (uuid.UUID, error)
 	UpdateUser(id uuid.UUID, email, name, lastName, patronymic string) error
 	DeleteUser(id uuid.UUID) error

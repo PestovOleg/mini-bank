@@ -14,6 +14,7 @@ type Account struct {
 	UserID       uuid.UUID
 	Account      string
 	Currency     string
+	Name         string
 	Amount       float64
 	InterestRate float64
 	IsActive     bool
@@ -21,11 +22,12 @@ type Account struct {
 	UpdatedAt    time.Time
 }
 
-func NewAccount(userID uuid.UUID, currency, account string) (*Account, error) {
+func NewAccount(userID uuid.UUID, currency, account, name string) (*Account, error) {
 	a := &Account{
 		ID:           uuid.New(),
 		Account:      account,
 		Currency:     currency,
+		Name:         name,
 		Amount:       0,
 		InterestRate: generateInterestRate(),
 		UserID:       userID,
@@ -48,12 +50,12 @@ func NewAccount(userID uuid.UUID, currency, account string) (*Account, error) {
 }
 
 func NextAccount(currency, account string) (string, error) {
-	if len(account) != 20 {
+	if len(account) != 20 && len(account) != 0 {
 		return "", ErrAccountLength
 	}
 
 	if account != "" {
-		matched, err := regexp.MatchString(`0123456789`, account)
+		matched, err := regexp.MatchString(`^[0-9]+$`, account)
 		if err != nil {
 			return "", err
 		}
@@ -64,7 +66,7 @@ func NextAccount(currency, account string) (string, error) {
 	}
 
 	if currency != "" {
-		matched, err := regexp.MatchString(`0123456789`, currency)
+		matched, err := regexp.MatchString(`^[0-9]+$`, currency)
 		if err != nil {
 			return "", err
 		}
@@ -81,6 +83,7 @@ func NextAccount(currency, account string) (string, error) {
 
 	if account == "" {
 		toDigits = 0
+		account = "40817"
 	} else {
 		toDigits, _ = strconv.Atoi(account[13:])
 	}
@@ -98,12 +101,16 @@ func (a *Account) Validate() error {
 		return ErrCurrencyMustBeEntered
 	}
 
-	if a.Amount <= 0 {
+	if a.Amount < 0 {
 		return ErrMustBePositiveOrZero
 	}
 
 	if a.UserID == uuid.Nil {
 		return ErrUserIDMustBeEntered
+	}
+
+	if a.Name == "" {
+		return ErrAccountNameMustBeEntered
 	}
 
 	return nil
@@ -112,6 +119,7 @@ func (a *Account) Validate() error {
 // generate random rate as a decimal(5,4)
 func generateInterestRate() float64 {
 	// randomizer' source
+
 	src := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(src)
 	intPart := r.Intn(10)
@@ -139,7 +147,7 @@ type Reader interface {
 // Update - update record
 // Delete - delete record (deactivate)
 type Writer interface {
-	Create(a *Account) (uuid.UUID, error)
+	Create(a *Account) error
 	Update(a *Account) error
 	Delete(id uuid.UUID) error
 }
@@ -153,6 +161,7 @@ type Repository interface {
 // Usecases
 // GetAccountByID - get account by ID
 // GetAccountByNumber - get account by account' number
+// GetAccountByIDAndUserID - get account by ID (safe)
 // ListAccount - get all clients' accounts
 // CreateAccount - create account
 // DeleteAccount - deactivate account
@@ -162,9 +171,11 @@ type Repository interface {
 type UseCase interface {
 	GetAccountByID(id uuid.UUID) (*Account, error)
 	GetAccountByNumber(account string) (*Account, error)
+	GetAccountByIDAndUserID(id, userID uuid.UUID) (*Account, error)
 	ListAccount(userID uuid.UUID) ([]*Account, error)
 	CreateAccount(userID uuid.UUID, currency string) (*Account, error)
 	TopUp(id uuid.UUID, money float64)
 	WithDraw(id uuid.UUID, money float64)
 	DeleteAccount(id uuid.UUID) error
+	UpdateAccount(id uuid.UUID, name string, rate float64) error
 }

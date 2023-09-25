@@ -53,6 +53,7 @@ func NewRouter(s *Services) http.Handler {
 		AllowedOrigins:   []string{"*"}, // TODO: ограничить
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"*"},
 	})
 
 	// Оборачиваем роутер в CORS
