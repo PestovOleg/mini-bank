@@ -767,9 +767,13 @@ const docTemplate = `{
         "mapper.User": {
             "type": "object",
             "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "01.01.1999"
+                },
                 "created_at": {
                     "type": "string",
-                    "example": "2023-09-19T10:58:00.000Z"
+                    "example": "01.01.1999"
                 },
                 "email": {
                     "type": "string",
@@ -795,9 +799,13 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Ivanych"
                 },
+                "phone": {
+                    "type": "string",
+                    "example": "+7(495)999-99-99"
+                },
                 "updated_at": {
                     "type": "string",
-                    "example": "2023-09-19T10:58:00.000Z"
+                    "example": "01.01.1999"
                 },
                 "username": {
                     "type": "string",
@@ -808,6 +816,10 @@ const docTemplate = `{
         "user.UserCreateRequest": {
             "type": "object",
             "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "01.01.1999"
+                },
                 "email": {
                     "type": "string",
                     "example": "Ivanych@gmail.com"
@@ -828,6 +840,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Ivanych"
                 },
+                "phone": {
+                    "type": "string",
+                    "example": "+7(495)999-99-99"
+                },
                 "username": {
                     "type": "string",
                     "example": "Ivanec"
@@ -841,17 +857,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Ivanych@gmail.com"
                 },
-                "lastName": {
+                "phone": {
                     "type": "string",
-                    "example": "Ivanov"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Ivan"
-                },
-                "patronymic": {
-                    "type": "string",
-                    "example": "Ivanych"
+                    "example": "+7(495)999-99-99"
                 }
             }
         }

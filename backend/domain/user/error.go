@@ -30,4 +30,10 @@ var (
 
 	// ErrEmptyPassword Password must be filled in
 	ErrEmptyPassword = errors.New("password must be filled in")
+
+	// ErrEmptyBirthday Birthday must be filled in
+	ErrEmptyBirthday = errors.New("birthday must be filled in")
+
+	// ErrEmptyPassword Password must be filled in
+	ErrEmptyPhone = errors.New("phone must be filled in")
 )

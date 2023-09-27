@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/PestovOleg/mini-bank/backend/domain/user"
 	"github.com/PestovOleg/mini-bank/backend/internal/http/mapper"
@@ -30,6 +31,8 @@ func NewUserHandler(s *user.Service) *UserHandler {
 type UserCreateRequest struct {
 	Username   string `json:"username" example:"Ivanec"`
 	Email      string `json:"email" example:"Ivanych@gmail.com"`
+	Phone      string `json:"phone" example:"+7(495)999-99-99"`
+	Birthday   string `json:"birthday" example:"2013-Feb-03"`
 	Name       string `json:"name" example:"Ivan"`
 	LastName   string `json:"lastName" example:"Ivanov"`
 	Patronymic string `json:"patronymic" example:"Ivanych"`
@@ -39,10 +42,8 @@ type UserCreateRequest struct {
 // UserUpdateRequest represents the request payload for user update.
 // swagger:model
 type UserUpdateRequest struct {
-	Email      string `json:"email" example:"Ivanych@gmail.com"`
-	Name       string `json:"name" example:"Ivan"`
-	LastName   string `json:"lastName" example:"Ivanov"`
-	Patronymic string `json:"patronymic" example:"Ivanych"`
+	Email string `json:"email" example:"Ivanych@gmail.com"`
+	Phone string `json:"phone" example:"+7(495)999-99-99"`
 }
 
 type EnterWithCredentials struct {
@@ -77,14 +78,27 @@ func (u *UserHandler) CreateUser() http.Handler {
 
 			return
 		}
+		birthday, err := time.Parse(time.RFC3339, input.Birthday)
+		if err != nil {
+			u.logger.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to parse birthday"))
+			if err != nil {
+				u.logger.Error(err.Error())
+			}
+
+			return
+		}
 
 		id, err := u.service.CreateUser(
 			input.Username,
 			input.Email,
+			input.Phone,
 			input.Name,
 			input.LastName,
 			input.Patronymic,
 			input.Password,
+			birthday,
 		)
 
 		u.logger.Debug(id.String())
@@ -175,12 +189,14 @@ func (u *UserHandler) GetUser() http.Handler {
 			ID:         data.ID,
 			Username:   data.Username,
 			Email:      data.Email,
+			Phone:      data.Phone,
+			Birthday:   data.Birthday.Format(time.RFC3339),
 			Name:       data.Name,
 			LastName:   data.LastName,
 			Patronymic: data.Patronymic,
 			IsActive:   data.IsActive,
-			CreatedAt:  data.CreatedAt,
-			UpdatedAt:  data.UpdatedAt,
+			CreatedAt:  data.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:  data.UpdatedAt.Format(time.RFC3339),
 		}
 
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
@@ -203,7 +219,7 @@ func (u *UserHandler) GetUser() http.Handler {
 // @accept json
 // @produce json
 // @param id path string true "User ID"
-// @param body body UserUpdateRequest true "User Update Payload"
+// @param body UserUpdateRequest true "User Update Payload"
 // @success 200 {string} string "Successfully updated user details"
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "User not found"
@@ -224,10 +240,8 @@ func (u *UserHandler) UpdateUser() http.Handler {
 			return
 		}
 		var input struct {
-			Email      string `json:"email"`
-			Name       string `json:"name"`
-			LastName   string `json:"lastName"`
-			Patronymic string `json:"patronymic"`
+			Email string `json:"email"`
+			Phone string `json:"phone"`
 		}
 
 		err = json.NewDecoder(r.Body).Decode(&input)
@@ -242,7 +256,7 @@ func (u *UserHandler) UpdateUser() http.Handler {
 			return
 		}
 
-		err = u.service.UpdateUser(id, input.Email, input.Name, input.LastName, input.Patronymic)
+		err = u.service.UpdateUser(id, input.Email, input.Phone)
 		if err != nil {
 			u.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)

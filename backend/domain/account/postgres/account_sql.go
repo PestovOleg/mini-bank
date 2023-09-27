@@ -131,12 +131,27 @@ func (r *AccountSQL) List(userID uuid.UUID) ([]*account.Account, error) {
 	defer rows.Close()
 
 	var accounts []*account.Account
+
 	for rows.Next() {
 		var a account.Account
-		err = rows.Scan(&a.ID, &a.Account, &a.Currency, &a.Name, &a.Amount, &a.InterestRate, &a.UserID, &a.CreatedAt, &a.UpdatedAt, &a.IsActive)
+
+		err = rows.Scan(
+			&a.ID,
+			&a.Account,
+			&a.Currency,
+			&a.Name,
+			&a.Amount,
+			&a.InterestRate,
+			&a.UserID,
+			&a.CreatedAt,
+			&a.UpdatedAt,
+			&a.IsActive,
+		)
+
 		if err != nil {
 			return nil, err
 		}
+
 		accounts = append(accounts, &a)
 	}
 

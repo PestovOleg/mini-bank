@@ -2,7 +2,6 @@
 package user
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -48,9 +47,17 @@ func (s *Service) GetUserByUName(username string) (*User, error) {
 }
 
 // CreateUser Создать пользователя TODO: переделать на возврат User?
-func (s *Service) CreateUser(username, email, name, lastName, patronymic, password string) (uuid.UUID, error) {
-	fmt.Printf("%s %s %v %v %v %v", username, email, name, lastName, patronymic, password)
-	u, err := NewUser(username, email, name, lastName, patronymic, password)
+func (s *Service) CreateUser(
+	username,
+	email,
+	phone,
+	name,
+	lastName,
+	patronymic,
+	password string,
+	birthday time.Time,
+) (uuid.UUID, error) {
+	u, err := NewUser(username, email, phone, name, lastName, patronymic, password, birthday)
 
 	if err != nil {
 		return uuid.Nil, err
@@ -60,12 +67,12 @@ func (s *Service) CreateUser(username, email, name, lastName, patronymic, passwo
 }
 
 // UpdateUser Обновить пользователя
-func (s *Service) UpdateUser(id uuid.UUID, email, name, lastName, patronymic string) error {
+func (s *Service) UpdateUser(id uuid.UUID, email, phone string) error {
 	if id == uuid.Nil {
 		return ErrIDMustBeEntered
 	}
 
-	if email == "" && name == "" && lastName == "" && patronymic == "" {
+	if email == "" && phone == "" {
 		return ErrMustBeFilledIn
 	}
 
@@ -82,16 +89,8 @@ func (s *Service) UpdateUser(id uuid.UUID, email, name, lastName, patronymic str
 		u.Email = email
 	}
 
-	if name != "" {
-		u.Name = name
-	}
-
-	if lastName != "" {
-		u.LastName = lastName
-	}
-
-	if patronymic != "" {
-		u.Patronymic = patronymic
+	if phone != "" {
+		u.Phone = phone
 	}
 
 	u.UpdatedAt = time.Now()

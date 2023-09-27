@@ -1,10 +1,13 @@
+import { AccountStore } from "./account.store";
 import { UserStore } from "./user.store";
 
-class Store{
+export class Store{
     userStore: UserStore;
+    accountStore:AccountStore;
 
     constructor(){
-        this.userStore=new UserStore();
+        this.userStore=new UserStore(this);
+        this.accountStore=new AccountStore(this);
     }
 }
 

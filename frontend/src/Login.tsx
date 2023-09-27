@@ -2,10 +2,9 @@ import { observer } from "mobx-react-lite";
 import store from "./store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Avatar, Box, Button, Container, CssBaseline, Link, TextField, Typography } from "@mui/material";
+import { AppBar, Avatar, Box, Button, Container, CssBaseline, IconButton, Link, TextField, Toolbar, Typography } from "@mui/material";
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import FullScreenDialog from "./SignUp";
-import Divider from '@mui/material/Divider';
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -14,15 +13,15 @@ function Login() {
     const login = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         if (username && password) {
-            console.log("Вывод из формы: username:",username," password: ",password)
             await store.userStore.login(username, password);
-            console.log("идем в main page")
+            
             navigate("/", { replace: true });
+
         }
     };
 
     return (
-        <Container className="login" component="main" maxWidth="xs">
+        <Container className="login" component="main" maxWidth="xs" >
             <CssBaseline />
             <Box
                 sx={{
@@ -30,14 +29,26 @@ function Login() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
+                    height: '100%',
                 }}
             >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                    <SavingsOutlinedIcon fontSize="medium" />
-                </Avatar>
-                <Typography component="h1" variant="h5">
-                    Минибанк
-                </Typography>
+                <AppBar position="static">
+                    <Toolbar>
+                        <IconButton
+                            size="large"
+                            edge="start"
+                            color="inherit"
+                            aria-label="menu"
+                            sx={{ mr: 2 }}
+                        >
+                            <SavingsOutlinedIcon fontSize="large" />
+                        </IconButton>
+                        <Typography variant="h6" component="div" sx={{ ml: 5,letterSpacing: 5 }}>
+                            МИНИБАНК
+                        </Typography>
+
+                    </Toolbar>
+                </AppBar>
                 <Box component="form" onSubmit={login} noValidate sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
@@ -56,30 +67,24 @@ function Login() {
                         required
                         fullWidth
                         name="password"
-                        label="Password"
+                        label="Пароль"
                         type="password"
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         autoComplete="current-password"
                     />
-                    <TextField size="small"
-                        disabled
-                        id="outlined-disabled"
-                        label={store.userStore.authError}
-                        defaultValue={store.userStore.authError}
-                    />
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        size="large"
+                        sx={{ mt: 3, mb: 2, }}
                     >
                         Войти
                     </Button>
-                    
+
                 </Box>
-                <Divider />
                 <Box component="form" onSubmit={(e) => { e.preventDefault(); }} noValidate sx={{ mt: 1 }}>
                     <FullScreenDialog />
                 </Box>

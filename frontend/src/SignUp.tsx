@@ -8,11 +8,12 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
-import { Box, TextField } from '@mui/material';
+import { Alert, Box, Link, Snackbar, TextField } from '@mui/material';
 import store from "./store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import AlertSuccess from './AlertSignUp';
+import InputMask from 'react-input-mask';
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -31,6 +32,8 @@ export default function FullScreenDialog() {
     const [firstName, setFirstName] = useState("");
     const [patronymic, setPatronymic] = useState("");
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [birthday, setBirthday] = useState("");
     const [showAlert, setShowAlert] = React.useState(false);
 
     let navigate = useNavigate();
@@ -44,35 +47,36 @@ export default function FullScreenDialog() {
 
     const signup = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
-        if (firstName && lastName && patronymic && email && username && password) {
-            await store.userStore.signup(firstName, lastName, patronymic, email, username, password);
-            
+        const b = new Date(birthday);
+        if (firstName && lastName && patronymic && email && username && password && phone && birthday) {
+            await store.userStore.signup(firstName, lastName, patronymic, email, username, password, phone, b);
+
             // Show the alert
             setShowAlert(true);
-            
+
             setTimeout(() => {
                 navigate("/", { replace: true });
                 setShowAlert(false);
-            }, 5000);  
+            }, 5000);
         }
     };
-    
+
     return (
         <Box sx={{
             display: 'flex',
             flexDirection: 'column',
         }}
         >
-            <Button variant="outlined" onClick={handleClickOpen}>
+            <Link component="button" variant="body2" onClick={handleClickOpen}>
                 Регистрация
-            </Button>
+            </Link>
 
             <Dialog
                 open={open}
                 onClose={handleClose}
                 TransitionComponent={Transition}
             >
-                <AppBar sx={{ position: 'relative',pr:2, pl:2 }}>
+                <AppBar sx={{ position: 'relative', pr: 2, pl: 2 }}>
                     <Toolbar>
                         <IconButton
                             edge="start"
@@ -82,15 +86,12 @@ export default function FullScreenDialog() {
                         >
                             <CloseIcon />
                         </IconButton>
-                        <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            Ввод данных
+                        <Typography sx={{ ml: 18, flex: 1 }} variant="h6" component="div">
+                            Регистрация
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={handleClose} >
-                            ОК
-                        </Button>
                     </Toolbar>
                 </AppBar>
-                <Box component="form" onSubmit={signup} noValidate sx={{ mt: 1,pr:5, pl:5 }}>
+                <Box component="form" onSubmit={signup} noValidate sx={{ mt: 1, pr: 5, pl: 5 }}>
                     <TextField
                         margin="normal"
                         required
@@ -108,24 +109,12 @@ export default function FullScreenDialog() {
                         required
                         fullWidth
                         name="password"
-                        label="Password"
+                        label="Пароль"
                         type="password"
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         autoComplete="current-password"
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="email"
-                        name="email"
-                        value={email}
-                        autoComplete="email"
-                        autoFocus
-                        onChange={(e) => setEmail(e.target.value)}
                     />
                     <TextField
                         margin="normal"
@@ -163,6 +152,46 @@ export default function FullScreenDialog() {
                         autoFocus
                         onChange={(e) => setPatronymic(e.target.value)}
                     />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="email"
+                        name="email"
+                        value={email}
+                        autoComplete="email"
+                        autoFocus
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="phone"
+                        label="Телефон"
+                        name="phone"
+                        value={phone}
+                        autoComplete="phone"
+                        autoFocus
+                        onChange={(e) => setPhone(e.target.value)}
+                        InputProps={{
+                            inputComponent: InputMask,
+                            inputProps: { mask: '+7 (999) 999-99-99' }
+                        }}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        type="date"
+                        id="birthday"
+                        name="birthday"
+                        value={birthday}
+                        autoFocus
+                        onChange={(e) => setBirthday(e.target.value)}
+                    />
+
                     <Button
                         type="submit"
                         fullWidth
@@ -171,8 +200,12 @@ export default function FullScreenDialog() {
                     >
                         Зарегистрироваться
                     </Button>
-                    { showAlert && <AlertSuccess /> }
                 </Box>
+                {showAlert && <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
+                        Регистрация завершена,выполните вход.
+                    </Alert>
+                </Snackbar>}
             </Dialog>
         </Box>
     );

@@ -59,8 +59,11 @@ definitions:
     type: object
   mapper.User:
     properties:
+      birthday:
+        example: 01.01.1999
+        type: string
       created_at:
-        example: "2023-09-19T10:58:00.000Z"
+        example: 01.01.1999
         type: string
       email:
         example: Ivanych@gmail.com
@@ -80,8 +83,11 @@ definitions:
       patronymic:
         example: Ivanych
         type: string
+      phone:
+        example: +7(495)999-99-99
+        type: string
       updated_at:
-        example: "2023-09-19T10:58:00.000Z"
+        example: 01.01.1999
         type: string
       username:
         example: Ivanych
@@ -89,6 +95,9 @@ definitions:
     type: object
   user.UserCreateRequest:
     properties:
+      birthday:
+        example: 01.01.1999
+        type: string
       email:
         example: Ivanych@gmail.com
         type: string
@@ -104,6 +113,9 @@ definitions:
       patronymic:
         example: Ivanych
         type: string
+      phone:
+        example: +7(495)999-99-99
+        type: string
       username:
         example: Ivanec
         type: string
@@ -113,14 +125,8 @@ definitions:
       email:
         example: Ivanych@gmail.com
         type: string
-      lastName:
-        example: Ivanov
-        type: string
-      name:
-        example: Ivan
-        type: string
-      patronymic:
-        example: Ivanych
+      phone:
+        example: +7(495)999-99-99
         type: string
     type: object
 externalDocs:

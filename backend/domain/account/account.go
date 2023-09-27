@@ -118,8 +118,6 @@ func (a *Account) Validate() error {
 
 // generate random rate as a decimal(5,4)
 func generateInterestRate() float64 {
-	// randomizer' source
-
 	src := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(src)
 	intPart := r.Intn(10)

@@ -26,11 +26,14 @@ func TestNewAccountTableDriven(t *testing.T) {
 				currency string
 				account  string
 				name     string
-			}{userID: uuid.Must(uuid.Parse("99371a5f-ad18-4d75-8e4f-ce1e4cbd6dac")), currency: "810", account: "", name: "так себе счет"},
+			}{userID: uuid.Must(uuid.Parse("99371a5f-ad18-4d75-8e4f-ce1e4cbd6dac")),
+				currency: "810",
+				account:  "40817810902000000000",
+				name:     "так себе счет"},
 			out: struct {
 				account string
 				err     error
-			}{account: "40817810902000000123", err: nil},
+			}{account: "40817810902000000001", err: nil},
 		},
 		{
 			in: struct {
@@ -38,11 +41,14 @@ func TestNewAccountTableDriven(t *testing.T) {
 				currency string
 				account  string
 				name     string
-			}{userID: uuid.Must(uuid.Parse("99371a5f-ad18-4d75-8e4f-ce1e4cbd6dac")), currency: "810", account: "", name: "так себе счет"},
+			}{userID: uuid.Must(uuid.Parse("99371a5f-ad18-4d75-8e4f-ce1e4cbd6dac")),
+				currency: "810",
+				account:  "",
+				name:     "так себе счет"},
 			out: struct {
 				account string
 				err     error
-			}{account: "40817810902000000123", err: nil},
+			}{account: "40817810902000000001", err: nil},
 		},
 	}
 

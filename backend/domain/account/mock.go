@@ -1,7 +1,6 @@
 package account
 
 import (
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,12 +20,13 @@ func (m *MockAccountRepository) Create(a *Account) error {
 	id := uuid.New()
 	a.ID = id
 	m.accounts[id] = a
+
 	return nil
 }
 
 func (m *MockAccountRepository) Update(a *Account) error {
 	if _, exists := m.accounts[a.ID]; !exists {
-		return errors.New("account not found")
+		return ErrNotFound
 	}
 
 	a.UpdatedAt = time.Now()
@@ -37,7 +37,7 @@ func (m *MockAccountRepository) Update(a *Account) error {
 
 func (m *MockAccountRepository) Delete(id uuid.UUID) error {
 	if _, exists := m.accounts[id]; !exists {
-		return errors.New("account not found")
+		return ErrNotFound
 	}
 
 	delete(m.accounts, id)
@@ -48,8 +48,9 @@ func (m *MockAccountRepository) Delete(id uuid.UUID) error {
 func (m *MockAccountRepository) GetByID(id uuid.UUID) (*Account, error) {
 	account, exists := m.accounts[id]
 	if !exists {
-		return nil, errors.New("account not found")
+		return nil, ErrNotFound
 	}
+
 	return account, nil
 }
 
@@ -59,30 +60,37 @@ func (m *MockAccountRepository) GetByNumber(acc string) (*Account, error) {
 			return account, nil
 		}
 	}
-	return nil, errors.New("account not found")
+
+	return nil, ErrNotFound
 }
 
 func (m *MockAccountRepository) List(userID uuid.UUID) ([]*Account, error) {
 	var userAccounts []*Account
+
 	for _, account := range m.accounts {
 		if account.UserID == userID {
 			userAccounts = append(userAccounts, account)
 		}
 	}
+
 	return userAccounts, nil
 }
 
 func (m *MockAccountRepository) GetLastOpenedAccount(currency string) (string, error) {
 	var lastOpenedAccount string
+
 	var latestTime time.Time
+
 	for _, account := range m.accounts {
 		if account.Currency == currency && account.CreatedAt.After(latestTime) {
 			latestTime = account.CreatedAt
 			lastOpenedAccount = account.Account
 		}
 	}
+
 	if lastOpenedAccount == "" {
 		return "", nil
 	}
+
 	return lastOpenedAccount, nil
 }

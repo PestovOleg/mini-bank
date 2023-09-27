@@ -60,17 +60,17 @@ type ChangeBalanceRequest struct {
 // @Failure 500 {string} string "Internal server error"
 // @Security BasicAuth
 // @Router /users/{id}/accounts [post]
-func (u *AccountHandler) CreateAccount() http.Handler {
+func (a *AccountHandler) CreateAccount() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		w.Header().Set("Content-Type", "application/json")
 		userID, err := uuid.Parse(vars["id"])
 		if err != nil {
-			u.logger.Error(err.Error())
+			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Couldn't parse ID:" + err.Error()))
 			if err != nil {
-				u.logger.Error(err.Error())
+				a.logger.Error(err.Error())
 			}
 
 			return
@@ -78,31 +78,31 @@ func (u *AccountHandler) CreateAccount() http.Handler {
 		var input AccountCreateRequest
 		err = json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
-			u.logger.Error(err.Error())
+			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Unable to decode request"))
 			if err != nil {
-				u.logger.Error(err.Error())
+				a.logger.Error(err.Error())
 			}
 
 			return
 		}
 
-		u.logger.Sugar().Debugf("userID: %v, input.Currency: %s", userID, input.Currency)
+		a.logger.Sugar().Debugf("userID: %v, input.Currency: %s", userID, input.Currency)
 
-		account, err := u.service.CreateAccount(
+		account, err := a.service.CreateAccount(
 			userID,
 			input.Currency,
 			input.Name,
 		)
 
-		u.logger.Debug(account.Account)
+		a.logger.Debug(account.Account)
 		if err != nil {
-			u.logger.Error(err.Error())
+			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Unable to create a new account: " + err.Error()))
 			if err != nil {
-				u.logger.Error(err.Error())
+				a.logger.Error(err.Error())
 			}
 
 			return
@@ -115,14 +115,14 @@ func (u *AccountHandler) CreateAccount() http.Handler {
 		}
 
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
-			u.logger.Error(err.Error())
+			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Error while reading ID"))
 			if err != nil {
-				u.logger.Error(err.Error())
+				a.logger.Error(err.Error())
 			}
 		}
-		u.logger.Sugar().Infof("New account was created with number: %s", account.Account)
+		a.logger.Sugar().Infof("New account was created with number: %s", account.Account)
 		w.WriteHeader(http.StatusCreated)
 	})
 }

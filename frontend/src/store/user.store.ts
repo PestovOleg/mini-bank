@@ -1,7 +1,8 @@
-import { IUser } from "../models/user/types";
+import { IUser } from "../models/types";
 import { action, makeAutoObservable, observable } from "mobx";
 import { runInAction } from "mobx";
 import { EMPTY_USER } from "../const"
+import { Store } from './store';
 
 const URL = "http://localhost/api/v1";
 
@@ -14,7 +15,7 @@ export class UserStore {
 
     public signUpSuccess: boolean=false
 
-    constructor() {
+    constructor(private rootStore: Store) {
         makeAutoObservable(this);
         this.User = { ...EMPTY_USER };
         this.isAuth = false
@@ -35,11 +36,12 @@ export class UserStore {
                 throw new Error("Failed to login.");
             }
 
-            const res: string = await response.json();
+            const res: any = await response.json();
 
             runInAction(() => {
+                
                 this.isAuth = true;
-                this.User.id = res;
+                this.User.id = res.id;
                 this.User.username = username;
                 this.User.password = password;
             });
@@ -55,14 +57,17 @@ export class UserStore {
         this.User = { ...EMPTY_USER }
     }
 
-    public async signup(firstName: string, lastName: string, patronymic: string, email: string, username: string, password: string): Promise<void> {
+    public async signup(firstName: string, lastName: string, patronymic: string, email: string, username: string, password: string,phone:string,birthday:Date): Promise<void> {
+               
         const userData = {
             email,
             lastName,
             name: firstName,
             password,
             patronymic,
-            username
+            username,
+            phone:phone.replace(/\D/g, ''),
+            birthday:birthday.toISOString(),
         };
 
         try {
@@ -80,7 +85,6 @@ export class UserStore {
 
             const res: any = await response.json();
             runInAction(() => {
-                this.User = res;
                 this.signUpSuccess=true;
             });
 
@@ -90,22 +94,36 @@ export class UserStore {
     }
 
 
-    public getUser(): void {
+    public async getUser(): Promise<void> {
         const base64Credentials = btoa(this.User.username + ':' + this.User.password);
-
-        fetch(`${URL}/users/35ec1e95-87d3-42fe-8158-bf59c78b9e26`, {
-            headers: {
-                'Authorization': 'Basic ' + base64Credentials
-            }
-        }).then(response => response.json())
-            .then((res: any) => {
-                runInAction(() => {
-                    this.User = res;
-                    console.log(this.User)
-                });
+    
+        try {
+            const response = await fetch(`${URL}/users/${this.User.id}`, {
+                headers: {
+                    'Authorization': 'Basic ' + base64Credentials
+                }
             });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch user');
+            }
+    
+            const res: any = await response.json();
+            
+            runInAction(() => {
+                this.User.username = res.username;
+                this.User.email = res.email;
+                this.User.phone=res.phone;
+                this.User.birthday=res.birthday;
+                this.User.name = res.name;
+                this.User.lastName = res.last_name;
+                this.User.patronimyc = res.patronymic;
+                this.User.createdAt = new Date(res.created_at);
+            });
+        } catch (error) {
+            console.log(this.User.id);
+            console.error('There was a problem with the fetch operation:', error);
+        }
     }
+    
 }
-
-const userStore = new UserStore();
-export default userStore;

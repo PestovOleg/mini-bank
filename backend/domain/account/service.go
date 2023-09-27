@@ -97,6 +97,7 @@ func (s *Service) TopUp(id uuid.UUID, money float64) (float64, error) {
 	a.Amount += money
 	a.UpdatedAt = time.Now()
 	err = s.repo.Update(a)
+
 	if err != nil {
 		return 0, err
 	}
@@ -121,6 +122,7 @@ func (s *Service) WithDraw(id uuid.UUID, money float64) (float64, error) {
 
 	a.UpdatedAt = time.Now()
 	err = s.repo.Update(a)
+
 	if err != nil {
 		return 0, err
 	}
@@ -141,6 +143,8 @@ func (s *Service) UpdateAccount(id uuid.UUID, name string, rate float64) error {
 	if rate > 0 {
 		a.InterestRate = rate
 	}
+
 	a.UpdatedAt = time.Now()
+
 	return s.repo.Update(a)
 }

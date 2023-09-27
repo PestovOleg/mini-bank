@@ -70,6 +70,8 @@ if [ $rv != 0 ]; then
     exit 1
 else    
     echo "Testing is OK"
+    echo "Building web..."
+    cd frontend && npm run build
 fi
 
 echo "Deleting old container: $CURRENT_BACKEND"
