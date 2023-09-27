@@ -55,6 +55,9 @@ linters:
     - tagliatelle
     - cyclop
     - funlen
+    - gosec
+    - maintidx
+    - nilnil #включить
     # are deprecated by authors
     - maligned
     - ifshort

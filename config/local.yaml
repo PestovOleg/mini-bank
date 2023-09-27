@@ -1,6 +1,6 @@
 #конфигурация HTTP-сервера
 http_server_app_config:
-  addr: ":3333"
+  addr: "0.0.0.0:3333"
   read_timeout: 5s
   write_timeout: 5s
   max_headers_bytes: 1000

@@ -5,9 +5,8 @@ import (
 )
 
 type MockRepository struct {
-	errToReturn  error
-	userToReturn *User
-	createdUser  *User
+	errToReturn error
+	createdUser *User
 }
 
 func (m *MockRepository) Create(u *User) (uuid.UUID, error) {

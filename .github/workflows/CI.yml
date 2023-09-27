@@ -23,6 +23,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54
+          working-directory: backend
 
   test:
     needs: lint
@@ -32,7 +33,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Run go test
-        run: go test ./...
+        run: cd backend && go test ./...
 
   build:
     needs: test
@@ -42,5 +43,5 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       - name: build
-        run: mkdir -p build/; go build -o build/minibank cmd/main.go
+        run: cd backend && go build -o build/minibank cmd/main.go
 
