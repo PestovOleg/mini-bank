@@ -19,7 +19,8 @@
 
 # Go workspace file
 go.work
-/build
+/build/backend/minibank
+./backend/build
 /.vscode
 
 # Logs
