@@ -20,8 +20,8 @@ func NewUserSQL(db *sql.DB) *UserSQL {
 
 func (r *UserSQL) Create(u *user.User) (uuid.UUID, error) {
 	rec, err := r.db.Prepare(`
-		insert into users (id, username, email, name, last_name, patronymic, password, is_active, created_at)
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9)`)
+		insert into users (id, username, email, phone,name, last_name, patronymic, password, is_active, created_at, birthday)
+		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`)
 
 	if err != nil {
 		return u.ID, err
@@ -31,12 +31,14 @@ func (r *UserSQL) Create(u *user.User) (uuid.UUID, error) {
 		u.ID,
 		u.Username,
 		u.Email,
+		u.Phone,
 		u.Name,
 		u.LastName,
 		u.Patronymic,
 		u.Password,
 		u.IsActive,
 		time.Now().Format(time.RFC1123Z),
+		u.Birthday,
 	)
 	if err != nil {
 		return u.ID, err
@@ -52,7 +54,7 @@ func (r *UserSQL) Create(u *user.User) (uuid.UUID, error) {
 
 func (r *UserSQL) GetByID(id uuid.UUID) (*user.User, error) {
 	rec, err := r.db.Prepare(`
-		select id, username, email, name, last_name, patronymic, password,is_active, created_at,updated_at
+		select id, username, email, phone, birthday, name, last_name, patronymic, password,is_active, created_at,updated_at
 		from users where id=$1`)
 
 	if err != nil {
@@ -73,6 +75,8 @@ func (r *UserSQL) GetByID(id uuid.UUID) (*user.User, error) {
 			&u.ID,
 			&u.Username,
 			&u.Email,
+			&u.Phone,
+			&u.Birthday,
 			&u.Name,
 			&u.LastName,
 			&u.Patronymic,
@@ -100,7 +104,7 @@ func (r *UserSQL) GetByID(id uuid.UUID) (*user.User, error) {
 
 func (r *UserSQL) GetByUName(username string) (*user.User, error) {
 	rec, err := r.db.Prepare(`
-		select id, username, email, name, last_name, patronymic, password,is_active, created_at,updated_at
+		select id, username, email, phone, birthday, name, last_name, patronymic, password,is_active, created_at,updated_at
 		from users where username=$1`)
 
 	if err != nil {
@@ -121,6 +125,8 @@ func (r *UserSQL) GetByUName(username string) (*user.User, error) {
 			&u.ID,
 			&u.Username,
 			&u.Email,
+			&u.Phone,
+			&u.Birthday,
 			&u.Name,
 			&u.LastName,
 			&u.Patronymic,
@@ -146,13 +152,9 @@ func (r *UserSQL) GetByUName(username string) (*user.User, error) {
 	return &u, nil
 }
 
-func (r *UserSQL) List() ([]*user.User, error) {
-	return nil, nil
-}
-
 func (r *UserSQL) Update(u *user.User) error {
 	rec, err := r.db.Prepare(`
-		update users set email=$1, name=$2, last_name=$3, patronymic=$4,updated_at=$5 where id=$6`)
+		update users set email=$1, updated_at=$2,phone=$3 where id=$4`)
 
 	if err != nil {
 		return err
@@ -160,10 +162,8 @@ func (r *UserSQL) Update(u *user.User) error {
 
 	_, err = rec.Exec(
 		u.Email,
-		u.Name,
-		u.LastName,
-		u.Patronymic,
 		u.UpdatedAt,
+		u.Phone,
 		u.ID,
 	)
 	if err != nil {

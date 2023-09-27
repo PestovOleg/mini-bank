@@ -13,6 +13,8 @@ type User struct {
 	ID         uuid.UUID
 	Username   string
 	Email      string
+	Phone      string
+	Birthday   time.Time
 	Name       string
 	LastName   string
 	Patronymic string
@@ -23,11 +25,13 @@ type User struct {
 }
 
 // Конструктор
-func NewUser(userName, email, name, lastName, patronymic, password string) (*User, error) {
+func NewUser(username, email, phone, name, lastName, patronymic, password string, birthday time.Time) (*User, error) {
 	u := &User{
 		ID:         uuid.New(),
-		Username:   userName,
+		Username:   username,
 		Email:      email,
+		Phone:      phone,
+		Birthday:   birthday,
 		Name:       name,
 		LastName:   lastName,
 		IsActive:   true,
@@ -78,6 +82,14 @@ func (u *User) ValidateUser() error {
 		return ErrEmptyPassword
 	}
 
+	if u.Birthday.IsZero() {
+		return ErrEmptyBirthday
+	}
+
+	if u.Phone == "" {
+		return ErrEmptyPhone
+	}
+
 	return nil
 }
 
@@ -107,7 +119,6 @@ func (u *User) VerifyPassword(pwd string) error {
 type Reader interface {
 	GetByID(id uuid.UUID) (*User, error)
 	GetByUName(username string) (*User, error)
-	List() ([]*User, error)
 }
 
 // Writer
@@ -137,8 +148,8 @@ type Repository interface {
 type UseCase interface {
 	GetUserByID(id uuid.UUID) (*User, error)
 	GetUserByUName(username string) (*User, error)
-	ListUsers() ([]*User, error)
-	CreateUser(username, email, name, lastName, patronymic, password string) (uuid.UUID, error)
-	UpdateUser(id uuid.UUID, email, name, lastName, patronymic string) error
+	Enter(username, password string) (uuid.UUID, error)
+	CreateUser(username, email, phone, name, lastName, patronymic, password string, birthday time.Time) (uuid.UUID, error)
+	UpdateUser(id uuid.UUID, email, phone string) error
 	DeleteUser(id uuid.UUID) error
 }

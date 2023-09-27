@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -11,12 +12,14 @@ import (
 func TestCreateUserTableDriven(t *testing.T) {
 	tests := []struct {
 		in struct {
-			username   string
-			email      string
-			name       string
-			lastName   string
-			patronymic string
-			password   string
+			Username   string
+			Email      string
+			Phone      string
+			Name       string
+			LastName   string
+			Patronymic string
+			Password   string
+			Birthday   time.Time
 		}
 		out struct {
 			uuid uuid.UUID
@@ -25,9 +28,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 	}{
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"vasyan", "vasyan@mail.ru", "Vasya", "Vasilev", "Vasilich", "vasyaqwerty"},
+				Username:   "vasyan",
+				Email:      "vasyan@mail.ru",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "Vasilev",
+				Patronymic: "Vasilich",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -35,9 +53,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"petyan", "petyan@mail.ru", "Petya", "Petrov", "Petrovich", "petya123"},
+				Username:   "Petyan",
+				Email:      "vasn@mail.ru",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "Vasilev",
+				Patronymic: "Vasilich",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -45,9 +78,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"", "nil@nil.ru", "Nil", "Nilov", "Nilovich", "nil123"},
+				Username:   "",
+				Email:      "vasyan@mail.ru",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "Vasilev",
+				Patronymic: "Vasilich",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -55,9 +103,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"nill", "", "Nil", "Nilov", "Nilovich", "nil123"},
+				Username:   "vasyan",
+				Email:      "",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "Vasilev",
+				Patronymic: "Vasilich",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -65,9 +128,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"nill", "nil@nil.ru", "", "Nilov", "Nilovich", "nil123"},
+				Username:   "vasyan",
+				Email:      "vasyan@mail.ru",
+				Phone:      "1234567890",
+				Name:       "",
+				LastName:   "Vasilev",
+				Patronymic: "Vasilich",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -75,9 +153,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"nill", "nil@nil.ru", "Nil", "", "Nilovich", "nil123"},
+				Username:   "vasyan",
+				Email:      "vasyan@mail.ru",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "",
+				Patronymic: "Vasilich",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -85,9 +178,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"nill", "nil@nil.ru", "Nil", "Nilov", "", "nil123"},
+				Username:   "vasyan",
+				Email:      "vasyan@mail.ru",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "Vasilev",
+				Patronymic: "",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -95,9 +203,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"nill", "nil@nil.ru", "Nil", "Nilov", "Nilovich", ""},
+				Username:   "vasyan",
+				Email:      "vasyan@mail.ru",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "Vasilev",
+				Patronymic: "Vasilich",
+				Password:   "",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -105,9 +228,24 @@ func TestCreateUserTableDriven(t *testing.T) {
 		},
 		{
 			in: struct {
-				username, email, name, lastName, patronymic, password string
+				Username   string
+				Email      string
+				Phone      string
+				Name       string
+				LastName   string
+				Patronymic string
+				Password   string
+				Birthday   time.Time
 			}{
-				"", "", "", "", "", ""},
+				Username:   "",
+				Email:      "vasyan@mail.ru",
+				Phone:      "1234567890",
+				Name:       "Vasya",
+				LastName:   "Vasilev",
+				Patronymic: "Vasilich",
+				Password:   "vasyaqwerty",
+				Birthday:   time.Now(),
+			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
@@ -122,7 +260,16 @@ func TestCreateUserTableDriven(t *testing.T) {
 	for _, i := range tests {
 		testname := fmt.Sprintf("input in: %v wants out: %v", i.in, i.out)
 		t.Run(testname, func(t *testing.T) {
-			id, err := service.CreateUser(i.in.username, i.in.email, i.in.name, i.in.lastName, i.in.patronymic, i.in.password)
+			id, err := service.CreateUser(
+				i.in.Username,
+				i.in.Email,
+				i.in.Phone,
+				i.in.Name,
+				i.in.LastName,
+				i.in.Patronymic,
+				i.in.Password,
+				i.in.Birthday,
+			)
 			if id != i.out.uuid && !errors.Is(err, i.out.err) {
 				t.Errorf("got %v and %v, wants %v", id, err, i.out)
 			}

@@ -1,6 +1,7 @@
 package account
 
 import (
+	"math/rand"
 	"regexp"
 	"strconv"
 	"time"
@@ -9,24 +10,30 @@ import (
 )
 
 type Account struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Account   string
-	Currency  string
-	IsActive  bool
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           uuid.UUID
+	UserID       uuid.UUID
+	Account      string
+	Currency     string
+	Name         string
+	Amount       float64
+	InterestRate float64
+	IsActive     bool
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
-func NewAccount(userID uuid.UUID, currency, account string) (*Account, error) {
+func NewAccount(userID uuid.UUID, currency, account, name string) (*Account, error) {
 	a := &Account{
-		ID:        uuid.New(),
-		Account:   account,
-		Currency:  currency,
-		UserID:    userID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		IsActive:  true,
+		ID:           uuid.New(),
+		Account:      account,
+		Currency:     currency,
+		Name:         name,
+		Amount:       0,
+		InterestRate: generateInterestRate(),
+		UserID:       userID,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		IsActive:     true,
 	}
 
 	err := a.Validate()
@@ -43,12 +50,12 @@ func NewAccount(userID uuid.UUID, currency, account string) (*Account, error) {
 }
 
 func NextAccount(currency, account string) (string, error) {
-	if len(account) != 20 {
+	if len(account) != 20 && len(account) != 0 {
 		return "", ErrAccountLength
 	}
 
 	if account != "" {
-		matched, err := regexp.MatchString(`0123456789`, account)
+		matched, err := regexp.MatchString(`^[0-9]+$`, account)
 		if err != nil {
 			return "", err
 		}
@@ -59,7 +66,7 @@ func NextAccount(currency, account string) (string, error) {
 	}
 
 	if currency != "" {
-		matched, err := regexp.MatchString(`0123456789`, currency)
+		matched, err := regexp.MatchString(`^[0-9]+$`, currency)
 		if err != nil {
 			return "", err
 		}
@@ -76,6 +83,7 @@ func NextAccount(currency, account string) (string, error) {
 
 	if account == "" {
 		toDigits = 0
+		account = "40817"
 	} else {
 		toDigits, _ = strconv.Atoi(account[13:])
 	}
@@ -93,11 +101,31 @@ func (a *Account) Validate() error {
 		return ErrCurrencyMustBeEntered
 	}
 
+	if a.Amount < 0 {
+		return ErrMustBePositiveOrZero
+	}
+
 	if a.UserID == uuid.Nil {
 		return ErrUserIDMustBeEntered
 	}
 
+	if a.Name == "" {
+		return ErrAccountNameMustBeEntered
+	}
+
 	return nil
+}
+
+// generate random rate as a decimal(5,4)
+func generateInterestRate() float64 {
+	src := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(src)
+	intPart := r.Intn(10)
+	decimalPart := r.Float64()
+	rate := float64(intPart) + decimalPart
+
+	// Округляем до 4х знаков после запятой
+	return float64(int(rate*10000)) / 10000
 }
 
 // Reader
@@ -117,7 +145,8 @@ type Reader interface {
 // Update - update record
 // Delete - delete record (deactivate)
 type Writer interface {
-	Create(a *Account) (uuid.UUID, error)
+	Create(a *Account) error
+	Update(a *Account) error
 	Delete(id uuid.UUID) error
 }
 
@@ -127,17 +156,24 @@ type Repository interface {
 	Writer
 }
 
-// Usecase интерфейс
+// Usecases
 // GetAccountByID - get account by ID
 // GetAccountByNumber - get account by account' number
+// GetAccountByIDAndUserID - get account by ID (safe)
 // ListAccount - get all clients' accounts
 // CreateAccount - create account
 // DeleteAccount - deactivate account
+// TopUp - top up account balance
+// Withdraw - withdraw money
 
 type UseCase interface {
 	GetAccountByID(id uuid.UUID) (*Account, error)
 	GetAccountByNumber(account string) (*Account, error)
-	ListAccount() ([]*Account, error)
+	GetAccountByIDAndUserID(id, userID uuid.UUID) (*Account, error)
+	ListAccount(userID uuid.UUID) ([]*Account, error)
 	CreateAccount(userID uuid.UUID, currency string) (*Account, error)
+	TopUp(id uuid.UUID, money float64)
+	WithDraw(id uuid.UUID, money float64)
 	DeleteAccount(id uuid.UUID) error
+	UpdateAccount(id uuid.UUID, name string, rate float64) error
 }

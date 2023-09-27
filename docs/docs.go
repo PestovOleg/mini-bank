@@ -48,6 +48,44 @@ const docTemplate = `{
             }
         },
         "/users": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Get User ID with credentials.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get User ID with credentials.",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new user unsing the provided details",
                 "consumes": [
@@ -75,7 +113,7 @@ const docTemplate = `{
                     "201": {
                         "description": "A new user has been created with ID: {id}",
                         "schema": {
-                            "type": "uuid"
+                            "type": "string"
                         }
                     },
                     "500": {
@@ -134,16 +172,608 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Update the user details using the provided user ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update user details based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User Update Payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated user details",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Delete the user using the provided user ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete user based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/accounts": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Fetch the list of accounts using the provided User ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Retrieve list of accounts based on the provided User ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved account details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/mapper.Account"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Accounts not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Create a new account using the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Create a new account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Account details for creation",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/account.AccountCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "A new account has been created with number: {string}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userid}/accounts/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Fetch the account details using the provided account ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Retrieve account details based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved account details",
+                        "schema": {
+                            "$ref": "#/definitions/mapper.Account"
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Update the account details using the provided user ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Update account details based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Account Update Payload",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/account.AccountUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated account details",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Delete the account using the provided account ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Delete account based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted account",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userid}/accounts/{id}/topup": {
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "TopUp the account balance using the provided user ID and amount.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "TopUp account balance based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "TopUp Account Payload",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/account.ChangeBalanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully toped up account details",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userid}/accounts/{id}/withdraw": {
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Withdraw money using the provided user ID and amount.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Withdraw money based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Withdraw Account Payload",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/account.ChangeBalanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully Withdrawed account",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
-        "mapper.User": {
+        "account.AccountCreateRequest": {
             "type": "object",
             "properties": {
+                "currency": {
+                    "type": "string",
+                    "example": "810"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Удачный"
+                }
+            }
+        },
+        "account.AccountUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "interest_rate": {
+                    "type": "number",
+                    "example": 0.125
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Удачный"
+                }
+            }
+        },
+        "account.ChangeBalanceRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 9999.99
+                }
+            }
+        },
+        "mapper.Account": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "example": "40817810902007654321"
+                },
+                "amount": {
+                    "type": "number",
+                    "example": 99999.99
+                },
                 "created_at": {
                     "type": "string",
                     "example": "2023-09-19T10:58:00.000Z"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "810"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "fdee7aae-f79f-4653-8a16-9207e6805b93"
+                },
+                "interest_rate": {
+                    "type": "number",
+                    "example": 0.125
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Удачный"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-09-19T10:58:00.000Z"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "fdee7aae-f79f-4653-8a16-9207e6805b93"
+                }
+            }
+        },
+        "mapper.User": {
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "01.01.1999"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "01.01.1999"
                 },
                 "email": {
                     "type": "string",
@@ -169,9 +799,13 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Ivanych"
                 },
+                "phone": {
+                    "type": "string",
+                    "example": "+7(495)999-99-99"
+                },
                 "updated_at": {
                     "type": "string",
-                    "example": "2023-09-19T10:58:00.000Z"
+                    "example": "01.01.1999"
                 },
                 "username": {
                     "type": "string",
@@ -182,6 +816,10 @@ const docTemplate = `{
         "user.UserCreateRequest": {
             "type": "object",
             "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "01.01.1999"
+                },
                 "email": {
                     "type": "string",
                     "example": "Ivanych@gmail.com"
@@ -202,10 +840,26 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Ivanych"
                 },
+                "phone": {
+                    "type": "string",
+                    "example": "+7(495)999-99-99"
+                },
                 "username": {
-                    "description": "the name for this user\nrequired: true\nmin length: 3",
                     "type": "string",
                     "example": "Ivanec"
+                }
+            }
+        },
+        "user.UserUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "Ivanych@gmail.com"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+7(495)999-99-99"
                 }
             }
         }
@@ -224,7 +878,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:3333",
+	Host:             "localhost",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "minibank",
