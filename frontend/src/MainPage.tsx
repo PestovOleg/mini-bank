@@ -185,11 +185,11 @@ function MainPage() {
                     href="https://github.com/PestovOleg/mini-bank"
                     label="Github"
                     icon={<GitHubIcon />}
-                  /> 
+                  />
                 </IconButton>
-                <Typography variant="caption" sx={{ fontSize: 14, ml: -3}}>
-        &copy; by Pestov
-      </Typography>
+                <Typography variant="caption" sx={{ fontSize: 14, ml: -3 }}>
+                  &copy; by Pestov
+                </Typography>
                 <StyledFab color="secondary" aria-label="add">
                   <AddIcon />
                 </StyledFab>

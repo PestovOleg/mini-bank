@@ -3,7 +3,7 @@ import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ProtectedRouteObserver from './ProtectedRoute';
 import MainPageObserver from './MainPage';
-import LoginObserver from './Login';
+import LoginObserver from './components/Login';
 
 function App() {
   return (

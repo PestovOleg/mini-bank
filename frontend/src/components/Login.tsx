@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import store from "./store/store";
+import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AppBar, Avatar, Box, Button, Container, CssBaseline, IconButton, Link, TextField, Toolbar, Typography } from "@mui/material";

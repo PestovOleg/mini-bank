@@ -1,4 +1,4 @@
-import { IAccount, IUser } from "./models/types";
+import { IAccount, IUser } from "../models/types";
 
 export const EMPTY_USER: IUser = {
     id: '',
