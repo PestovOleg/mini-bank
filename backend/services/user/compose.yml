@@ -1,0 +1,44 @@
+services:
+  
+  user-backend-blue:
+    image: pistollo/user-minibank:${APP_VERSION}
+    container_name: auth-backend-blue
+    hostname: auth-backend-green
+    environment:
+      CONFIG_PATH: ${CONFIG_PATH}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log 
+      - /etc/minibank/user-config.yaml:/etc/minibank/user-config.yaml   
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4454:3333
+    restart: unless-stopped
+
+  user-backend-green:
+    image: pistollo/user-minibank:${APP_VERSION}
+    container_name: green-backend
+    hostname: green-backend
+    environment:
+      CONFIG_PATH: ${CONFIG_PATH}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log
+      - /etc/minibank/user-config.yaml:/etc/minibank/user-config.yaml
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4455:3333
+    restart: unless-stopped
+
+networks:
+  minibank_net:
