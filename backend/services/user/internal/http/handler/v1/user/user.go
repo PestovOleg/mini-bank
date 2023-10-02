@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/PestovOleg/mini-bank/backend/domain/user"
-	"github.com/PestovOleg/mini-bank/backend/internal/http/mapper"
+	"../../backend/services/user/domain/user"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
+	"github.com/PestovOleg/mini-bank/backend/services/user/internal/http/mapper"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -36,7 +36,6 @@ type UserCreateRequest struct {
 	Name       string `json:"name" example:"Ivan"`
 	LastName   string `json:"lastName" example:"Ivanov"`
 	Patronymic string `json:"patronymic" example:"Ivanych"`
-	Password   string `json:"password" example:"mypass"`
 }
 
 // UserUpdateRequest represents the request payload for user update.
@@ -46,16 +45,11 @@ type UserUpdateRequest struct {
 	Phone string `json:"phone" example:"+7(495)999-99-99"`
 }
 
-type EnterWithCredentials struct {
-	Username   string `json:"username" example:"username"`
-	Patronymic string `json:"password" example:"password"`
-}
-
 // CreateUser godoc
 // @Version 1.0
 // @title CreateUser
 // @Summary Create a new user
-// @Description Create a new user unsing the provided details
+// @Description Create a new user using the provided details
 // @Tags users
 // @Accept  json
 // @Produce  json
@@ -90,14 +84,25 @@ func (u *UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		id, err := u.service.CreateUser(
-			input.Username,
+		id, err := uuid.Parse(input.ID)
+		if err != nil {
+			u.logger.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Couldn't parse ID:" + err.Error()))
+			if err != nil {
+				u.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		err = u.service.CreateUser(
+			id,
 			input.Email,
 			input.Phone,
 			input.Name,
 			input.LastName,
 			input.Patronymic,
-			input.Password,
 			birthday,
 		)
 
@@ -162,7 +167,7 @@ func (u *UserHandler) GetUser() http.Handler {
 			return
 		}
 
-		data, err := u.service.GetUserByID(id)
+		data, err := u.service.GetUser(id)
 		if err != nil && !errors.Is(err, user.ErrNotFound) {
 			u.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)

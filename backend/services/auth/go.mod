@@ -12,3 +12,5 @@ require (
 )
 
 require go.uber.org/multierr v1.10.0 // indirect
+
+replace github.com/PestovOleg/mini-bank/backend/pkg/logger v0.0.0 => ../..
