@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 
-class User {
+export class User {
     id: UUID;
     username: string;
     email: string;

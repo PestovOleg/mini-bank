@@ -1,7 +1,7 @@
 import { IAccount, IUser } from "../models/types";
 import { action, makeAutoObservable, observable } from "mobx";
 import { runInAction } from "mobx";
-import { EMPTY_USER,EMPTY_ACCOUNT } from "../const"
+import { EMPTY_USER,EMPTY_ACCOUNT } from "../const/empties"
 import { Store } from './store';
 
 const URL = "http://localhost/api/v1";
