@@ -76,7 +76,6 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 			input.Password,
 		)
 
-		a.logger.Debug("Record created with ID: " + id.String())
 		if err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -87,6 +86,8 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 
 			return
 		}
+
+		a.logger.Debug("Record created with ID: " + id.String())
 
 		toJSON := &struct {
 			ID string `json:"id"`

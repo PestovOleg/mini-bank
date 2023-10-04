@@ -1,3 +1,4 @@
+// TODO: сделать  описание
 package user
 
 import (
@@ -6,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"../../backend/services/user/domain/user"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
+	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user"
 	"github.com/PestovOleg/mini-bank/backend/services/user/internal/http/mapper"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -96,7 +97,7 @@ func (u *UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		err = u.service.CreateUser(
+		_, err = u.service.CreateUser(
 			id,
 			input.Email,
 			input.Phone,
@@ -192,14 +193,12 @@ func (u *UserHandler) GetUser() http.Handler {
 
 		toJSON := &mapper.User{
 			ID:         data.ID,
-			Username:   data.Username,
 			Email:      data.Email,
 			Phone:      data.Phone,
 			Birthday:   data.Birthday.Format(time.RFC3339),
 			Name:       data.Name,
 			LastName:   data.LastName,
 			Patronymic: data.Patronymic,
-			IsActive:   data.IsActive,
 			CreatedAt:  data.CreatedAt.Format(time.RFC3339),
 			UpdatedAt:  data.UpdatedAt.Format(time.RFC3339),
 		}
@@ -273,84 +272,5 @@ func (u *UserHandler) UpdateUser() http.Handler {
 			return
 		}
 		u.logger.Sugar().Infof("User %v was updated", id)
-	})
-}
-
-// DeleteUser godoc
-// @title Delete User by ID
-// @version 1.0
-// @summary Delete user based on the provided ID.
-// @description Delete the user using the provided user ID.
-// @tags users
-// @accept json
-// @produce json
-// @param id path string true "User ID"
-// @success 200 {string} string "Successfully deleted user"
-// @failure 500 {string} string "Internal server error"
-// @failure 404 {string} string "User not found"
-// @Security BasicAuth
-// @router /users/{id} [delete]
-func (u *UserHandler) DeleteUser() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := uuid.Parse(vars["id"])
-		if err != nil {
-			u.logger.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte("Couldn't parse ID:" + err.Error()))
-			if err != nil {
-				u.logger.Error(err.Error())
-			}
-
-			return
-		}
-
-		err = u.service.DeleteUser(id)
-		if err != nil {
-			u.logger.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte("Couldn't delete user: " + err.Error()))
-			if err != nil {
-				u.logger.Error(err.Error())
-			}
-
-			return
-		}
-		u.logger.Sugar().Infof("User %v was deleted", id)
-	})
-}
-
-// Enter godoc
-// @title Enter with credentials
-// @version 1.0
-// @summary Get User ID with credentials.
-// @description Get User ID with credentials.
-// @tags users
-// @accept json
-// @produce json
-// @success 200 {string} ID "Successfully retrieved User ID"
-// @failure 500 {string} string "Internal server error"
-// @failure 404 {string} string "User not found"
-// @Security BasicAuth
-// @router /users [get]
-func (u *UserHandler) Enter() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		username, _, _ := r.BasicAuth()
-		user, _ := u.service.GetUserByUName(username)
-
-		w.Header().Set("Content-Type", "application/json")
-		toJSON := &struct {
-			ID string `json:"id"`
-		}{
-			ID: user.ID.String(),
-		}
-		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
-			u.logger.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte("Error while reading ID"))
-			if err != nil {
-				u.logger.Error(err.Error())
-			}
-		}
 	})
 }

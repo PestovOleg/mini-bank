@@ -4,26 +4,26 @@ import (
 	"context"
 	"net/http"
 
-	postgresConnect "github.com/PestovOleg/mini-bank/backend/pkg/database/postgres"
+	"github.com/PestovOleg/mini-bank/backend/pkg/config"
+	"github.com/PestovOleg/mini-bank/backend/pkg/database"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
-	"github.com/PestovOleg/mini-bank/backend/pkg/middleware"
 	"github.com/PestovOleg/mini-bank/backend/pkg/server"
 	"github.com/PestovOleg/mini-bank/backend/pkg/signal"
-	"github.com/PestovOleg/mini-bank/backend/services/auth/internal/config"
+	unleashServer "github.com/PestovOleg/mini-bank/backend/pkg/unleash"
+	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user"
+	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user/postgres"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"golang.org/x/sys/unix"
 )
 
 type Services struct {
-	UserService    *user.Service
-	AccountService *account.Service
+	UserService *user.Service
 }
 
-func NewServices(u *user.Service, a *account.Service) *Services {
+func NewServices(u *user.Service) *Services {
 	return &Services{
-		UserService:    u,
-		AccountService: a,
+		UserService: u,
 	}
 }
 
@@ -35,14 +35,8 @@ type App struct {
 
 func NewRouter(s *Services) http.Handler {
 	r := mux.NewRouter()
-	subRouterV1 := r.PathPrefix("/api/v1").Subrouter()
-	subRouterV1.Use(middleware.LoggerMiddleware)
-
-	subRouterV1L := r.PathPrefix("/api/v1").Subrouter()
-	subRouterV1L.Use(middleware.LoggerMiddleware)
-	subRouterV1L.Use(middleware.BasicAuthMiddleware(s.UserService))
-	SetHandler(subRouterV1, BaseRoutes(s))
-	SetHandler(subRouterV1L, BaseRoutesL(s))
+	subRouter := r.PathPrefix("/api/v1").Subrouter()
+	SetHandler(subRouter, BaseRoutes(s))
 
 	// Настраиваем CORS (как минимум для swagger'а)
 	c := cors.New(cors.Options{
@@ -57,7 +51,7 @@ func NewRouter(s *Services) http.Handler {
 }
 
 func NewApp(cfg *config.AppConfig) App {
-	conn := postgresConnect.NewDBCon(
+	conn := database.NewDBCon(
 		cfg.PostgresDBConfig.User,
 		cfg.PostgresDBConfig.Password,
 		cfg.PostgresDBConfig.Host,
@@ -65,27 +59,26 @@ func NewApp(cfg *config.AppConfig) App {
 		cfg.PostgresDBConfig.Name,
 		cfg.PostgresDBConfig.SSLMode,
 	)
-	logger := logger.GetLogger("APP")
+	logger := logger.GetLogger("User")
+	db := database.NewDatabase()
+	pgClient, err := db.GetSQLDBCon(conn)
 
-	pgClient, err := postgresConnect.GetDBCon(conn)
 	if err != nil {
 		logger.Fatal("Unexpected error with DB connection: " + err.Error())
 	}
 
 	logger.Info("DB connection is established")
 
-	err = InitUnleash(cfg)
+	err = unleashServer.InitUnleash(cfg, "user")
 	if err != nil {
 		logger.Sugar().Fatalf("Couldn't establish a connection to the Unleash Server: %s", err.Error())
 		panic(err.Error())
 	}
 
-	userRepo := repoUser.NewUserSQL(pgClient)
+	userRepo := postgres.NewUserSQL(pgClient)
 	userService := user.NewService(userRepo)
 
-	accountRepo := postgres.NewAccountSQL(pgClient)
-	accountService := account.NewService(accountRepo)
-	s := NewServices(userService, accountService)
+	s := NewServices(userService)
 
 	api := NewRouter(s)
 

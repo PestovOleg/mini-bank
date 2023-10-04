@@ -64,34 +64,6 @@ func TestNewUserTableDriven(t *testing.T) {
 				err:  nil,
 			},
 		},
-
-		{
-			in: struct {
-				id         uuid.UUID
-				Email      string
-				Phone      string
-				Name       string
-				LastName   string
-				Patronymic string
-				Birthday   time.Time
-			}{
-				id:         uuid.Nil,
-				Email:      "vasyan@mail.ru",
-				Phone:      "1234567890",
-				Name:       "Vasya",
-				LastName:   "Vasilev",
-				Patronymic: "Vasilich",
-				Birthday:   time.Now(),
-			},
-			out: struct {
-				user *User
-				err  error
-			}{
-				user: mockUser,
-				err:  ErrEmptyUsername,
-			},
-		},
-
 		{
 			in: struct {
 				id         uuid.UUID
@@ -226,33 +198,6 @@ func TestNewUserTableDriven(t *testing.T) {
 				err:  ErrEmptyPatronymic,
 			},
 		},
-
-		{
-			in: struct {
-				id         uuid.UUID
-				Email      string
-				Phone      string
-				Name       string
-				LastName   string
-				Patronymic string
-				Birthday   time.Time
-			}{
-				id:         uuid.New(),
-				Email:      "vasyan@mail.ru",
-				Phone:      "1234567890",
-				Name:       "Vasya",
-				LastName:   "Vasilev",
-				Patronymic: "Vasilich",
-				Birthday:   time.Now(),
-			},
-			out: struct {
-				user *User
-				err  error
-			}{
-				user: mockUser,
-				err:  ErrEmptyPassword,
-			},
-		},
 	}
 
 	for _, i := range tests {
@@ -289,42 +234,33 @@ func TestValidateUserTableDriven(t *testing.T) {
 	}{
 		{mockUser, nil},
 		{&User{
-			ID:         uuid.New(),
-			Username:   "",
+			ID:         uuid.Nil,
 			Email:      "vasyan@mail.ru",
 			Phone:      "1234567890",
 			Name:       "Vasya",
 			LastName:   "Vasilev",
-			IsActive:   true,
 			Patronymic: "Vasilich",
-			Password:   "samplePassword",
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 			Birthday:   time.Now(),
-		}, ErrEmptyUsername},
+		}, ErrIDMustBeEntered},
 		{&User{
 			ID:         uuid.New(),
-			Username:   "vasyan",
 			Email:      "",
 			Phone:      "1234567890",
 			Name:       "Vasya",
 			LastName:   "Vasilev",
-			IsActive:   true,
 			Patronymic: "Vasilich",
-			Password:   "samplePassword",
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 			Birthday:   time.Now(),
 		}, ErrEmptyEmail},
 		{&User{
 			ID:         uuid.New(),
-			Username:   "vasyan",
 			Email:      "vasyan@mail.ru",
 			Name:       "",
 			LastName:   "Vasilev",
-			IsActive:   true,
 			Patronymic: "Vasilich",
-			Password:   "samplePassword",
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 			Phone:      "1234567890",
@@ -332,13 +268,10 @@ func TestValidateUserTableDriven(t *testing.T) {
 		}, ErrEmptyName},
 		{&User{
 			ID:         uuid.New(),
-			Username:   "vasyan",
 			Email:      "vasyan@mail.ru",
 			Name:       "Vasya",
 			LastName:   "",
-			IsActive:   true,
 			Patronymic: "Vasilich",
-			Password:   "samplePassword",
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 			Phone:      "1234567890",
@@ -346,32 +279,15 @@ func TestValidateUserTableDriven(t *testing.T) {
 		}, ErrEmptyLastName},
 		{&User{
 			ID:         uuid.New(),
-			Username:   "vasyan",
 			Email:      "vasyan@mail.ru",
 			Name:       "Vasya",
 			LastName:   "Vasilev",
-			IsActive:   true,
 			Patronymic: "",
-			Password:   "samplePassword",
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 			Phone:      "1234567890",
 			Birthday:   time.Now(),
 		}, ErrEmptyPatronymic},
-		{&User{
-			ID:         uuid.New(),
-			Username:   "vasyan",
-			Email:      "vasyan@mail.ru",
-			Name:       "Vasya",
-			LastName:   "Vasilev",
-			IsActive:   true,
-			Patronymic: "Vasilich",
-			Password:   "",
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-			Phone:      "1234567890",
-			Birthday:   time.Now(),
-		}, ErrEmptyPassword},
 	}
 
 	for _, i := range tests {

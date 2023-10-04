@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/PestovOleg/mini-bank/backend/domain/user"
+	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user"
 	"github.com/google/uuid"
 )
 

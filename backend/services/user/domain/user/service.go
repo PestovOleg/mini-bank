@@ -61,7 +61,7 @@ func (s *Service) UpdateUser(id uuid.UUID, email, phone string) error {
 		return ErrMustBeFilledIn
 	}
 
-	u, err := s.Get(id)
+	u, err := s.repo.Get(id)
 	if err != nil {
 		return err
 	}

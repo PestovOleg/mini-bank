@@ -33,7 +33,7 @@ func main() {
 		panic("Logger cannot be initialized")
 	}
 
-	logger := logger.GetLogger("APP")
+	logger := logger.GetLogger("Auth")
 	app := app.NewApp(&cfg)
 
 	err = app.Run()

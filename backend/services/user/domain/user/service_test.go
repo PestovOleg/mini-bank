@@ -92,7 +92,7 @@ func TestCreateUserTableDriven(t *testing.T) {
 			out: struct {
 				uuid uuid.UUID
 				err  error
-			}{uuid: uuid.Nil, err: ErrEmptyUsername},
+			}{uuid: uuid.Nil, err: ErrIDMustBeEntered},
 		},
 		{
 			in: struct {
@@ -202,12 +202,11 @@ func TestCreateUserTableDriven(t *testing.T) {
 				Name:       "Vasya",
 				LastName:   "Vasilev",
 				Patronymic: "Vasilich",
-				Birthday:   nil,
 			},
 			out: struct {
 				uuid uuid.UUID
 				err  error
-			}{uuid: uuid.Nil, err: ErrEmptyUsername},
+			}{uuid: uuid.Nil, err: ErrEmptyBirthday},
 		},
 	}
 

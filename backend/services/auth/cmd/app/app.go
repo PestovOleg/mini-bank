@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/config"
-	postgresConnect "github.com/PestovOleg/mini-bank/backend/pkg/database/postgres"
+	"github.com/PestovOleg/mini-bank/backend/pkg/database"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
 	"github.com/PestovOleg/mini-bank/backend/pkg/server"
 	"github.com/PestovOleg/mini-bank/backend/pkg/signal"
@@ -51,7 +51,7 @@ func NewRouter(s *Services) http.Handler {
 }
 
 func NewApp(cfg *config.AppConfig) App {
-	conn := postgresConnect.NewDBCon(
+	conn := database.NewDBCon(
 		cfg.PostgresDBConfig.User,
 		cfg.PostgresDBConfig.Password,
 		cfg.PostgresDBConfig.Host,
@@ -59,9 +59,10 @@ func NewApp(cfg *config.AppConfig) App {
 		cfg.PostgresDBConfig.Name,
 		cfg.PostgresDBConfig.SSLMode,
 	)
-	logger := logger.GetLogger("APP")
+	logger := logger.GetLogger("Auth")
+	db := database.NewDatabase()
+	pgClient, err := db.GetSQLDBCon(conn)
 
-	pgClient, err := postgresConnect.GetDBCon(conn)
 	if err != nil {
 		logger.Fatal("Unexpected error with DB connection: " + err.Error())
 	}
