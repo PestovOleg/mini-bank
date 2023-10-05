@@ -22,7 +22,7 @@ type UserHandler struct {
 
 func NewUserHandler(s *user.Service) *UserHandler {
 	return &UserHandler{
-		logger:  logger.GetLogger("API"),
+		logger:  logger.GetLogger("UserAPI"),
 		service: s,
 	}
 }
@@ -33,7 +33,7 @@ type UserCreateRequest struct {
 	ID         string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
 	Email      string `json:"email" example:"Ivanych@gmail.com"`
 	Phone      string `json:"phone" example:"+7(495)999-99-99"`
-	Birthday   string `json:"birthday" example:"2013-Feb-03"`
+	Birthday   string `json:"birthday" example:"02.01.2006"`
 	Name       string `json:"name" example:"Ivan"`
 	LastName   string `json:"lastName" example:"Ivanov"`
 	Patronymic string `json:"patronymic" example:"Ivanych"`
@@ -73,7 +73,7 @@ func (u *UserHandler) CreateUser() http.Handler {
 
 			return
 		}
-		birthday, err := time.Parse(time.RFC3339, input.Birthday)
+		birthday, err := time.Parse("02.01.2006", input.Birthday)
 		if err != nil {
 			u.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -195,12 +195,12 @@ func (u *UserHandler) GetUser() http.Handler {
 			ID:         data.ID,
 			Email:      data.Email,
 			Phone:      data.Phone,
-			Birthday:   data.Birthday.Format(time.RFC3339),
+			Birthday:   data.Birthday.Format("02.01.2006"),
 			Name:       data.Name,
 			LastName:   data.LastName,
 			Patronymic: data.Patronymic,
-			CreatedAt:  data.CreatedAt.Format(time.RFC3339),
-			UpdatedAt:  data.UpdatedAt.Format(time.RFC3339),
+			CreatedAt:  data.CreatedAt.Format("02.01.2006"),
+			UpdatedAt:  data.UpdatedAt.Format("02.01.2006"),
 		}
 
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {

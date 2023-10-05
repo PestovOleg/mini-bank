@@ -77,7 +77,6 @@ services:
     volumes:
       - /var/log/nginx:/var/log/nginx
       - /opt/minibank-web:/usr/share/nginx/html
-      #- /opt/minibank-web/index.html:/usr/share/nginx/html/index.html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
     ports:
@@ -98,6 +97,7 @@ services:
       dockerfile: ./backend/services/account/Dockerfile
     environment:
       CONFIG_PATH: ${ACCOUNT_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -121,6 +121,7 @@ services:
       dockerfile: ./backend/services/account/Dockerfile
     environment:
       CONFIG_PATH: ${ACCOUNT_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -144,6 +145,7 @@ services:
       dockerfile: ./backend/services/auth/Dockerfile
     environment:
       CONFIG_PATH: ${AUTH_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -167,6 +169,7 @@ services:
       dockerfile: ./backend/services/auth/Dockerfile
     environment:
       CONFIG_PATH: ${AUTH_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -190,6 +193,7 @@ services:
       dockerfile: ./backend/services/user/Dockerfile
     environment:
       CONFIG_PATH: ${USER_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -213,6 +217,7 @@ services:
       dockerfile: ./backend/services/user/Dockerfile
     environment:
       CONFIG_PATH: ${USER_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log

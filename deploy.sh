@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 echo "Starting deploy ${SERVICE}..."
-
+echo ${AUTH_HOST}
+# TODO: добавиь установку переменных для миграции и активного сервиса auth
 echo "Checking nginx template for service ${SERVICE}"
 [ -f "./nginx/conf.d/${SERVICE}.conf.template" ] && 
 echo "Nginx template for ${SERVICE} is found" || 
@@ -31,6 +32,13 @@ docker compose up -d $NEXT_BACKEND
 echo "Waiting 5 sec"
 sleep 5
 
+echo "Starting stub service for nginx"
+{ while :; do \
+    { echo -ne "HTTP/1.1 503 Service Unavailable\r\nContent-Length: $(echo -n 'Service Unavailable')\r\n\r\nService Unavailable"; } | \
+    nc -l -p 3333 -q 1; \
+  done } & \
+STUB_PID=$!
+
 echo "Copying current nginx.conf to nginx.conf.back"
 cp ./nginx/conf.d/${SERVICE}.nginx.conf ./nginx/conf.d/${SERVICE}.conf.back 2>/dev/null
 
@@ -58,8 +66,9 @@ else
     echo "Nginx reloaded"
 fi
 
-echo "Waiting 3 sec..."
+echo "Waiting 3 sec...and killing STUB service"
 sleep 3
+kill $STUB_PID
 
 echo "Testing minibank..."
 curl -s http://localhost/api/v1/${SERVICE}-health | grep "Service is healthy"

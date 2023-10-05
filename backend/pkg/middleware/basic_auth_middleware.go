@@ -4,6 +4,8 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
 )
@@ -12,8 +14,19 @@ import (
 func BasicAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := logger.GetLogger("BAuthMdle")
-		client := &http.Client{}
-		authRequest, err := http.NewRequestWithContext(context.Background(), "GET", "http://localhost/api/v1/auth", nil)
+		client := &http.Client{
+			Timeout: time.Second * 3,
+		}
+		host := os.Getenv("AUTH_HOST")
+
+		if host == "" {
+			logger.Error("sysvar AUTH_HOST is not enabled, URL to Auth server cannot be found")
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+
+		authRequest, err := http.NewRequestWithContext(context.Background(), http.MethodGet, host, nil)
 		if err != nil {
 			logger.Error(err.Error())
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -33,7 +46,6 @@ func BasicAuthMiddleware(next http.Handler) http.Handler {
 		defer resp.Body.Close()
 
 		if resp.StatusCode == http.StatusUnauthorized {
-			// If unauthorized, copy the response from the authorization request to the original response writer
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				logger.Error(err.Error())
@@ -42,7 +54,11 @@ func BasicAuthMiddleware(next http.Handler) http.Handler {
 				return
 			}
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write(body)
+			_, err = w.Write(body)
+			if err != nil {
+				logger.Error(err.Error())
+			}
+
 			return
 		}
 

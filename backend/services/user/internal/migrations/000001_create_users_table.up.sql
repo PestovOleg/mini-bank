@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id uuid PRIMARY KEY ,
     email varchar(256) UNIQUE NOT NULL,
-    phone varchar(15) NOT NULL,
+    phone varchar(25) NOT NULL,
     birthday timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
     name varchar(256)  NOT NULL,
     last_name varchar(256)  NOT NULL,

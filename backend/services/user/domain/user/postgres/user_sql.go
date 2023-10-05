@@ -21,7 +21,7 @@ func NewUserSQL(db *sql.DB) *UserSQL {
 func (r *UserSQL) Create(u *user.User) (uuid.UUID, error) {
 	rec, err := r.db.Prepare(`
 		insert into users (id, email, phone,name, last_name, patronymic, created_at, birthday)
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`)
+		values($1, $2, $3, $4, $5, $6, $7, $8)`)
 
 	if err != nil {
 		return u.ID, err

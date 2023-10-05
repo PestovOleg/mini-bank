@@ -20,7 +20,7 @@ type AccountHandler struct {
 
 func NewAccountHandler(s *account.Service) *AccountHandler {
 	return &AccountHandler{
-		logger:  logger.GetLogger("API"),
+		logger:  logger.GetLogger("AccountAPI"),
 		service: s,
 	}
 }
