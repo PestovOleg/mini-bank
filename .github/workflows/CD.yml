@@ -82,7 +82,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/mini-bank
-            git pull origin main
+            git pull
             export MGMT_CONFIG_PATH=${{ vars.MGMT_CONFIG_PATH }}
             export MGMT_APP_VERSION=${{ env.VERSION }}
             echo 'Переменные для миграции'
