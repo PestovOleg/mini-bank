@@ -8,89 +8,42 @@ package app
 import (
 	"net/http"
 
-	handlerAccount "github.com/PestovOleg/mini-bank/backend/internal/http/handler/v1/account"
-	"github.com/PestovOleg/mini-bank/backend/internal/http/handler/v1/health"
-	handlerUser "github.com/PestovOleg/mini-bank/backend/internal/http/handler/v1/user"
-	"github.com/PestovOleg/mini-bank/backend/internal/http/middleware"
+	"github.com/PestovOleg/mini-bank/backend/pkg/middleware"
+	"github.com/PestovOleg/mini-bank/backend/services/user/internal/http/handler/v1/health"
+	handlerUser "github.com/PestovOleg/mini-bank/backend/services/user/internal/http/handler/v1/user"
 	"github.com/gorilla/mux"
 )
 
 type RouteConfig struct {
-	Handler http.Handler
-	Feature string
+	Handler     http.Handler
+	Feature     string
+	Middlewares []mux.MiddlewareFunc
 }
 
 func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 	return map[string]map[string]RouteConfig{
-		"/health": {
+		"/user-minibank-health": {
 			http.MethodGet: {
 				Handler: health.NewHealthCheckHandler(),
 			},
 		},
 		"/users": {
 			http.MethodPost: {
-				Handler: handlerUser.NewUserHandler(s.UserService).CreateUser(),
-				Feature: "CreateUserToggle",
-			},
-		},
-	}
-}
-
-func BaseRoutesL(s *Services) map[string]map[string]RouteConfig {
-	return map[string]map[string]RouteConfig{
-		"/users": {
-			http.MethodGet: {
-				Handler: handlerUser.NewUserHandler(s.UserService).Enter(),
+				Handler:     handlerUser.NewUserHandler(s.UserService).CreateUser(),
+				Feature:     "CreateUserToggle",
+				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
 			},
 		},
 		"/users/{id}": {
 			http.MethodGet: {
-				Handler: handlerUser.NewUserHandler(s.UserService).GetUser(),
-				Feature: "GetUserToggle",
+				Handler:     handlerUser.NewUserHandler(s.UserService).GetUser(),
+				Feature:     "GetUserToggle",
+				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
 			},
 			http.MethodPut: {
-				Handler: handlerUser.NewUserHandler(s.UserService).UpdateUser(),
-				Feature: "UpdateUserToggle",
-			},
-			http.MethodDelete: {
-				Handler: handlerUser.NewUserHandler(s.UserService).DeleteUser(),
-				Feature: "DeleteUserToggle",
-			},
-		},
-		"/users/{id}/accounts": {
-			http.MethodPost: {
-				Handler: handlerAccount.NewAccountHandler(s.AccountService).CreateAccount(),
-				Feature: "CreateAccountToggle",
-			},
-			http.MethodGet: {
-				Handler: handlerAccount.NewAccountHandler(s.AccountService).ListAccountsByUserID(),
-				Feature: "ListAccountsToggle",
-			},
-		},
-		"/users/{userid}/accounts/{id}": {
-			http.MethodPut: {
-				Handler: handlerAccount.NewAccountHandler(s.AccountService).UpdateAccount(),
-				Feature: "UpdateAccountToggle",
-			},
-			http.MethodGet: {
-				Handler: handlerAccount.NewAccountHandler(s.AccountService).GetAccountByID(),
-				Feature: "GetAccountToggle",
-			},
-			http.MethodDelete: {
-				Handler: handlerAccount.NewAccountHandler(s.AccountService).DeleteAccount(),
-				Feature: "DeleteAccountToggle",
-			},
-		},
-		"/users/{userid}/accounts/{id}/topup": {
-			http.MethodPut: {
-				Handler: handlerAccount.NewAccountHandler(s.AccountService).TopUp(),
-				Feature: "TopUpToggle",
-			},
-		},
-		"/users/{userid}/accounts/{id}/withdraw": {
-			http.MethodPut: {
-				Handler: handlerAccount.NewAccountHandler(s.AccountService).Withdraw(),
-				Feature: "WithdrawToggle",
+				Handler:     handlerUser.NewUserHandler(s.UserService).UpdateUser(),
+				Feature:     "UpdateUserToggle",
+				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
 			},
 		},
 	}
@@ -99,10 +52,15 @@ func BaseRoutesL(s *Services) map[string]map[string]RouteConfig {
 func SetHandler(r *mux.Router, paths map[string]map[string]RouteConfig) {
 	for path, methods := range paths {
 		for method, config := range methods {
-			if config.Feature == "" {
-				r.Handle(path, config.Handler).Methods(method)
+			handler := config.Handler
+			for _, middleware := range config.Middlewares { // оборачиваем во все middleware
+				handler = middleware(handler)
+			}
+
+			if config.Feature == "" { // присваиваем фичи
+				r.Handle(path, handler).Methods(method)
 			} else {
-				r.Handle(path, middleware.FeatureToggleMiddleware(config.Feature, config.Handler)).Methods(method)
+				r.Handle(path, middleware.FeatureToggleMiddleware(config.Feature, handler)).Methods(method)
 			}
 		}
 	}

@@ -1,0 +1,251 @@
+.
+├── ./.dockerignore
+├── ./.github
+│   └── ./.github/workflows
+│       ├── ./.github/workflows/CD-account-minibank.yml
+│       ├── ./.github/workflows/CD.yml
+│       ├── ./.github/workflows/CDTest.yml
+│       ├── ./.github/workflows/CI-mgmt-minibank.yml
+│       └── ./.github/workflows/CI.yml
+├── ./.gitignore
+├── ./Makefile
+├── ./README.md
+├── ./backend
+│   ├── ./backend/.golangci.yml
+│   ├── ./backend/Makefile
+│   ├── ./backend/config
+│   │   └── ./backend/config/example.yaml
+│   ├── ./backend/go.work
+│   ├── ./backend/go.work.sum
+│   ├── ./backend/pkg
+│   │   ├── ./backend/pkg/config
+│   │   │   ├── ./backend/pkg/config/config.go
+│   │   │   ├── ./backend/pkg/config/go.mod
+│   │   │   └── ./backend/pkg/config/go.sum
+│   │   ├── ./backend/pkg/database
+│   │   │   ├── ./backend/pkg/database/database.go
+│   │   │   ├── ./backend/pkg/database/go.mod
+│   │   │   ├── ./backend/pkg/database/go.sum
+│   │   │   └── ./backend/pkg/database/postgres.go
+│   │   ├── ./backend/pkg/logger
+│   │   │   ├── ./backend/pkg/logger/go.mod
+│   │   │   ├── ./backend/pkg/logger/go.sum
+│   │   │   ├── ./backend/pkg/logger/logger.go
+│   │   │   ├── ./backend/pkg/logger/logger_test.go
+│   │   │   └── ./backend/pkg/logger/mocktest.go
+│   │   ├── ./backend/pkg/middleware
+│   │   │   ├── ./backend/pkg/middleware/basic_auth_middleware.go
+│   │   │   ├── ./backend/pkg/middleware/feature_middleware.go
+│   │   │   ├── ./backend/pkg/middleware/go.mod
+│   │   │   ├── ./backend/pkg/middleware/go.sum
+│   │   │   └── ./backend/pkg/middleware/logger_middleware.go
+│   │   ├── ./backend/pkg/server
+│   │   │   ├── ./backend/pkg/server/go.mod
+│   │   │   ├── ./backend/pkg/server/go.sum
+│   │   │   ├── ./backend/pkg/server/server.go
+│   │   │   └── ./backend/pkg/server/server_test.go
+│   │   ├── ./backend/pkg/signal
+│   │   │   ├── ./backend/pkg/signal/go.mod
+│   │   │   ├── ./backend/pkg/signal/signal.go
+│   │   │   └── ./backend/pkg/signal/signal_test.go
+│   │   └── ./backend/pkg/unleash
+│   │       ├── ./backend/pkg/unleash/go.mod
+│   │       ├── ./backend/pkg/unleash/go.sum
+│   │       └── ./backend/pkg/unleash/unleash.go
+│   └── ./backend/services
+│       ├── ./backend/services/account
+│       │   ├── ./backend/services/account/.golangci.yml
+│       │   ├── ./backend/services/account/Dockerfile
+│       │   ├── ./backend/services/account/cmd
+│       │   │   ├── ./backend/services/account/cmd/app
+│       │   │   │   ├── ./backend/services/account/cmd/app/app.go
+│       │   │   │   └── ./backend/services/account/cmd/app/routing.go
+│       │   │   └── ./backend/services/account/cmd/main.go
+│       │   ├── ./backend/services/account/compose.yaml
+│       │   ├── ./backend/services/account/domain
+│       │   │   └── ./backend/services/account/domain/account
+│       │   │       ├── ./backend/services/account/domain/account/account.go
+│       │   │       ├── ./backend/services/account/domain/account/account_test.go
+│       │   │       ├── ./backend/services/account/domain/account/error.go
+│       │   │       ├── ./backend/services/account/domain/account/mock.go
+│       │   │       ├── ./backend/services/account/domain/account/postgres
+│       │   │       │   └── ./backend/services/account/domain/account/postgres/account_sql.go
+│       │   │       ├── ./backend/services/account/domain/account/service.go
+│       │   │       └── ./backend/services/account/domain/account/service_test.go
+│       │   ├── ./backend/services/account/go.mod
+│       │   ├── ./backend/services/account/go.sum
+│       │   └── ./backend/services/account/internal
+│       │       ├── ./backend/services/account/internal/http
+│       │       │   ├── ./backend/services/account/internal/http/handler
+│       │       │   │   └── ./backend/services/account/internal/http/handler/v1
+│       │       │   │       ├── ./backend/services/account/internal/http/handler/v1/account
+│       │       │   │       │   └── ./backend/services/account/internal/http/handler/v1/account/account.go
+│       │       │   │       └── ./backend/services/account/internal/http/handler/v1/health
+│       │       │   │           ├── ./backend/services/account/internal/http/handler/v1/health/health_check.go
+│       │       │   │           └── ./backend/services/account/internal/http/handler/v1/health/health_check_test.go
+│       │       │   └── ./backend/services/account/internal/http/mapper
+│       │       │       └── ./backend/services/account/internal/http/mapper/account.go
+│       │       └── ./backend/services/account/internal/migrations
+│       │           ├── ./backend/services/account/internal/migrations/000001_create_accounts_table.down.sql
+│       │           └── ./backend/services/account/internal/migrations/000001_create_accounts_table.up.sql
+│       ├── ./backend/services/auth
+│       │   ├── ./backend/services/auth/.golangci.yml
+│       │   ├── ./backend/services/auth/Dockerfile
+│       │   ├── ./backend/services/auth/cmd
+│       │   │   ├── ./backend/services/auth/cmd/app
+│       │   │   │   ├── ./backend/services/auth/cmd/app/app.go
+│       │   │   │   └── ./backend/services/auth/cmd/app/routing.go
+│       │   │   └── ./backend/services/auth/cmd/main.go
+│       │   ├── ./backend/services/auth/compose.yaml
+│       │   ├── ./backend/services/auth/domain
+│       │   │   └── ./backend/services/auth/domain/auth
+│       │   │       ├── ./backend/services/auth/domain/auth/auth.go
+│       │   │       ├── ./backend/services/auth/domain/auth/error.go
+│       │   │       ├── ./backend/services/auth/domain/auth/interface.go
+│       │   │       ├── ./backend/services/auth/domain/auth/mock.go
+│       │   │       ├── ./backend/services/auth/domain/auth/postgres
+│       │   │       │   └── ./backend/services/auth/domain/auth/postgres/user_sql.go
+│       │   │       ├── ./backend/services/auth/domain/auth/service.go
+│       │   │       ├── ./backend/services/auth/domain/auth/service_test.go
+│       │   │       └── ./backend/services/auth/domain/auth/user_test.go
+│       │   ├── ./backend/services/auth/go.mod
+│       │   ├── ./backend/services/auth/go.sum
+│       │   └── ./backend/services/auth/internal
+│       │       ├── ./backend/services/auth/internal/http
+│       │       │   ├── ./backend/services/auth/internal/http/handler
+│       │       │   │   └── ./backend/services/auth/internal/http/handler/v1
+│       │       │   │       ├── ./backend/services/auth/internal/http/handler/v1/auth
+│       │       │   │       │   └── ./backend/services/auth/internal/http/handler/v1/auth/auth.go
+│       │       │   │       └── ./backend/services/auth/internal/http/handler/v1/health
+│       │       │   │           ├── ./backend/services/auth/internal/http/handler/v1/health/health_check.go
+│       │       │   │           └── ./backend/services/auth/internal/http/handler/v1/health/health_check_test.go
+│       │       │   └── ./backend/services/auth/internal/http/mapper
+│       │       │       ├── ./backend/services/auth/internal/http/mapper/account.go
+│       │       │       └── ./backend/services/auth/internal/http/mapper/user.go
+│       │       └── ./backend/services/auth/internal/migrations
+│       │           ├── ./backend/services/auth/internal/migrations/000001_create_authentications_table.down.sql
+│       │           └── ./backend/services/auth/internal/migrations/000001_create_authentications_table.up.sql
+│       ├── ./backend/services/mgmt
+│       │   ├── ./backend/services/mgmt/.golangci.yml
+│       │   ├── ./backend/services/mgmt/Dockerfile
+│       │   ├── ./backend/services/mgmt/cmd
+│       │   │   ├── ./backend/services/mgmt/cmd/app
+│       │   │   │   ├── ./backend/services/mgmt/cmd/app/app.go
+│       │   │   │   └── ./backend/services/mgmt/cmd/app/routing.go
+│       │   │   └── ./backend/services/mgmt/cmd/main.go
+│       │   ├── ./backend/services/mgmt/compose.yaml
+│       │   ├── ./backend/services/mgmt/go.mod
+│       │   ├── ./backend/services/mgmt/go.sum
+│       │   └── ./backend/services/mgmt/internal
+│       │       └── ./backend/services/mgmt/internal/http
+│       │           ├── ./backend/services/mgmt/internal/http/handler
+│       │           │   └── ./backend/services/mgmt/internal/http/handler/v1
+│       │           │       ├── ./backend/services/mgmt/internal/http/handler/v1/health
+│       │           │       │   ├── ./backend/services/mgmt/internal/http/handler/v1/health/health_check.go
+│       │           │       │   └── ./backend/services/mgmt/internal/http/handler/v1/health/health_check_test.go
+│       │           │       └── ./backend/services/mgmt/internal/http/handler/v1/mgmt
+│       │           │           └── ./backend/services/mgmt/internal/http/handler/v1/mgmt/mgmt.go
+│       │           └── ./backend/services/mgmt/internal/http/mapper
+│       │               └── ./backend/services/mgmt/internal/http/mapper/mgmt.go
+│       └── ./backend/services/user
+│           ├── ./backend/services/user/.golangci.yml
+│           ├── ./backend/services/user/Dockerfile
+│           ├── ./backend/services/user/cmd
+│           │   ├── ./backend/services/user/cmd/app
+│           │   │   ├── ./backend/services/user/cmd/app/app.go
+│           │   │   └── ./backend/services/user/cmd/app/routing.go
+│           │   └── ./backend/services/user/cmd/main.go
+│           ├── ./backend/services/user/compose.yaml
+│           ├── ./backend/services/user/domain
+│           │   └── ./backend/services/user/domain/user
+│           │       ├── ./backend/services/user/domain/user/error.go
+│           │       ├── ./backend/services/user/domain/user/interface.go
+│           │       ├── ./backend/services/user/domain/user/mock.go
+│           │       ├── ./backend/services/user/domain/user/postgres
+│           │       │   └── ./backend/services/user/domain/user/postgres/user_sql.go
+│           │       ├── ./backend/services/user/domain/user/service.go
+│           │       ├── ./backend/services/user/domain/user/service_test.go
+│           │       ├── ./backend/services/user/domain/user/user.go
+│           │       └── ./backend/services/user/domain/user/user_test.go
+│           ├── ./backend/services/user/go.mod
+│           ├── ./backend/services/user/go.sum
+│           └── ./backend/services/user/internal
+│               ├── ./backend/services/user/internal/http
+│               │   ├── ./backend/services/user/internal/http/handler
+│               │   │   └── ./backend/services/user/internal/http/handler/v1
+│               │   │       ├── ./backend/services/user/internal/http/handler/v1/health
+│               │   │       │   ├── ./backend/services/user/internal/http/handler/v1/health/health_check.go
+│               │   │       │   └── ./backend/services/user/internal/http/handler/v1/health/health_check_test.go
+│               │   │       └── ./backend/services/user/internal/http/handler/v1/user
+│               │   │           └── ./backend/services/user/internal/http/handler/v1/user/user.go
+│               │   └── ./backend/services/user/internal/http/mapper
+│               │       └── ./backend/services/user/internal/http/mapper/user.go
+│               └── ./backend/services/user/internal/migrations
+│                   ├── ./backend/services/user/internal/migrations/000001_create_users_table.down.sql
+│                   └── ./backend/services/user/internal/migrations/000001_create_users_table.up.sql
+├── ./db
+│   └── ./db/init-unleash.sh
+├── ./deploy.sh
+├── ./docker-compose.yaml
+├── ./docs
+│   ├── ./docs/docs.go
+│   ├── ./docs/swagger.json
+│   └── ./docs/swagger.yaml
+├── ./frontend
+│   ├── ./frontend/.gitignore
+│   ├── ./frontend/package-lock.json
+│   ├── ./frontend/package.json
+│   ├── ./frontend/public
+│   │   ├── ./frontend/public/favicon.ico
+│   │   ├── ./frontend/public/index.html
+│   │   ├── ./frontend/public/manifest.json
+│   │   └── ./frontend/public/robots.txt
+│   ├── ./frontend/src
+│   │   ├── ./frontend/src/App.css
+│   │   ├── ./frontend/src/App.test.tsx
+│   │   ├── ./frontend/src/App.tsx
+│   │   ├── ./frontend/src/MainPage.tsx
+│   │   ├── ./frontend/src/ProtectedRoute.tsx
+│   │   ├── ./frontend/src/components
+│   │   │   ├── ./frontend/src/components/Account.tsx
+│   │   │   ├── ./frontend/src/components/AlertSignUp.tsx
+│   │   │   ├── ./frontend/src/components/Login.tsx
+│   │   │   └── ./frontend/src/components/SignUp.tsx
+│   │   ├── ./frontend/src/const
+│   │   │   ├── ./frontend/src/const/empties.ts
+│   │   │   └── ./frontend/src/const/errors.ts
+│   │   ├── ./frontend/src/index.css
+│   │   ├── ./frontend/src/index.tsx
+│   │   ├── ./frontend/src/models
+│   │   │   ├── ./frontend/src/models/account.ts
+│   │   │   ├── ./frontend/src/models/types.ts
+│   │   │   └── ./frontend/src/models/user.ts
+│   │   ├── ./frontend/src/react-app-env.d.ts
+│   │   ├── ./frontend/src/react-input-mask.d.ts
+│   │   ├── ./frontend/src/reportWebVitals.ts
+│   │   ├── ./frontend/src/setupTests.ts
+│   │   └── ./frontend/src/store
+│   │       ├── ./frontend/src/store/account.store.ts
+│   │       ├── ./frontend/src/store/store.ts
+│   │       └── ./frontend/src/store/user.store.ts
+│   └── ./frontend/tsconfig.json
+├── ./go.work.sum
+├── ./nginx
+│   ├── ./nginx/conf.d
+│   │   ├── ./nginx/conf.d/account-minibank.conf.template
+│   │   ├── ./nginx/conf.d/account-minibank.nginx.conf
+│   │   ├── ./nginx/conf.d/auth-minibank.conf.template
+│   │   ├── ./nginx/conf.d/auth-minibank.nginx.conf
+│   │   ├── ./nginx/conf.d/mgmt-minibank.conf.template
+│   │   ├── ./nginx/conf.d/mgmt-minibank.nginx.conf
+│   │   ├── ./nginx/conf.d/proxy_headers.nginx.conf
+│   │   ├── ./nginx/conf.d/user-minibank.conf.template
+│   │   ├── ./nginx/conf.d/user-minibank.nginx.conf
+│   │   ├── ./nginx/conf.d/web.conf.template
+│   │   └── ./nginx/conf.d/web.nginx.conf
+│   └── ./nginx/nginx.conf
+├── ./output.txt
+└── ./scripts
+    └── ./scripts/init.sh
+
+77 directories, 171 files

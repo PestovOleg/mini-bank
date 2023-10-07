@@ -20,9 +20,9 @@
 package main
 
 import (
-	"github.com/PestovOleg/mini-bank/backend/cmd/app"
-	"github.com/PestovOleg/mini-bank/backend/internal/config"
+	"github.com/PestovOleg/mini-bank/backend/pkg/config"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
+	"github.com/PestovOleg/mini-bank/backend/services/user/cmd/app"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 		panic("Logger cannot be initialized")
 	}
 
-	logger := logger.GetLogger("APP")
+	logger := logger.GetLogger("User")
 	app := app.NewApp(&cfg)
 
 	err = app.Run()

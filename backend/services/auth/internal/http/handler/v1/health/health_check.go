@@ -21,11 +21,11 @@ func NewHealthCheckHandler() *healthCheckHandler {
 // @version 	 1.0
 // @summary      Check the health status of the auth server
 // @description  Returns the server's health status.
-// @tags         server
+// @tags         auth-minibank
 // @success 200 {string} string "Service is healthy - Hello from Health Check Handler Endpoint" "StatusOK"
 // @example 200 {string} "Service is healthy - Hello from Health Check Handler Endpoint"
 // @failure 500 {string} string "StatusInternalError"
-// @router       /health [get]
+// @router       /auth-minibank-health [get]
 func (h *healthCheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_, err := io.WriteString(w, "Auth Service is healthy - Hello from Health Check Handler Endpoint")
 

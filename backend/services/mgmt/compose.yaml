@@ -1,0 +1,52 @@
+services:
+  
+  mgmt-minibank-blue:
+    image: pistollo/mgmt-minibank:${MGMT_APP_VERSION}
+    container_name: mgmt-minibank-blue
+    hostname: mgmt-minibank-blue
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      CONFIG_PATH: ${MGMT_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
+      USER_HOST: ${USER_HOST}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log 
+      - /etc/minibank/mgmt-config.yaml:/etc/minibank/mgmt-config.yaml   
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4484:3333
+    restart: unless-stopped
+
+  mgmt-minibank-green:
+    image: pistollo/mgmt-minibank:${MGMT_APP_VERSION}
+    container_name: mgmt-minibank-green
+    hostname: mgmt-minibank-green
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      CONFIG_PATH: ${MGMT_CONFIG_PATH}
+      AUTH_HOST: ${AUTH_HOST}
+      USER_HOST: ${USER_HOST}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log
+      - /etc/minibank/mgmt-config.yaml:/etc/minibank/mgmt-config.yaml
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4485:3333
+    restart: unless-stopped
+

@@ -91,7 +91,6 @@ func (s *Service) AuthenticateUser(username, password string) (uuid.UUID, error)
 	}
 
 	return a.ID, nil
-
 }
 
 func (s *Service) AuthorizeUser(token string) error {
@@ -125,5 +124,4 @@ func (s *Service) AuthorizeUser(token string) error {
 	}
 
 	return nil
-
 }

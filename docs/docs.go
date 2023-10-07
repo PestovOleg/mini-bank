@@ -24,11 +24,11 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/health": {
+        "/account-minibank-health": {
             "get": {
                 "description": "Returns the server's health status.",
                 "tags": [
-                    "server"
+                    "account-minibank"
                 ],
                 "summary": "Check the health status of the server",
                 "responses": {
@@ -47,237 +47,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users": {
-            "get": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
-                "description": "Get User ID with credentials.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Get User ID with credentials.",
-                "responses": {
-                    "200": {
-                        "description": "Successfully retrieved User ID",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "User not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new user unsing the provided details",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Create a new user",
-                "parameters": [
-                    {
-                        "description": "User details for creation",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.UserCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "A new user has been created with ID: {id}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
-                "description": "Fetch the user details using the provided user ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Retrieve user details based on the provided ID.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully retrieved user details",
-                        "schema": {
-                            "$ref": "#/definitions/mapper.User"
-                        }
-                    },
-                    "404": {
-                        "description": "User not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
-                "description": "Update the user details using the provided user ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Update user details based on the provided ID.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "User Update Payload",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.UserUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully updated user details",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "User not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BasicAuth": []
-                    }
-                ],
-                "description": "Delete the user using the provided user ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Delete user based on the provided ID.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully deleted user",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "User not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{id}/accounts": {
+        "/accounts": {
             "get": {
                 "security": [
                     {
@@ -292,7 +62,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "account-minibank"
                 ],
                 "summary": "Retrieve list of accounts based on the provided User ID.",
                 "parameters": [
@@ -342,7 +112,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "account-minibank"
                 ],
                 "summary": "Create a new account",
                 "parameters": [
@@ -379,7 +149,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{userid}/accounts/{id}": {
+        "/accounts/{id}": {
             "get": {
                 "security": [
                     {
@@ -394,7 +164,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "account-minibank"
                 ],
                 "summary": "Retrieve account details based on the provided ID.",
                 "parameters": [
@@ -448,7 +218,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "account-minibank"
                 ],
                 "summary": "Update account details based on the provided ID.",
                 "parameters": [
@@ -511,7 +281,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "account-minibank"
                 ],
                 "summary": "Delete account based on the provided ID.",
                 "parameters": [
@@ -552,7 +322,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{userid}/accounts/{id}/topup": {
+        "/accounts/{id}/topup": {
             "put": {
                 "security": [
                     {
@@ -567,7 +337,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "account-minibank"
                 ],
                 "summary": "TopUp account balance based on the provided ID.",
                 "parameters": [
@@ -617,7 +387,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{userid}/accounts/{id}/withdraw": {
+        "/accounts/{id}/withdraw": {
             "put": {
                 "security": [
                     {
@@ -632,7 +402,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "account-minibank"
                 ],
                 "summary": "Withdraw money based on the provided ID.",
                 "parameters": [
@@ -681,6 +451,425 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/auth": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Authorize User with token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth-minibank"
+                ],
+                "summary": "Authorize User with token.",
+                "responses": {
+                    "200": {
+                        "description": "Authorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new authentication record using the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth-minibank"
+                ],
+                "summary": "Create a new authentication record",
+                "parameters": [
+                    {
+                        "description": "Authentication details for creation",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/backend_services_auth_internal_http_handler_v1_auth.AuthCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "A new authentication record has been created with ID: {id}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth-minibank-health": {
+            "get": {
+                "description": "Returns the server's health status.",
+                "tags": [
+                    "auth-minibank"
+                ],
+                "summary": "Check the health status of the auth server",
+                "responses": {
+                    "200": {
+                        "description": "Service is healthy - Hello from Health Check Handler Endpoint\" \"StatusOK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "StatusInternalError",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Deactivate the authentication record using the provided user ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth-minibank"
+                ],
+                "summary": "Deactivate authentication record based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Auth ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted authentication record",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Page not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/mgmt": {
+            "post": {
+                "description": "Create a new user using the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mgmt"
+                ],
+                "summary": "Orchestrate creation of a new user with services auth and user",
+                "parameters": [
+                    {
+                        "description": "User details for creation",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mgmt.MgmtCreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "A new user has been created with ID: {id}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/mgmt-minibank-health": {
+            "get": {
+                "description": "Returns the server's health status.",
+                "tags": [
+                    "mgmt"
+                ],
+                "summary": "Check the health status of the server",
+                "responses": {
+                    "200": {
+                        "description": "User Service is healthy - Hello from Health Check Handler Endpoint\" \"StatusOK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "StatusInternalError",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user-minibank-health": {
+            "get": {
+                "description": "Returns the server's health status.",
+                "tags": [
+                    "user-minibank"
+                ],
+                "summary": "Check the health status of the server",
+                "responses": {
+                    "200": {
+                        "description": "User Service is healthy - Hello from Health Check Handler Endpoint\" \"StatusOK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "StatusInternalError",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Get User ID with credentials.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth-minibank"
+                ],
+                "summary": "Authenticate User with credentials.",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new user using the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user-minibank"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "User details for creation",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "A new user has been created with ID: {id}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Fetch the user details using the provided user ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user-minibank"
+                ],
+                "summary": "Retrieve user details based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved user details",
+                        "schema": {
+                            "$ref": "#/definitions/mapper.User"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Update the user details using the provided user ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user-minibank"
+                ],
+                "summary": "Update user details based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User Update Payload",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated user details",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -694,6 +883,10 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Удачный"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "fdee7aae-f79f-4653-8a16-9207e6805b93"
                 }
             }
         },
@@ -716,6 +909,19 @@ const docTemplate = `{
                 "amount": {
                     "type": "number",
                     "example": 9999.99
+                }
+            }
+        },
+        "backend_services_auth_internal_http_handler_v1_auth.AuthCreateRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "mypass"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "Ivanec"
                 }
             }
         },
@@ -783,10 +989,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "fdee7aae-f79f-4653-8a16-9207e6805b93"
                 },
-                "is_active": {
-                    "type": "boolean",
-                    "example": true
-                },
                 "last_name": {
                     "type": "string",
                     "example": "Ivanov"
@@ -806,25 +1008,21 @@ const docTemplate = `{
                 "updated_at": {
                     "type": "string",
                     "example": "01.01.1999"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "Ivanych"
                 }
             }
         },
-        "user.UserCreateRequest": {
+        "mgmt.MgmtCreateUserRequest": {
             "type": "object",
             "properties": {
                 "birthday": {
                     "type": "string",
-                    "example": "01.01.1999"
+                    "example": "02.01.2006"
                 },
                 "email": {
                     "type": "string",
                     "example": "Ivanych@gmail.com"
                 },
-                "lastName": {
+                "last_name": {
                     "type": "string",
                     "example": "Ivanov"
                 },
@@ -847,6 +1045,39 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "Ivanec"
+                }
+            }
+        },
+        "user.UserCreateRequest": {
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "02.01.2006"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "Ivanych@gmail.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Ivanov"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Ivan"
+                },
+                "patronymic": {
+                    "type": "string",
+                    "example": "Ivanych"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+7(495)999-99-99"
                 }
             }
         },
