@@ -37,7 +37,8 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Run go test
-        run: cd backend && go test ./services/mgmt/... -v --cover
+        working-directory: backend/services/mgmt
+        run: go test ./... -v --cover
 
   build:
     needs: test
