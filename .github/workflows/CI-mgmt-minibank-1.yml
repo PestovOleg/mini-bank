@@ -28,8 +28,8 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54
-          working-directory: backend
-          args: ./services/mgmt/...
+          working-directory: backend/services/mgmt
+          args: ./...
 
   test:
     needs: lint
@@ -39,7 +39,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Run go test
-        run: cd backend && test ./services/mgmt/... -v --cover
+        run: cd backend && go test ./services/mgmt/... -v --cover
 
   build:
     needs: test
