@@ -1,0 +1,48 @@
+services:
+  
+  account-backend-blue:
+    image: pistollo/account-minibank:${ACCOUNT_APP_VERSION}
+    container_name: account-minibank-blue
+    hostname: account-minibank-blue
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      CONFIG_PATH: ${ACCOUNT_CONFIG_PATH}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log 
+      - /etc/minibank/account-config.yaml:/etc/minibank/account-config.yaml   
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4464:3333
+    restart: unless-stopped
+
+  account-backend-green:
+    image: pistollo/account-minibank:${ACCOUNT_APP_VERSION}
+    container_name: account-minibank-green
+    hostname: account-minibank-green
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      CONFIG_PATH: ${ACCOUNT_CONFIG_PATH}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log
+      - /etc/minibank/account-config.yaml:/etc/minibank/account-config.yaml
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4465:3333
+    restart: unless-stopped
+

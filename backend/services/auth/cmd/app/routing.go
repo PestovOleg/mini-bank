@@ -20,7 +20,7 @@ type RouteConfig struct {
 
 func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 	return map[string]map[string]RouteConfig{
-		"/health": {
+		"/auth-minibank-health": {
 			http.MethodGet: {
 				Handler: health.NewHealthCheckHandler(),
 			},
@@ -56,9 +56,10 @@ func SetHandler(r *mux.Router, paths map[string]map[string]RouteConfig) {
 	for path, methods := range paths {
 		for method, config := range methods {
 			handler := config.Handler
-			for _, middleware := range config.Middlewares { //оборачиваем во все middleware
+			for _, middleware := range config.Middlewares { // оборачиваем во все middleware
 				handler = middleware(handler)
 			}
+
 			if config.Feature == "" { // присваиваем фичи
 				r.Handle(path, handler).Methods(method)
 			} else {

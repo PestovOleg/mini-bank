@@ -1,0 +1,8 @@
+
+location /api/v1/auth {
+    proxy_pass http://${NEXT_BACKEND}:3333;
+}
+
+location ~ ^/api/.+/auth-minibank-health$ {
+    proxy_pass http://${NEXT_BACKEND}:3333;
+}

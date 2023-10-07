@@ -1,3 +1,4 @@
+// TODO: сделать  описание
 package user
 
 import (
@@ -6,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"../../backend/services/user/domain/user"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
+	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user"
 	"github.com/PestovOleg/mini-bank/backend/services/user/internal/http/mapper"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -21,7 +22,7 @@ type UserHandler struct {
 
 func NewUserHandler(s *user.Service) *UserHandler {
 	return &UserHandler{
-		logger:  logger.GetLogger("API"),
+		logger:  logger.GetLogger("UserAPI"),
 		service: s,
 	}
 }
@@ -32,9 +33,9 @@ type UserCreateRequest struct {
 	ID         string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
 	Email      string `json:"email" example:"Ivanych@gmail.com"`
 	Phone      string `json:"phone" example:"+7(495)999-99-99"`
-	Birthday   string `json:"birthday" example:"2013-Feb-03"`
+	Birthday   string `json:"birthday" example:"02.01.2006"`
 	Name       string `json:"name" example:"Ivan"`
-	LastName   string `json:"lastName" example:"Ivanov"`
+	LastName   string `json:"last_name" example:"Ivanov"`
 	Patronymic string `json:"patronymic" example:"Ivanych"`
 }
 
@@ -50,7 +51,7 @@ type UserUpdateRequest struct {
 // @title CreateUser
 // @Summary Create a new user
 // @Description Create a new user using the provided details
-// @Tags users
+// @tags user-minibank
 // @Accept  json
 // @Produce  json
 // @Param user body UserCreateRequest true "User details for creation"
@@ -72,7 +73,7 @@ func (u *UserHandler) CreateUser() http.Handler {
 
 			return
 		}
-		birthday, err := time.Parse(time.RFC3339, input.Birthday)
+		birthday, err := time.Parse("02.01.2006", input.Birthday)
 		if err != nil {
 			u.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -96,7 +97,7 @@ func (u *UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		err = u.service.CreateUser(
+		_, err = u.service.CreateUser(
 			id,
 			input.Email,
 			input.Phone,
@@ -124,6 +125,8 @@ func (u *UserHandler) CreateUser() http.Handler {
 			ID: id.String(),
 		}
 
+		w.WriteHeader(http.StatusCreated)
+
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
 			u.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -133,7 +136,6 @@ func (u *UserHandler) CreateUser() http.Handler {
 			}
 		}
 		u.logger.Sugar().Infof("New user was created with ID: ", id.String())
-		w.WriteHeader(http.StatusCreated)
 	})
 }
 
@@ -142,7 +144,7 @@ func (u *UserHandler) CreateUser() http.Handler {
 // @version 1.0
 // @summary Retrieve user details based on the provided ID.
 // @description Fetch the user details using the provided user ID.
-// @tags users
+// @tags user-minibank
 // @accept json
 // @produce json
 // @param id path string true "User ID"
@@ -192,16 +194,14 @@ func (u *UserHandler) GetUser() http.Handler {
 
 		toJSON := &mapper.User{
 			ID:         data.ID,
-			Username:   data.Username,
 			Email:      data.Email,
 			Phone:      data.Phone,
-			Birthday:   data.Birthday.Format(time.RFC3339),
+			Birthday:   data.Birthday.Format("02.01.2006"),
 			Name:       data.Name,
 			LastName:   data.LastName,
 			Patronymic: data.Patronymic,
-			IsActive:   data.IsActive,
-			CreatedAt:  data.CreatedAt.Format(time.RFC3339),
-			UpdatedAt:  data.UpdatedAt.Format(time.RFC3339),
+			CreatedAt:  data.CreatedAt.Format("02.01.2006"),
+			UpdatedAt:  data.UpdatedAt.Format("02.01.2006"),
 		}
 
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
@@ -220,11 +220,11 @@ func (u *UserHandler) GetUser() http.Handler {
 // @version 1.0
 // @summary Update user details based on the provided ID.
 // @description Update the user details using the provided user ID.
-// @tags users
+// @tags user-minibank
 // @accept json
 // @produce json
 // @param id path string true "User ID"
-// @param body UserUpdateRequest true "User Update Payload"
+// @param user body UserUpdateRequest true "User Update Payload"
 // @success 200 {string} string "Successfully updated user details"
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "User not found"
@@ -273,84 +273,5 @@ func (u *UserHandler) UpdateUser() http.Handler {
 			return
 		}
 		u.logger.Sugar().Infof("User %v was updated", id)
-	})
-}
-
-// DeleteUser godoc
-// @title Delete User by ID
-// @version 1.0
-// @summary Delete user based on the provided ID.
-// @description Delete the user using the provided user ID.
-// @tags users
-// @accept json
-// @produce json
-// @param id path string true "User ID"
-// @success 200 {string} string "Successfully deleted user"
-// @failure 500 {string} string "Internal server error"
-// @failure 404 {string} string "User not found"
-// @Security BasicAuth
-// @router /users/{id} [delete]
-func (u *UserHandler) DeleteUser() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := uuid.Parse(vars["id"])
-		if err != nil {
-			u.logger.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte("Couldn't parse ID:" + err.Error()))
-			if err != nil {
-				u.logger.Error(err.Error())
-			}
-
-			return
-		}
-
-		err = u.service.DeleteUser(id)
-		if err != nil {
-			u.logger.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte("Couldn't delete user: " + err.Error()))
-			if err != nil {
-				u.logger.Error(err.Error())
-			}
-
-			return
-		}
-		u.logger.Sugar().Infof("User %v was deleted", id)
-	})
-}
-
-// Enter godoc
-// @title Enter with credentials
-// @version 1.0
-// @summary Get User ID with credentials.
-// @description Get User ID with credentials.
-// @tags users
-// @accept json
-// @produce json
-// @success 200 {string} ID "Successfully retrieved User ID"
-// @failure 500 {string} string "Internal server error"
-// @failure 404 {string} string "User not found"
-// @Security BasicAuth
-// @router /users [get]
-func (u *UserHandler) Enter() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		username, _, _ := r.BasicAuth()
-		user, _ := u.service.GetUserByUName(username)
-
-		w.Header().Set("Content-Type", "application/json")
-		toJSON := &struct {
-			ID string `json:"id"`
-		}{
-			ID: user.ID.String(),
-		}
-		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
-			u.logger.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte("Error while reading ID"))
-			if err != nil {
-				u.logger.Error(err.Error())
-			}
-		}
 	})
 }

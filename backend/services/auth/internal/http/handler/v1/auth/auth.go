@@ -18,14 +18,14 @@ type AuthHandler struct {
 
 func NewAuthHandler(s *auth.Service) *AuthHandler {
 	return &AuthHandler{
-		logger:  logger.GetLogger("API"),
+		logger:  logger.GetLogger("AuthAPI"),
 		service: s,
 	}
 }
 
 // AuthCreateRequest represents the request payload for authentication record creation.
 // swagger:model
-type AuthCreateRequestquest struct {
+type AuthCreateRequest struct {
 	Username string `json:"username" example:"Ivanec"`
 	Password string `json:"password" example:"mypass"`
 }
@@ -48,7 +48,7 @@ type AuthWithToken struct {
 // @title CreateAuth
 // @Summary Create a new authentication record
 // @Description Create a new authentication record using the provided details
-// @Tags authentication
+// @Tags auth-minibank
 // @Accept  json
 // @Produce  json
 // @Param user body AuthCreateRequest true "Authentication details for creation"
@@ -58,7 +58,7 @@ type AuthWithToken struct {
 // @Router /auth [post]
 func (a *AuthHandler) CreateAuth() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input AuthCreateRequestquest
+		var input AuthCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			a.logger.Error(err.Error())
@@ -76,7 +76,6 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 			input.Password,
 		)
 
-		a.logger.Debug("Record created with ID: " + id.String())
 		if err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -88,11 +87,15 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 			return
 		}
 
+		a.logger.Debug("Record created with ID: " + id.String())
+
 		toJSON := &struct {
 			ID string `json:"id"`
 		}{
 			ID: id.String(),
 		}
+
+		w.WriteHeader(http.StatusCreated)
 
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
 			a.logger.Error(err.Error())
@@ -103,7 +106,6 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 			}
 		}
 		a.logger.Sugar().Infof("New authentication record was created with ID: ", id.String())
-		w.WriteHeader(http.StatusCreated)
 	})
 }
 
@@ -112,7 +114,7 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 // @version 1.0
 // @summary Deactivate authentication record based on the provided ID.
 // @description Deactivate the authentication record using the provided user ID.
-// @tags auth
+// @tags auth-minibank
 // @accept json
 // @produce json
 // @param id path string true "Auth ID"
@@ -156,7 +158,7 @@ func (a *AuthHandler) DeleteAuth() http.Handler {
 // @version 1.0
 // @summary Authenticate User with credentials.
 // @description Get User ID with credentials.
-// @tags users
+// @tags auth-minibank
 // @accept json
 // @produce json
 // @success 200 {string} ID "Successfully retrieved User ID"
@@ -194,7 +196,7 @@ func (a *AuthHandler) Authenticate() http.Handler {
 // @version 1.0
 // @summary Authorize User with token.
 // @description Authorize User with token.
-// @tags users
+// @tags auth-minibank
 // @accept json
 // @produce json
 // @success 200 {string} ID "Authorized"
