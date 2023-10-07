@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+# проверка переменной имени сервиса
+if [[ -z $SERVICE ]]; then
+  echo "var SERVICE is empty. Exiting."
+  exit 1
+fi
+
 echo "Starting deploy ${SERVICE}..."
-echo ${AUTH_HOST}
 # TODO: добавиь установку переменных для миграции и активного сервиса auth
 echo "Checking nginx template for service ${SERVICE}"
 [ -f "./nginx/conf.d/${SERVICE}.conf.template" ] && 
@@ -22,15 +27,19 @@ echo "Removing old container if it hasn't been removed..."
 docker compose rm -f -s -v $NEXT_BACKEND
 printf "%s\n" "Done"
 
-echo "Migrating database ..."
-docker compose up -d migrate
-printf "%s\n" "Done...waiting 3 sec"
-sleep 3
+if [ "$MIGRATE" == "YES" ]; then
+  echo "Migrating database ..."
+  docker compose up -d migrate
+  printf "%s\n" "Done...waiting 3 sec"
+  sleep 3
+else 
+  echo "Skipping database migration."
+fi
 
 echo "Starting $NEXT_BACKEND"
 docker compose up -d $NEXT_BACKEND
-echo "Waiting 5 sec"
-sleep 5
+echo "Waiting 3 sec"
+sleep 3
 
 echo "Copying current nginx.conf to nginx.conf.back"
 cp ./nginx/conf.d/${SERVICE}.nginx.conf ./nginx/conf.d/${SERVICE}.conf.back 2>/dev/null

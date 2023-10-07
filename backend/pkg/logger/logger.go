@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"errors"
 	"os"
 	"sync"
 
@@ -92,8 +91,10 @@ func getCoreFile(path string) zapcore.WriteSyncer {
 		if err != nil {
 			panic(err)
 		}
+
 		return file
 	}
+
 	return file
 }
 
@@ -107,6 +108,7 @@ func getLoggerLevel(level string) zapcore.Level {
 	case "error":
 		return zapcore.ErrorLevel
 	}
+
 	return zapcore.InfoLevel
 }
 
@@ -114,6 +116,7 @@ func getLoggerLevel(level string) zapcore.Level {
 func GetLogger(system string) *zap.Logger {
 	sLoggerMx.Lock()
 	defer sLoggerMx.Unlock()
+
 	logger, exist := sLoggers[system]
 
 	if !exist {
@@ -140,6 +143,7 @@ func GetLoggerSafe(system string) *zap.Logger {
 
 		rootLogger, _ = logCfg.Build()
 	}
+
 	return rootLogger.Named(system)
 }
 
@@ -158,7 +162,6 @@ func InitLogger(l LoggerConfig) error {
 		core := make([]zapcore.Core, 0, len(lCfg))
 
 		for _, k := range lCfg {
-
 			switch k.Encoding {
 			case "console":
 				consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
@@ -172,11 +175,14 @@ func InitLogger(l LoggerConfig) error {
 		}
 		combinedCore := zapcore.NewTee(core...)
 		rootLogger = zap.New(combinedCore)
-		defer rootLogger.Sync()
 
+		//nolint:gocritic
+		defer rootLogger.Sync()
 	})
+
 	if rootLogger == nil {
-		return errors.New("Could not initialize rootLogger")
+		return ErrCouldNotInit
 	}
+
 	return nil
 }

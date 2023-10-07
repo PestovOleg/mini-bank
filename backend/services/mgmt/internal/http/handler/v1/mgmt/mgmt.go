@@ -151,7 +151,7 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 		dec := json.NewDecoder(resp.Body)
 		if err := dec.Decode(&authResp); err != nil {
 			m.logger.Sugar().Error("Failed to decode JSON response:", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError) // TODO:сделать возврат ошибок
+			http.Error(w, "Internal server error", http.StatusInternalServerError) // TODO: сделать возврат ошибок
 
 			return
 		}
