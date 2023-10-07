@@ -2,11 +2,21 @@ name: CI mgmt service
 
 on:
   push:
+    branches:
+      - main
+      - develop
+      - release/**
     paths:
-      - 'mini-bank/backend/services/mgmt'
+      - 'mini-bank/backend/services/mgmt/**'
+      - '.github/workflows/CI-mgmt*'
   pull_request:
+    branches:
+      - main
+      - develop
+      - release/**
     paths:
-      - 'mini-bank/backend/services/mgmt'
+      - 'mini-bank/backend/services/mgmt/**'
+      - '.github/workflows/CI-mgmt*'
   workflow_dispatch:
 
 jobs:
@@ -51,5 +61,3 @@ jobs:
         run: |
           cd backend/services/mgmt
           go build -o build/minibank cmd/main.go
-
-  
