@@ -1,0 +1,18 @@
+name: CI Mgmt service
+
+on:
+  push:
+    paths:
+      - 'mini-bank/backend/services/mgmt'
+  pull_request:
+    paths:
+      - 'mini-bank/backend/services/mgmt'
+  workflow_dispatch:
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Placeholder step
+      run: echo "Mock job."
+  
