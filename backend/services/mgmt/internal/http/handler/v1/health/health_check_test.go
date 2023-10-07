@@ -19,7 +19,7 @@ func TestHealthCheckHandler_ServeHTTP(t *testing.T) {
 
 	handler := NewHealthCheckHandler()
 
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/mgmt-minibank-health", nil)
 	if err != nil {
 		t.Fatalf("Cannot make request, error: %v", err)
 	}
