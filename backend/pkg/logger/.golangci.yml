@@ -1,22 +1,12 @@
 # # Options for analysis running.
 run:
   skip-files:
-    - pkg/logger/logger.go
+    - logger.go
 # output:
 #   # See the dedicated "output" documentation section.
 #   option: value
 # # All available settings of specific linters.
 linters-settings:
-  gomoddirectives:
-    # Allow local `replace` directives. Default is false.
-    replace-local: true
-    # List of allowed `replace` directives. Default is empty.
-    replace-allow-list:
-      - launchpad.net/gocheck
-    # Allow to not explain why the version has been retracted in the `retract` directives. Default is false.
-    retract-allow-no-explanation: false
-    # Forbid the use of the `exclude` directives. Default is false.
-    exclude-forbidden: false
   tagliatelle:
     # Check the struck tag name case.
     case:
@@ -83,6 +73,7 @@ linters:
     - sqlclosecheck
     - structcheck
     - wastedassign
+    - gomoddirectives
 
 # issues:
 #   # See the dedicated "issues" documentation section.

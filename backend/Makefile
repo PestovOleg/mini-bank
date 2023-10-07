@@ -4,7 +4,7 @@ help: ## Display available commands.
 	
 .PHONY: build
 
-lint:
+lint: ## Lint all
 	cd ./pkg/logger && golangci-lint run . 
 	cd ../database && golangci-lint run .
 	cd ../config && golangci-lint run . 

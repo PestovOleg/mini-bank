@@ -1,7 +1,7 @@
 # # Options for analysis running.
 run:
   skip-files:
-    - pkg/logger/logger.go
+    - ./backend/pkg/logger/logger.go
 # output:
 #   # See the dedicated "output" documentation section.
 #   option: value

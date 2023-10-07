@@ -4,30 +4,35 @@ help: ## Display available commands.
 	
 .PHONY: build
 
-lint:
-	cd backend && golangci-lint run ./...
+auth: ## Deploy and run auth service
+	export SERVICE=auth-minibank
+	MINIBANK_DB=$(grep AUTH_MINIBANK_DB .env | cut -d '=' -f2)
+	MINIBANK_USER=$(grep AUTH_MINIBANK_USER .env | cut -d '=' -f2)
+	MINIBANK_PASSWORD=$(grep AUTH_MINIBANK_PASSWORD .env | cut -d '=' -f2)
+	/bin/bash deploy.sh
 
-build:
-	cd backend && go build -o build/minibank cmd/main.go
+user: ## Deploy and run user service
+	export SERVICE=user-minibank
+	MINIBANK_DB=$(grep USER_MINIBANK_DB .env | cut -d '=' -f2)
+	MINIBANK_USER=$(grep USER_MINIBANK_USER .env | cut -d '=' -f2)
+	MINIBANK_PASSWORD=$(grep USER_MINIBANK_PASSWORD .env | cut -d '=' -f2)
+	/bin/bash deploy.sh
 
-run:
-	rm -rf backend/build/ && mkdir -p backend/build/
-	cd backend && go build -o build/minibank cmd/main.go
-	CONFIG_PATH=./config/local.yaml backend/build/minibank
+account: ## Deploy and run account service
+	export SERVICE=account-minibank
+	MINIBANK_DB=$(grep ACCOUNT_MINIBANK_DB .env | cut -d '=' -f2)
+	MINIBANK_USER=$(grep ACCOUNT_MINIBANK_USER .env | cut -d '=' -f2)
+	MINIBANK_PASSWORD=$(grep ACCOUNT_MINIBANK_PASSWORD .env | cut -d '=' -f2)
+	/bin/bash deploy.sh
 
-clean:
-	rm -rf backend/build/
+mgmt: ## Deploy and run mgmt service
+	export SERVICE=mgmt-minibank
+	/bin/bash deploy.sh
 
-docker:
-	docker build -t minibank:0.1.0 .
-
-todockerhub:
-	docker build -t pistollo/minibank:latest .
-
-gitlog:
+gitlog: ## Output git log
 	git log --pretty=format:"%H [%cd]: %an - %s" --graph --date=format:%c
 
-migrateup:
+migrateup: ## Migrate DB with current vars: MINIBANK_USER,MINIBANK_PASSWORD,MINIBANK_DB
 	docker compose up -d migrate
 
 migratedown:

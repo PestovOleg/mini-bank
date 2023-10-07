@@ -1,18 +1,63 @@
-name: CI Mgmt service
+name: CI mgmt service
 
 on:
   push:
+    branches:
+      - main
+      - develop
+      - release/**
     paths:
-      - 'mini-bank/backend/services/mgmt'
+      - 'mini-bank/backend/services/mgmt/**'
+      - '.github/workflows/CI-mgmt*'
   pull_request:
+    branches:
+      - main
+      - develop
+      - release/**
     paths:
-      - 'mini-bank/backend/services/mgmt'
+      - 'mini-bank/backend/services/mgmt/**'
+      - '.github/workflows/CI-mgmt*'
   workflow_dispatch:
 
 jobs:
-  placeholder:
-    runs-on: ubuntu-latest
+  lint:
+    name: Lint
+    runs-on: ubuntu-20.04
     steps:
-    - name: Placeholder step
-      run: echo "Mock job."
-  
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.6
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.54
+          working-directory: backend/services/mgmt
+          args: ./...
+
+  test:
+    needs: lint
+    name: Unit test 
+    runs-on: ubuntu-20.04    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Run go test
+        working-directory: backend/services/mgmt
+        run: go test ./... -v --cover
+
+  build:
+    needs: test
+    name: build 
+    runs-on: ubuntu-20.04    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: build
+        run: |
+          cd backend/services/mgmt
+          go build -o build/minibank cmd/main.go
