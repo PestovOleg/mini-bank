@@ -33,7 +33,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
-
+//nolint:gomoddirectives
 replace github.com/PestovOleg/mini-bank/backend/pkg/logger => ../../../backend/pkg/logger
 
 replace github.com/PestovOleg/mini-bank/backend/pkg/config => ../../../backend/pkg/config

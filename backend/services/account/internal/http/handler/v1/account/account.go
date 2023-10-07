@@ -51,10 +51,9 @@ type ChangeBalanceRequest struct {
 // @title CreateAccount
 // @Summary Create a new account
 // @Description Create a new account using the provided details
-// @Tags accounts
+// @Tags account-minibank
 // @Accept  json
 // @Produce  json
-// @param id path string true "User ID"
 // @Param user body AccountCreateRequest true "Account details for creation"
 // @Success 201 {string} string "A new account has been created with number: {string}"
 // @Error 404 {string} "Page not found"
@@ -116,6 +115,8 @@ func (a *AccountHandler) CreateAccount() http.Handler {
 			ID: account.ID.String(),
 		}
 
+		w.WriteHeader(http.StatusCreated)
+
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -125,7 +126,6 @@ func (a *AccountHandler) CreateAccount() http.Handler {
 			}
 		}
 		a.logger.Sugar().Infof("New account was created with number: %s", account.Account)
-		w.WriteHeader(http.StatusCreated)
 	})
 }
 
@@ -134,7 +134,7 @@ func (a *AccountHandler) CreateAccount() http.Handler {
 // @version 1.0
 // @summary Retrieve account details based on the provided ID.
 // @description Fetch the account details using the provided account ID.
-// @tags accounts
+// @tags account-minibank
 // @accept json
 // @produce json
 // @param id path string true "Account ID"
@@ -224,7 +224,7 @@ func (a *AccountHandler) GetAccountByID() http.Handler {
 // @version 1.0
 // @summary Update account details based on the provided ID.
 // @description Update the account details using the provided user ID.
-// @tags accounts
+// @tags account-minibank
 // @accept json
 // @produce json
 // @param id path string true "Account ID"
@@ -311,7 +311,7 @@ func (a *AccountHandler) UpdateAccount() http.Handler {
 // @version 1.0
 // @summary Delete account based on the provided ID.
 // @description Delete the account using the provided account ID.
-// @tags accounts
+// @tags account-minibank
 // @accept json
 // @produce json
 // @param id path string true "Account ID"
@@ -380,7 +380,7 @@ func (a *AccountHandler) DeleteAccount() http.Handler {
 // @version 1.0
 // @summary Retrieve list of accounts based on the provided User ID.
 // @description Fetch the list of accounts using the provided User ID.
-// @tags accounts
+// @tags account-minibank
 // @accept json
 // @produce json
 // @param id path string true "User ID"
@@ -460,7 +460,7 @@ func (a *AccountHandler) ListAccountsByUserID() http.Handler {
 // @version 1.0
 // @summary TopUp account balance based on the provided ID.
 // @description TopUp the account balance using the provided user ID and amount.
-// @tags accounts
+// @tags account-minibank
 // @accept json
 // @produce json
 // @param id path string true "Account ID"
@@ -565,7 +565,7 @@ func (a *AccountHandler) TopUp() http.Handler {
 // @version 1.0
 // @summary Withdraw money based on the provided ID.
 // @description Withdraw money using the provided user ID and amount.
-// @tags accounts
+// @tags account-minibank
 // @accept json
 // @produce json
 // @param id path string true "Account ID"

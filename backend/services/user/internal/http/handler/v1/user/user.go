@@ -35,7 +35,7 @@ type UserCreateRequest struct {
 	Phone      string `json:"phone" example:"+7(495)999-99-99"`
 	Birthday   string `json:"birthday" example:"02.01.2006"`
 	Name       string `json:"name" example:"Ivan"`
-	LastName   string `json:"lastName" example:"Ivanov"`
+	LastName   string `json:"last_name" example:"Ivanov"`
 	Patronymic string `json:"patronymic" example:"Ivanych"`
 }
 
@@ -51,7 +51,7 @@ type UserUpdateRequest struct {
 // @title CreateUser
 // @Summary Create a new user
 // @Description Create a new user using the provided details
-// @Tags users
+// @tags user-minibank
 // @Accept  json
 // @Produce  json
 // @Param user body UserCreateRequest true "User details for creation"
@@ -125,6 +125,8 @@ func (u *UserHandler) CreateUser() http.Handler {
 			ID: id.String(),
 		}
 
+		w.WriteHeader(http.StatusCreated)
+
 		if err := json.NewEncoder(w).Encode(toJSON); err != nil {
 			u.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -134,7 +136,6 @@ func (u *UserHandler) CreateUser() http.Handler {
 			}
 		}
 		u.logger.Sugar().Infof("New user was created with ID: ", id.String())
-		w.WriteHeader(http.StatusCreated)
 	})
 }
 
@@ -143,7 +144,7 @@ func (u *UserHandler) CreateUser() http.Handler {
 // @version 1.0
 // @summary Retrieve user details based on the provided ID.
 // @description Fetch the user details using the provided user ID.
-// @tags users
+// @tags user-minibank
 // @accept json
 // @produce json
 // @param id path string true "User ID"
@@ -219,11 +220,11 @@ func (u *UserHandler) GetUser() http.Handler {
 // @version 1.0
 // @summary Update user details based on the provided ID.
 // @description Update the user details using the provided user ID.
-// @tags users
+// @tags user-minibank
 // @accept json
 // @produce json
 // @param id path string true "User ID"
-// @param body UserUpdateRequest true "User Update Payload"
+// @param user body UserUpdateRequest true "User Update Payload"
 // @success 200 {string} string "Successfully updated user details"
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "User not found"

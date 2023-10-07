@@ -3,24 +3,22 @@ package mgmt
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
-	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user"
 	"go.uber.org/zap"
 )
 
 type MgmtHandler struct {
-	logger  *zap.Logger
-	service *user.Service
+	logger *zap.Logger
 }
 
-func NewMgmtHandler(s *user.Service) *MgmtHandler {
+func NewMgmtHandler() *MgmtHandler {
 	return &MgmtHandler{
 		logger: logger.GetLogger("MgmtAPI"),
 	}
@@ -35,7 +33,7 @@ type MgmtCreateUserRequest struct {
 	Phone      string `json:"phone" example:"+7(495)999-99-99"`
 	Birthday   string `json:"birthday" example:"02.01.2006"`
 	Name       string `json:"name" example:"Ivan"`
-	LastName   string `json:"lastName" example:"Ivanov"`
+	LastName   string `json:"last_name" example:"Ivanov"`
 	Patronymic string `json:"patronymic" example:"Ivanych"`
 }
 
@@ -52,6 +50,8 @@ type MgmtCreateUserRequest struct {
 // @Error 404 {string} "Page not found"
 // @Failure 500 {string} string "Internal server error"
 // @Router /mgmt [post]
+//
+//nolint:gocognit
 func (m *MgmtHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input MgmtCreateUserRequest
@@ -100,7 +100,12 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 			return
 		}
 
-		authRequest, err := http.NewRequestWithContext(context.Background(), http.MethodPost, authHost, bytes.NewBuffer(jsonData))
+		authRequest, err := http.NewRequestWithContext(
+			r.Context(),
+			http.MethodPost,
+			authHost,
+			bytes.NewBuffer(jsonData),
+		)
 		if err != nil {
 			m.logger.Sugar().Error("Failed to create new HTTP request:", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -119,23 +124,19 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 			return
 		}
 
-		defer resp.Body.Close()
-
 		// Если статус отличен от успешного - возвращаем ошибку
 		if resp.StatusCode != http.StatusCreated {
+			m.logger.Debug("Status code of response (auth) = " + strconv.Itoa(resp.StatusCode))
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				m.logger.Sugar().Error("Failed to create user:", err)
+				m.logger.Sugar().Error("Failed to create user: %s", err.Error())
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 				return
 			}
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write(body)
-			if err != nil {
-				m.logger.Sugar().Error("Failed to create user:", err)
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-			}
+
+			m.logger.Sugar().Error("Failed to create user, body: %s", string(body))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 			return
 		}
@@ -150,10 +151,11 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 		dec := json.NewDecoder(resp.Body)
 		if err := dec.Decode(&authResp); err != nil {
 			m.logger.Sugar().Error("Failed to decode JSON response:", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			http.Error(w, "Internal server error", http.StatusInternalServerError) // TODO: сделать возврат ошибок
+
 			return
 		}
-
+		resp.Body.Close()
 		// Часть 2. Вызов сервиса User
 
 		type UserCreateRequest struct {
@@ -162,7 +164,7 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 			Phone      string `json:"phone"`
 			Birthday   string `json:"birthday"`
 			Name       string `json:"name"`
-			LastName   string `json:"lastName"`
+			LastName   string `json:"last_name"`
 			Patronymic string `json:"patronymic"`
 		}
 
@@ -183,8 +185,12 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 
 			return
 		}
-
-		userRequest, err := http.NewRequestWithContext(context.Background(), http.MethodPost, userHost, bytes.NewBuffer(jsonData))
+		userRequest, err := http.NewRequestWithContext(
+			r.Context(),
+			http.MethodPost,
+			userHost,
+			bytes.NewBuffer(jsonData),
+		)
 		if err != nil {
 			m.logger.Sugar().Error("Failed to create user HTTP request:", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -201,25 +207,20 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 			return
 		}
 
-		defer resp.Body.Close()
-
 		// Если статус отличен от успешного - возвращаем ошибку
 		// TODO: сделать удаление в auth
 		if resp.StatusCode != http.StatusCreated {
+			m.logger.Debug("Status code of response (user) = " + strconv.Itoa(resp.StatusCode))
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				m.logger.Sugar().Error("Failed to create user:", err)
+				m.logger.Sugar().Error("Failed to create user: %s", err.Error())
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 				return
 			}
 
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write(body)
-			if err != nil {
-				m.logger.Sugar().Error("Failed to create user:", err)
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-			}
+			m.logger.Sugar().Error("Failed to create user, body: %s", string(body))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 			return
 		}
@@ -235,6 +236,9 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 
 			return
 		}
+		resp.Body.Close()
+
+		w.WriteHeader(http.StatusCreated)
 
 		if err := json.NewEncoder(w).Encode(userResp); err != nil {
 			m.logger.Error(err.Error())
@@ -245,6 +249,5 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 			}
 		}
 		m.logger.Sugar().Infof("New user was created with ID: ", userResp.ID)
-		w.WriteHeader(http.StatusCreated)
 	})
 }

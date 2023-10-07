@@ -33,7 +33,7 @@ func TestHealthCheckHandler_ServeHTTP(t *testing.T) {
 		t.Errorf("MGMT Handler returned wrong status: got %v want %v", status, http.StatusOK)
 	}
 
-	expected := "User Service is healthy - Hello from Health Check Handler Endpoint"
+	expected := "MGMT Service is healthy - Hello from Health Check Handler Endpoint"
 	bodyBytes, err := io.ReadAll(rr.Body)
 
 	if err != nil {

@@ -5,26 +5,19 @@ import (
 	"net/http"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/config"
-	"github.com/PestovOleg/mini-bank/backend/pkg/database"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
 	"github.com/PestovOleg/mini-bank/backend/pkg/server"
 	"github.com/PestovOleg/mini-bank/backend/pkg/signal"
 	unleashServer "github.com/PestovOleg/mini-bank/backend/pkg/unleash"
-	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user"
-	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user/postgres"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"golang.org/x/sys/unix"
 )
 
-type Services struct {
-	UserService *user.Service
-}
+type Services struct{}
 
-func NewServices(u *user.Service) *Services {
-	return &Services{
-		UserService: u,
-	}
+func NewServices() *Services {
+	return &Services{}
 }
 
 type App struct {
@@ -51,35 +44,15 @@ func NewRouter(s *Services) http.Handler {
 }
 
 func NewApp(cfg *config.AppConfig) App {
-	conn := database.NewDBCon(
-		cfg.PostgresDBConfig.User,
-		cfg.PostgresDBConfig.Password,
-		cfg.PostgresDBConfig.Host,
-		cfg.PostgresDBConfig.Port,
-		cfg.PostgresDBConfig.Name,
-		cfg.PostgresDBConfig.SSLMode,
-	)
-	logger := logger.GetLogger("User")
-	db := database.NewDatabase()
-	pgClient, err := db.GetSQLDBCon(conn)
+	logger := logger.GetLogger("Mgmt")
 
-	if err != nil {
-		logger.Fatal("Unexpected error with DB connection: " + err.Error())
-	}
-
-	logger.Info("DB connection is established")
-
-	err = unleashServer.InitUnleash(cfg, "user")
+	err := unleashServer.InitUnleash(cfg, "user")
 	if err != nil {
 		logger.Sugar().Fatalf("Couldn't establish a connection to the Unleash Server: %s", err.Error())
 		panic(err.Error())
 	}
 
-	userRepo := postgres.NewUserSQL(pgClient)
-	userService := user.NewService(userRepo)
-
-	s := NewServices(userService)
-
+	s := NewServices()
 	api := NewRouter(s)
 
 	return App{
@@ -99,7 +72,7 @@ func (a *App) Run() error {
 		ReadHeaderTimeout: a.cfg.HTTPServerAppConfig.ReadHeaderTimeout,
 		IdleTimeout:       a.cfg.HTTPServerAppConfig.IdleTimeout,
 	}
-	logger := logger.GetLogger("server")
+	logger := logger.GetLogger("Mgmt")
 	ctx := signal.NewSignalContextHandle(unix.SIGINT, unix.SIGTERM)
 	errChan := make(chan error)
 

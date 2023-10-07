@@ -1,0 +1,8 @@
+
+location /api/v1/mgmt {       
+    proxy_pass http://${NEXT_BACKEND}:3333;
+}
+
+location ~ ^/api/.+/mgmt-minibank-health$ {        
+    proxy_pass http://${NEXT_BACKEND}:3333;
+}

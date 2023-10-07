@@ -8,5 +8,5 @@ require (
 )
 
 require go.uber.org/multierr v1.10.0 // indirect
-
+//nolint:gomoddirectives
 replace github.com/PestovOleg/mini-bank/backend/pkg/logger => ../../../backend/pkg/logger

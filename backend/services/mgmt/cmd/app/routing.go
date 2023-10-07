@@ -9,8 +9,8 @@ import (
 	"net/http"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/middleware"
-	"github.com/PestovOleg/mini-bank/backend/services/user/internal/http/handler/v1/health"
-	handlerUser "github.com/PestovOleg/mini-bank/backend/services/user/internal/http/handler/v1/user"
+	"github.com/PestovOleg/mini-bank/backend/services/mgmt/internal/http/handler/v1/health"
+	handlerMgmt "github.com/PestovOleg/mini-bank/backend/services/mgmt/internal/http/handler/v1/mgmt"
 	"github.com/gorilla/mux"
 )
 
@@ -22,28 +22,16 @@ type RouteConfig struct {
 
 func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 	return map[string]map[string]RouteConfig{
-		"/user-minibank-health": {
+		"/mgmt-minibank-health": {
 			http.MethodGet: {
 				Handler: health.NewHealthCheckHandler(),
 			},
 		},
-		"/users": {
+		"/mgmt": {
 			http.MethodPost: {
-				Handler:     handlerUser.NewUserHandler(s.UserService).CreateUser(),
+				Handler:     handlerMgmt.NewMgmtHandler().CreateUser(),
 				Feature:     "CreateUserToggle",
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
-			},
-		},
-		"/users/{id}": {
-			http.MethodGet: {
-				Handler:     handlerUser.NewUserHandler(s.UserService).GetUser(),
-				Feature:     "GetUserToggle",
-				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
-			},
-			http.MethodPut: {
-				Handler:     handlerUser.NewUserHandler(s.UserService).UpdateUser(),
-				Feature:     "UpdateUserToggle",
-				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
 			},
 		},
 	}
@@ -53,9 +41,10 @@ func SetHandler(r *mux.Router, paths map[string]map[string]RouteConfig) {
 	for path, methods := range paths {
 		for method, config := range methods {
 			handler := config.Handler
-			for _, middleware := range config.Middlewares { //оборачиваем во все middleware
+			for _, middleware := range config.Middlewares { // оборачиваем во все middleware
 				handler = middleware(handler)
 			}
+
 			if config.Feature == "" { // присваиваем фичи
 				r.Handle(path, handler).Methods(method)
 			} else {
