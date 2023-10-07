@@ -1,4 +1,4 @@
-name: CI Mgmt service
+name: CI mgmt service
 
 on:
   push:
@@ -50,6 +50,6 @@ jobs:
       - name: build
         run: |
           cd backend/services/mgmt
-          go build -o build/minibank
+          go build -o build/minibank cmd/main.go
 
   
