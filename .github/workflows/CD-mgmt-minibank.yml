@@ -2,11 +2,12 @@ name: CD mgmt service
 
 # Автосборка приостановлена //TODO: включить после полной настройки CD
 on:
-  #push:
-  #  branches:
-  #    - "main"
-  #  tags:
-  #    - "*.*.*"
+  push:
+    tags:
+      - "v*.*.*"
+    paths:
+      - 'mini-bank/backend/services/mgmt/**'
+      - '.github/workflows/CI-mgmt*'
   workflow_dispatch:
     inputs:
       reason:
@@ -23,8 +24,24 @@ jobs:
     name: Build and push Docker image to Dockerhub
     runs-on: ubuntu-20.04
 
-# заливаем исходники
     steps:
+# определяем версию (из пуша или при диспатче)
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Running workflow_dispatch, version is ${{ github.event.inputs.version }}"
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            TAG_VERSION=$(echo ${GITHUB_REF#refs/tags/} | sed 's/^v//')
+            echo "Running on push to tag, version is $TAG_VERSION"
+            echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
+          else
+            echo "Unknown event, exiting"
+            exit 1
+          fi
+
+# заливаем исходники
       - name: Check out code                        
         uses: actions/checkout@v3
 
@@ -33,10 +50,6 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.20.6
-
-# вывести тег для использования в версии image (//TODO: вывод версии при пуше)
-      - name: Versioning        
-        run: echo "Version is ${{ github.event.inputs.version }}"
 
 # логинимся в докерхаб      
       - name: Login to Docker Hub
@@ -54,15 +67,15 @@ jobs:
           context: .
           file: ./backend/services/mgmt/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mgmt-minibank:${{ github.event.inputs.version }}
-          labels: ${{ secrets.DOCKERHUB_USERNAME }}/mgmt-minibank:${{ github.event.inputs.version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mgmt-minibank:${{ env.VERSION }}
+          labels: ${{ secrets.DOCKERHUB_USERNAME }}/mgmt-minibank:${{ env.VERSION }}
   
   deploy:
     needs: build
     name: Deploy 
     runs-on: ubuntu-20.04
     
-# коннектимся по SSH,скачиваем образ и запускаем //TODO: запуск образа сменить на запуск скрипта swap.sh для blue-green деплоя
+# коннектимся по SSH,скачиваем образ и запускаем 
     steps:
       - name: SSH connect
         uses: appleboy/ssh-action@v1.0.0
@@ -72,10 +85,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/mini-bank
-            git pull origin main
-            export CONFIG_PATH=${{ vars.CONFIG_PATH }}
-            echo "CONFIG_PATH: $CONFIG_PATH"
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
+            git pull
+            export MGMT_CONFIG_PATH=${{ vars.MGMT_CONFIG_PATH }}
+            export MGMT_APP_VERSION=${{ env.VERSION }}
+            echo 'Переменные для миграции'
+            export MIGRATE=NO
+            export SERVICE=mgmt-minibank
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mgmt-minibank:${{ env.VERSION }}
             /bin/bash deploy.sh
-# docker run -p 80:3333 -e CONFIG_PATH=$CONFIG_PATH ${{ secrets.DOCKERHUB_USERNAME }}/minibank:${{ github.event.inputs.version }}
             
