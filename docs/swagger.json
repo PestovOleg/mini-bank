@@ -15,7 +15,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost",
+    "host": "minibank.su",
     "basePath": "/api/v1",
     "paths": {
         "/account-minibank-health": {
