@@ -86,9 +86,11 @@
    - **account-minibank** - сервис работы со счетами.
    - **auth-minibank** - сервис аутентификации/авторизации.
    - **web** - frontend (to be)
-### Используемые сервисы (см. docker-compose)
-- **Unleash** - <http://minibank.su:4242>
-- **Swagger** - <http://minibank.su:8001>
+    ### Используемые сервисы (см. docker-compose)
+   - **Unleash** - <http://minibank.su:4242>
+   - **Swagger** - <http://minibank.su:8001>
+
+
   ### API Routes
    Пример: <http://minibank.su/api/v1/mgmt-minibank-health>
 | Service         | API (/api/v1)         | Method | Feature Toggle    | Basic Authorization | Description                      |
