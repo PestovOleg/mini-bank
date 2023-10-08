@@ -15,7 +15,7 @@ lint: ## Lint all
 
 
 build:
-	cd backend && go build -o build/minibank cmd/main.go
+	go build -o build/minibank cmd/main.go
 
 run:
 	rm -rf backend/build/ && mkdir -p backend/build/
