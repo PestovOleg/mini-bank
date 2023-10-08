@@ -8,7 +8,7 @@ on:
       - release/**
     paths:
       - 'mini-bank/backend/services/account/**'
-      - '.github/workflows/CI-account*'
+      - '.github/workflows/CI-account**'
   pull_request:
     branches:
       - main
@@ -16,7 +16,7 @@ on:
       - release/**
     paths:
       - 'mini-bank/backend/services/account/**'
-      - '.github/workflows/CI-account*'
+      - '.github/workflows/CI-account**'
   workflow_dispatch:
 
 jobs:
