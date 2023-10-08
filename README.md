@@ -6,6 +6,7 @@
 - [Юзкейсы](#юзкейсы)
 - [Реализация](#реализация)
 - [Сервисы](#сервисы)
+- [Используемые сервисы](#используемые-сервисы-см-docker-compose)
 - [API Routes](#api-routes)
 - [Структура монорепо](#структура-монорепо)
 
@@ -86,7 +87,8 @@
    - **account-minibank** - сервис работы со счетами.
    - **auth-minibank** - сервис аутентификации/авторизации.
    - **web** - frontend (to be)
-    ### Используемые сервисы (см. docker-compose)
+
+   ### Используемые сервисы (см. docker-compose)
    - **Unleash** - <http://minibank.su:4242>
    - **Swagger** - <http://minibank.su:8001>
 
@@ -117,32 +119,47 @@
 |                 | `/accounts/{id}/withdraw`| PUT | WithdrawToggle   |         +          | Снять деньги со счета            |
 
 
-## Пререквизиты
-### Github variables
+### Github secrets and variables
 
-    | VARIABLE    |                                         |
-    | ----------- | --------------------------------------- |
-    | CONFIG_PATH | Путь к конфигу на сервере               |
-    | SECRET_PATH | Путь к секретам на сервере (БД и т.д.)  |
+<details>
+<summary><b>Environment Variables использующиеся в Docker Compose, сервисах, и Blue-Green Deployment ()</b></summary>
 
-### Github secrets
+**POSTGRES_PASSWORD** = `superSecure123`
+адреса сервисов в сети docker (для общения между сервисами)
+**AUTH_HOST** = `"http://nginx/api/v1/secureAuth"`
+**USER_HOST** = `"http://nginx/api/v1/secureUsers"`
+**ACCOUNT_HOST** = `"http://nginx/api/v1/secureAccounts"`
+для миграции текущего сервиса при выполнении скрипта deploy.sh
+**MINIBANK_DB** = `orchestraDB`
+**MINIBANK_USER** = `orchestraUser`
+**MINIBANK_PASSWORD** = `orchestraPWD`
+одноименные доступы сервисов к БД (также необходимы при инициализации БД)
+**AUTH_MINIBANK_DB** = `authDB`
+**AUTH_MINIBANK_USER** = `authUser`
+**AUTH_MINIBANK_PASSWORD** = `authPWD`
 
-    | VARIABLE              |                               |
-    | --------------------- | ----------------------------- |
-    | DOCKERHUB_TOKEN       | токен docker registry         |
-    | DOCKERHUB_USERNAME    | user dockerhub registry       |
-    | SSH_PRIVATE_KEY       |                               |
-    | SSH_SERVER_IP         | ip где разворачиваем          |
-    | SSH_SERVER_USER       |                               |
+**USER_MINIBANK_DB** = `userDB`
+**USER_MINIBANK_USER** = `userUser`
+**USER_MINIBANK_PASSWORD** = `userPWD`
 
+**ACCOUNT_MINIBANK_DB** = `accountDB`
+**ACCOUNT_MINIBANK_USER** = `accountUser`
+**ACCOUNT_MINIBANK_PASSWORD** = `accountPWD`
 
-### На стороне сервера
+**DATABASE_DB** = `toggleDB`
+**DATABASE_PASSWORD** = `togglePWD`
+**DATABASE_USER** = `toggleUser`
 
-    | CONFIG      |                                             |
-    | ----------- | ------------------------------------------- |
-    | CONFIG_PATH | Путь к конфигу (-см. Variables)             |
-    | SECRET_PATH | Путь к секретам на сервере (-см. Variables) |
-
-## Endpoints (v1):
-
-    - /v1/health-check  //проверка состояния сервера
+**UNLEASH_DB** = `unleashDB`
+**UNLEASH_PASSWORD** = `unleashPWD`
+**UNLEASH_USER** = `unleashUser`
+версии сервисов,устанавливаемые при Blue-Green Deployment и пути к конфигам
+**AUTH_APP_VERSION** = `latest`
+**AUTH_CONFIG_PATH** = `/etc/securePath/auth-config.yml`
+**USER_APP_VERSION** = `latest`
+**USER_CONFIG_PATH** = `/etc/securePath/user-config.yml`
+**ACCOUNT_APP_VERSION** = `latest`
+**ACCOUNT_CONFIG_PATH** = `/etc/securePath/account-config.yml`
+**MGMT_APP_VERSION** = `latest`
+**MGMT_CONFIG_PATH** = `/etc/securePath/mgmt-config.yml`
+</details>
