@@ -124,46 +124,46 @@
 <details>
 <summary><b>Environment Variables использующиеся в Docker Compose, сервисах, и Blue-Green Deployment</b></summary>
 
-**POSTGRES_PASSWORD** = `superSecure123`
+**POSTGRES_PASSWORD** = `superSecure123`  
 
-*адреса сервисов в сети docker (для общения между сервисами)*
-**AUTH_HOST** = `"http://nginx/api/v1/secureAuth"`
-**USER_HOST** = `"http://nginx/api/v1/secureUsers"`
-**ACCOUNT_HOST** = `"http://nginx/api/v1/secureAccounts"`
+*адреса сервисов в сети docker (для общения между сервисами)*  
+**AUTH_HOST** = `"http://nginx/api/v1/secureAuth"`  
+**USER_HOST** = `"http://nginx/api/v1/secureUsers"`  
+**ACCOUNT_HOST** = `"http://nginx/api/v1/secureAccounts"`  
 
-*для миграции текущего сервиса при выполнении скрипта deploy.sh*
-**MINIBANK_DB** = `orchestraDB`
-**MINIBANK_USER** = `orchestraUser`
-**MINIBANK_PASSWORD** = `orchestraPWD`
+*для миграции текущего сервиса при выполнении скрипта deploy.sh*  
+**MINIBANK_DB** = `orchestraDB`  
+**MINIBANK_USER** = `orchestraUser`  
+**MINIBANK_PASSWORD** = `orchestraPWD`  
 
-*одноименные доступы сервисов к БД (также необходимы при инициализации БД)*
-**AUTH_MINIBANK_DB** = `authDB`
-**AUTH_MINIBANK_USER** = `authUser`
-**AUTH_MINIBANK_PASSWORD** = `authPWD`
+*одноименные доступы сервисов к БД (также необходимы при инициализации БД)*  
+**AUTH_MINIBANK_DB** = `authDB`  
+**AUTH_MINIBANK_USER** = `authUser`  
+**AUTH_MINIBANK_PASSWORD** = `authPWD`  
 
-**USER_MINIBANK_DB** = `userDB`
-**USER_MINIBANK_USER** = `userUser`
-**USER_MINIBANK_PASSWORD** = `userPWD`
+**USER_MINIBANK_DB** = `userDB`  
+**USER_MINIBANK_USER** = `userUser`  
+**USER_MINIBANK_PASSWORD** = `userPWD`  
 
-**ACCOUNT_MINIBANK_DB** = `accountDB`
-**ACCOUNT_MINIBANK_USER** = `accountUser`
-**ACCOUNT_MINIBANK_PASSWORD** = `accountPWD`
+**ACCOUNT_MINIBANK_DB** = `accountDB`  
+**ACCOUNT_MINIBANK_USER** = `accountUser`  
+**ACCOUNT_MINIBANK_PASSWORD** = `accountPWD`  
 
-**DATABASE_DB** = `toggleDB`
-**DATABASE_PASSWORD** = `togglePWD`
-**DATABASE_USER** = `toggleUser`
+**DATABASE_DB** = `toggleDB`  
+**DATABASE_PASSWORD** = `togglePWD`  
+**DATABASE_USER** = `toggleUser`  
 
-**UNLEASH_DB** = `unleashDB`
-**UNLEASH_PASSWORD** = `unleashPWD`
-**UNLEASH_USER** = `unleashUser`
+**UNLEASH_DB** = `unleashDB`  
+**UNLEASH_PASSWORD** = `unleashPWD`  
+**UNLEASH_USER** = `unleashUser`  
 
-*версии сервисов,устанавливаемые при Blue-Green Deployment и пути к конфигам*
-**AUTH_APP_VERSION** = `latest`
-**AUTH_CONFIG_PATH** = `/etc/securePath/auth-config.yml`
-**USER_APP_VERSION** = `latest`
-**USER_CONFIG_PATH** = `/etc/securePath/user-config.yml`
-**ACCOUNT_APP_VERSION** = `latest`
-**ACCOUNT_CONFIG_PATH** = `/etc/securePath/account-config.yml`
-**MGMT_APP_VERSION** = `latest`
-**MGMT_CONFIG_PATH** = `/etc/securePath/mgmt-config.yml`
+*версии сервисов,устанавливаемые при Blue-Green Deployment и пути к конфигам*  
+**AUTH_APP_VERSION** = `latest`  
+**AUTH_CONFIG_PATH** = `/etc/securePath/auth-config.yml`  
+**USER_APP_VERSION** = `latest`  
+**USER_CONFIG_PATH** = `/etc/securePath/user-config.yml`  
+**ACCOUNT_APP_VERSION** = `latest`  
+**ACCOUNT_CONFIG_PATH** = `/etc/securePath/account-config.yml`  
+**MGMT_APP_VERSION** = `latest`  
+**MGMT_CONFIG_PATH** = `/etc/securePath/mgmt-config.yml`  
 </details>
