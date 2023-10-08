@@ -27,6 +27,7 @@ go.work
 *.log 
 /log 
 output.txt
+.env.example
 
 #envoirements
 *.env
