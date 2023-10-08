@@ -6,7 +6,7 @@ on:
       - "v*.*.*"
     paths:
       - 'mini-bank/backend/services/auth/**'
-      - '.github/workflows/CI-auth*'
+      - '.github/workflows/CD-auth*'
   workflow_dispatch:
     inputs:
       reason:

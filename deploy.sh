@@ -69,7 +69,7 @@ else
 fi
 
 echo "Testing minibank..."
-curl -s http://localhost/api/v1/${SERVICE}-health | grep "Service is healthy"
+curl -s http://0.0.0.0/api/v1/${SERVICE}-health | grep "Service is healthy"
 rv=$?
 if [ $rv != 0 ]; then
     echo "Testing is failed with exit code: $rv"
