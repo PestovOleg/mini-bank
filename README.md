@@ -7,6 +7,7 @@
 - [Реализация](#реализация)
 - [Сервисы](#сервисы)
 - [API Routes](#api-routes)
+- [Структура монорепо](#структура-проекта)
 
 ## ТЗ
 ### Юзкейсы
@@ -40,14 +41,52 @@
     10. [x] Обращение к сервисам осуществляется через прикладной балансировщик
 
 ## Реализация
+### Структура монорепо
+
+  - mini-bank/ 
+  - ├── Makefile < *try* **'make help'** >
+  - ├── README.md 
+  - ├── backend 
+    - ├── Makefile < *try* **'make help'** >
+    - ├── config 
+      - └── example.yml < *шаблон конфиг файла* >
+    - ├── pkg < *local libs (to be git submodule)* >
+      - ├── config 
+      - ├── database 
+      - ├── logger 
+      - ├── middleware 
+      - ├── server 
+      - ├── signal 
+      - └── unleash 
+    - └── services < *микросервисы* >
+      - ├── account 
+      - ├── auth 
+      - ├── mgmt 
+      - └── user 
+  - ├── db < *скрипты для DB* >
+    - └── init-unleash.sh < *скрипт инициализации DB* >
+  - ├── deploy.sh < *скрипт blue-green deployment* >
+  - ├── docker-compose.yml 
+  - ├── docs < *swagger docs* >
+  - ├── go.work < *go workspace file* >
+  - ├── nginx < *nginx конфиги* >
+    - ├── conf.d < *шаблоны nginx для deploy.sh* >
+      - ├── account-minibank.conf.template 
+      - ├── auth-minibank.conf.template 
+      - ├── mgmt-minibank.conf.template 
+      - ├── user-minibank.conf.template 
+      - ├── web.conf.template 
+    - └── nginx.conf < *upstream конфиг* >
+  - └── web < *frontend* >
+
 ### Сервисы
-    - **mgmt-minibank** - сервис оркестрации работы с пользователями.
-    - **user-minibank** - сервис работы с пользователями.
-    - **account-minibank** - сервис работы со счетами.
-    - **mgmt-minibank** - сервис аутентификации/авторизации.
+   - **mgmt-minibank** - сервис оркестрации работы с пользователями.
+   - **user-minibank** - сервис работы с пользователями.
+   - **account-minibank** - сервис работы со счетами.
+   - **auth-minibank** - сервис аутентификации/авторизации.
    
   ### API Routes
-    Пример <http://minibank.su/api/v1/mgmt-minibank-health>
+   Пример: <http://minibank.su/api/v1/mgmt-minibank-health>
 | Service         | API (/api/v1)         | Method | Feature Toggle    | Basic Authorization | Description                      |
 |-----------------|-----------------------|--------|-------------------|---------------------|----------------------------------|
 | **mgmt-minibank**| `/mgmt-minibank-health`| GET   |                   |                     | Health Check                     |
