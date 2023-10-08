@@ -24,12 +24,12 @@ else
 fi
 
 echo "Removing old container if it hasn't been removed..."
-docker compose rm -f -s -v $NEXT_BACKEND
+docker compose rm -f -s -v $NEXT_BACKEND 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
 printf "%s\n" "Done"
 
 if [ "$MIGRATE" == "YES" ]; then
   echo "Migrating database ..."
-  docker compose up -d migrate
+  docker compose run -d migrate 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
   printf "%s\n" "Done...waiting 3 sec"
   sleep 3
 else 
@@ -37,7 +37,7 @@ else
 fi
 
 echo "Starting $NEXT_BACKEND"
-docker compose up -d $NEXT_BACKEND
+docker compose up -d $NEXT_BACKEND 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
 echo "Waiting 3 sec"
 sleep 3
 
@@ -57,7 +57,7 @@ if [ $rv != 0 ]; then
 fi
 
 echo "Reloading nginx with $NEXT_BACKEND"
-docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload
+docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
 rv=$?
 if [ $rv != 0 ]; then
     echo "Reloading is failed with exit code: $rv"
@@ -69,7 +69,7 @@ else
 fi
 
 echo "Testing minibank..."
-curl -s http://localhost/api/v1/${SERVICE}-health | grep "Service is healthy"
+curl -s http://0.0.0.0/api/v1/${SERVICE}-health | grep "Service is healthy"
 rv=$?
 if [ $rv != 0 ]; then
     echo "Testing is failed with exit code: $rv"
@@ -77,7 +77,7 @@ if [ $rv != 0 ]; then
     cp ./nginx/conf.d/${SERVICE}.nginx.conf ./nginx/conf.d/${SERVICE}.error.conf.back 2>/dev/null
     cp ./nginx/conf.d/${SERVICE}.nginx.conf.back ./nginx/conf.d/${SERVICE}.nginx.conf 2>/dev/null
     echo "Reloading nginx with $CURRENT_BACKEND"
-    docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload
+    docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
     echo "Nothing has happend,do not forget about migration..."
     exit 1
 else    
@@ -85,6 +85,6 @@ else
 fi
 
 echo "Deleting old container: $CURRENT_BACKEND"
-docker compose rm -f -s -v $CURRENT_BACKEND
+docker compose rm -f -s -v $CURRENT_BACKEND 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
 
 echo "Blue-Green deployment is done!"

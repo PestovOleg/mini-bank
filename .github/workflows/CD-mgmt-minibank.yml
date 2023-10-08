@@ -7,7 +7,7 @@ on:
       - "v*.*.*"
     paths:
       - 'mini-bank/backend/services/mgmt/**'
-      - '.github/workflows/CI-mgmt*'
+      - '.github/workflows/CD-mgmt*'
   workflow_dispatch:
     inputs:
       reason:
@@ -23,6 +23,8 @@ jobs:
   build:
     name: Build and push Docker image to Dockerhub
     runs-on: ubuntu-20.04
+    outputs:
+      version: ${{ env.VERSION }}
 
     steps:
 # определяем версию (из пуша или при диспатче)
@@ -87,10 +89,12 @@ jobs:
             cd /opt/mini-bank
             git pull
             export MGMT_CONFIG_PATH=${{ vars.MGMT_CONFIG_PATH }}
-            export MGMT_APP_VERSION=${{ env.VERSION }}
+            export MGMT_APP_VERSION=${{ needs.build.outputs.version }}
+            export AUTH_HOST=${{ secrets.AUTH_HOST }}
+            export USER_HOST=${{ secrets.USER_HOST }}
+            export ACCOUNT_HOST=${{ secrets.ACCOUNT_HOST }}
             echo 'Переменные для миграции'
             export MIGRATE=NO
             export SERVICE=mgmt-minibank
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mgmt-minibank:${{ env.VERSION }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mgmt-minibank:${{ needs.build.outputs.version }}
             /bin/bash deploy.sh
-            
