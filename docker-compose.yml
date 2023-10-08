@@ -249,6 +249,7 @@ services:
       CONFIG_PATH: ${MGMT_CONFIG_PATH}
       AUTH_HOST: ${AUTH_HOST}
       USER_HOST: ${USER_HOST}
+      ACCOUNT_HOST: ${ACCOUNT_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -274,6 +275,7 @@ services:
       CONFIG_PATH: ${MGMT_CONFIG_PATH}
       AUTH_HOST: ${AUTH_HOST}
       USER_HOST: ${USER_HOST}
+      ACCOUNT_HOST: ${ACCOUNT_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log

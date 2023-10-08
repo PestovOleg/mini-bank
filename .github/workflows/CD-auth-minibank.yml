@@ -89,12 +89,13 @@ jobs:
             git pull
             export AUTH_CONFIG_PATH=${{ vars.AUTH_CONFIG_PATH }}
             export AUTH_APP_VERSION=${{ needs.build.outputs.version }}
+            export AUTH_HOST=${{ secrets.AUTH_HOST }}
             echo 'Переменные для миграции'
             export MIGRATE=YES
             export SERVICE=auth-minibank
             AUTH_MINIBANK_DB=${{ secrets.AUTH_MINIBANK_DB }}
             AUTH_MINIBANK_USER=${{ secrets.AUTH_MINIBANK_USER }}
             AUTH_MINIBANK_PASSWORD=${{ secrets.AUTH_MINIBANK_PASSWORD }} 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/auth-minibank:${{ env.VERSION }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/auth-minibank:${{ needs.build.outputs.version }}
             /bin/bash deploy.sh
             
