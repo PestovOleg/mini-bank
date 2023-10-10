@@ -25,24 +25,28 @@ func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 				Handler: health.NewHealthCheckHandler(),
 			},
 		},
+		"/auth/login": {
+			http.MethodPost: {
+				Handler:     auth.NewAuthHandler(s.AuthService).Authenticate(),
+				Feature:     "AuthenticateToggle",
+				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
+			},
+		},
 		"/auth": {
 			http.MethodPost: {
 				Handler:     auth.NewAuthHandler(s.AuthService).CreateAuth(),
 				Feature:     "CreateUserToggle",
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
 			},
-			http.MethodGet: {
-				Handler:     auth.NewAuthHandler(s.AuthService).Authenticate(),
-				Feature:     "AuthenticateToggle",
-				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
-			},
 		},
-		"/auth/{id}": {
-			http.MethodGet: {
+		"/auth/verify": {
+			http.MethodPost: {
 				Handler:     auth.NewAuthHandler(s.AuthService).Authorize(),
 				Feature:     "AuthorizeToggle",
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
 			},
+		},
+		"/auth/{id}": {
 			http.MethodDelete: {
 				Handler:     auth.NewAuthHandler(s.AuthService).DeleteAuth(),
 				Feature:     "DeleteUserToggle",

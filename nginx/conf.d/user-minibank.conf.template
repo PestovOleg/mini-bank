@@ -1,8 +1,8 @@
+location /api/v1/user-minibank-health {        
+    proxy_pass http://${NEXT_SERVICE}:3333;
+}
 
 location /api/v1/user {
-    proxy_pass http://${NEXT_BACKEND}:3333;
+    proxy_pass http://${NEXT_SERVICE}:3333;
 }
 
-location ~ ^/api/.+/user-minibank-health$ {
-    proxy_pass http://${NEXT_BACKEND}:3333;
-}
