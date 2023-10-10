@@ -12,6 +12,7 @@ export class User {
     createdAt: Date;
     updatedAt: Date;
     password: string;
+    token: string;
 
     constructor(id: UUID, username: string, email: string, phone:string, birthday:Date, name: string, lastName: string, patronimyc: string, createdAt: Date, updatedAt: Date) {
         this.id = id;
@@ -24,6 +25,7 @@ export class User {
         this.patronimyc = patronimyc;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.password=""
+        this.password="";
+        this.token="";
     }
 }

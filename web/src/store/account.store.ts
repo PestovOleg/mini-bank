@@ -1,7 +1,7 @@
 import { IAccount, IUser } from "../models/types";
 import { action, makeAutoObservable, observable } from "mobx";
 import { runInAction } from "mobx";
-import { EMPTY_USER,EMPTY_ACCOUNT } from "../const/empties"
+import { EMPTY_USER, EMPTY_ACCOUNT } from "../const/empties"
 import { Store } from './store';
 
 const URL = "http://localhost/api/v1";
@@ -13,23 +13,22 @@ export class AccountStore {
         makeAutoObservable(this);
         this.Accounts = [{ ...EMPTY_ACCOUNT }];
     }
-    
+
     public async getList(): Promise<void> {
-        const base64Credentials = btoa(this.rootStore.userStore.User.username + ':' + this.rootStore.userStore.User.password);
-        
+
         try {
             const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts`, {
                 headers: {
-                    'Authorization': 'Basic ' + base64Credentials
+                    'Authorization': this.rootStore.userStore.User.token,
                 }
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to fetch list of accounts');
             }
-    
+
             const res: any[] = await response.json();
-            
+
             runInAction(() => {
                 this.Accounts = [];
                 res.forEach((item: any) => {
@@ -51,5 +50,190 @@ export class AccountStore {
             console.error('There was a problem with the fetch operation:', error);
         }
     }
-    
+
+    public async getAccountInfo(id: string): Promise<void> {
+
+        try {
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
+                headers: {
+                    'Authorization': this.rootStore.userStore.User.token,
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to get account info');
+            }
+
+            const res: any = await response.json();
+
+            runInAction(() => {
+                const accountToUpdate = this.Accounts.find(account => account.id === id);
+
+                if (accountToUpdate) {
+                    accountToUpdate.amount = res.amount;
+                    accountToUpdate.currency = res.currency;
+                    accountToUpdate.createdAt = res.created_at;
+                    accountToUpdate.interestRate = res.interest_rate;
+                    accountToUpdate.account = res.account;
+                    accountToUpdate.userID = res.user_id;
+                    accountToUpdate.name = res.name;
+                }
+                console.log(this.Accounts)
+            });
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+
+    public async openAccount(
+        currency: string,
+        accountName: string
+    ): Promise<void> {
+        const accountData = {
+            currency: String(currency),
+            name: accountName,
+        };
+
+        try {
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': this.rootStore.userStore.User.token,
+                },
+                body: JSON.stringify(accountData),
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const res: any = await response.json();
+            runInAction(() => {
+                this.getList();
+            });
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+
+    public async updateAccount(
+        accountName: string,
+        id:string
+    ): Promise<void> {
+        const accountData = {
+            name: accountName,
+            id
+        };
+
+        try {
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': this.rootStore.userStore.User.token,
+                },
+                body: JSON.stringify(accountData),
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            runInAction(() => {
+                this.getAccountInfo(id);
+            });
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+
+    public async closeAccount(id:string): Promise<void> {
+       
+
+        try {
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': this.rootStore.userStore.User.token,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            runInAction(() => {
+                this.getList();
+            });
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+
+    public async topUpAccount(
+        amount: number,
+        id: string
+    ): Promise<void> {
+        const accountData = {
+            amount,
+            id
+        };
+
+        try {
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': this.rootStore.userStore.User.token,
+                },
+                body: JSON.stringify(accountData),
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const res: any = await response.json();
+            runInAction(() => {
+                this.getAccountInfo(id);
+            });
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+
+    public async withdrawAccount(
+        amount: number,
+        id: string
+    ): Promise<void> {
+        const accountData = {
+            amount,
+            id
+        };
+
+        try {
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': this.rootStore.userStore.User.token,
+                },
+                body: JSON.stringify(accountData),
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const res: any = await response.json();
+            runInAction(() => {
+                this.getAccountInfo(id);
+            });
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+
 }

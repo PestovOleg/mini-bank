@@ -11,6 +11,7 @@ export const EMPTY_USER: IUser = {
     patronimyc: '',
     createdAt: new Date(0),
     password:'',
+    token:'',
 };
 
 export const EMPTY_ACCOUNT: IAccount={

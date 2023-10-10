@@ -11,6 +11,7 @@ export interface IUser {
     patronimyc: string;
     createdAt: Date;
     password: string;
+    token: string;
 }
 
 export interface IAccount {

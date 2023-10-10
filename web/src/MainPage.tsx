@@ -44,6 +44,7 @@ import ModeSharpIcon from "@mui/icons-material/ModeSharp";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
+import NewAccountDialog from "./components/NewAccount";
 
 function MainPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -190,9 +191,7 @@ function MainPage() {
                 <Typography variant="caption" sx={{ fontSize: 14, ml: -3 }}>
                   &copy; by Pestov
                 </Typography>
-                <StyledFab color="secondary" aria-label="add">
-                  <AddIcon />
-                </StyledFab>
+                <NewAccountDialog/>
                 <Box sx={{ flexGrow: 1 }} />
               </Toolbar>
             </AppBar>
