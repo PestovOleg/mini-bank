@@ -93,6 +93,7 @@ jobs:
             export AUTH_HOST=${{ secrets.AUTH_HOST }}
             export USER_HOST=${{ secrets.USER_HOST }}
             export ACCOUNT_HOST=${{ secrets.ACCOUNT_HOST }}
+            export AUTH_VERIFY_HOST=${{secrets.AUTH_VERIFY_HOST}}
             echo 'Переменные для миграции'
             export MIGRATE=NO
             export SERVICE=mgmt-minibank

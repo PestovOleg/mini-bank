@@ -15,6 +15,7 @@ import { useState } from "react";
 import AlertSuccess from "./AlertSignUp";
 import InputMask from "react-input-mask";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { formatDate } from "../utils/utils"
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -51,6 +52,7 @@ export default function FullScreenDialog() {
   ): Promise<void> => {
     event.preventDefault();
     const b = new Date(birthday);
+    const formattedDate = formatDate(b);
     if (
       firstName &&
       lastName &&
@@ -69,7 +71,7 @@ export default function FullScreenDialog() {
         username,
         password,
         phone,
-        b
+        formattedDate
       );
 
       // Show the alert

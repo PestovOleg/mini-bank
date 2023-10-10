@@ -5,29 +5,45 @@ help: ## Display available commands.
 .PHONY: build
 
 auth: ## Deploy and run auth service
-	export SERVICE=auth-minibank
-	MINIBANK_DB=$(grep AUTH_MINIBANK_DB .env | cut -d '=' -f2)
-	MINIBANK_USER=$(grep AUTH_MINIBANK_USER .env | cut -d '=' -f2)
-	MINIBANK_PASSWORD=$(grep AUTH_MINIBANK_PASSWORD .env | cut -d '=' -f2)
+	export SERVICE=auth-minibank 
+	export MIGRATE=YES
+	export MINIBANK_DB=$(grep AUTH_MINIBANK_DB .env | cut -d '=' -f2) 
+	export MINIBANK_USER=$(grep AUTH_MINIBANK_USER .env | cut -d '=' -f2) 
+	export MINIBANK_PASSWORD=$(grep AUTH_MINIBANK_PASSWORD .env | cut -d '=' -f2)
 	/bin/bash deploy.sh
 
 user: ## Deploy and run user service
 	export SERVICE=user-minibank
-	MINIBANK_DB=$(grep USER_MINIBANK_DB .env | cut -d '=' -f2)
-	MINIBANK_USER=$(grep USER_MINIBANK_USER .env | cut -d '=' -f2)
-	MINIBANK_PASSWORD=$(grep USER_MINIBANK_PASSWORD .env | cut -d '=' -f2)
+	export MIGRATE=YES
+	export MINIBANK_DB=$(grep USER_MINIBANK_DB .env | cut -d '=' -f2)
+	export MINIBANK_USER=$(grep USER_MINIBANK_USER .env | cut -d '=' -f2)
+	export MINIBANK_PASSWORD=$(grep USER_MINIBANK_PASSWORD .env | cut -d '=' -f2)
 	/bin/bash deploy.sh
 
 account: ## Deploy and run account service
 	export SERVICE=account-minibank
-	MINIBANK_DB=$(grep ACCOUNT_MINIBANK_DB .env | cut -d '=' -f2)
-	MINIBANK_USER=$(grep ACCOUNT_MINIBANK_USER .env | cut -d '=' -f2)
-	MINIBANK_PASSWORD=$(grep ACCOUNT_MINIBANK_PASSWORD .env | cut -d '=' -f2)
+	export MIGRATE=YES
+	export MINIBANK_DB=$(grep ACCOUNT_MINIBANK_DB .env | cut -d '=' -f2)
+	export MINIBANK_USER=$(grep ACCOUNT_MINIBANK_USER .env | cut -d '=' -f2)
+	export MINIBANK_PASSWORD=$(grep ACCOUNT_MINIBANK_PASSWORD .env | cut -d '=' -f2)
 	/bin/bash deploy.sh
 
 mgmt: ## Deploy and run mgmt service
 	export SERVICE=mgmt-minibank
+	export MIGRATE=NO
 	/bin/bash deploy.sh
+
+backendbuild: ## Up all backend
+	docker compose build account-minibank-green user-minibank-green auth-minibank-green mgmt-minibank-green
+
+backendup: ## Up all backend
+	docker compose up -d account-minibank-green user-minibank-green auth-minibank-green mgmt-minibank-green
+
+backenddown: ## Down all backend
+	docker compose down account-minibank-green user-minibank-green auth-minibank-green mgmt-minibank-green
+
+swag: ##Generate Swagger documentation
+	swag init --pd -g ./backend/services/auth/cmd/main.go  ./backend/services/user/cmd/main.go ./backend/services/mgmt/cmd/main.go ./backend/services/account/cmd/main.go 
 
 gitlog: ## Output git log
 	git log --pretty=format:"%H [%cd]: %an - %s" --graph --date=format:%c

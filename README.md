@@ -102,21 +102,21 @@
 |                 | `/mgmt/{id}`          | DELETE | DeleteUserToggle  |          +          | Удаление (деактивация) пользователя |
 | **auth-minibank**| `/auth-minibank-health`| GET  |                   |                     | Health Check                     |
 |                 | `/auth`               | POST   | CreateUserToggle  |                     | Создание записи аутентификации (логин/пароль) |
-|                 | `/auth`               | GET    | AuthenticateToggle|          +          | Аутентификация                   |
-|                 | `/auth/{id}`          | GET    | AuthorizeToggle   |          +          | Авторизация пользователей к сервисам  |
+|                 | `/auth/login`               | POST    | AuthenticateToggle|          +          | Аутентификация                   |
+|                 | `/auth/verify`          | POST    | AuthorizeToggle   |          +          | Авторизация пользователей к сервисам  |
 |                 | `/auth/{id}`          | DELETE | DeleteUserToggle  |          +          | Удаление (деактивация) пользователя |
 | **user-minibank**| `/user-minibank-health`| GET  |                   |                     | Health Check                     |
 |                 | `/users`              | POST   | CreateUserToggle  |          +          | Данные пользователя              |
 |                 | `/users/{id}`         | GET    | GetUserToggle     |          +          | Данные пользователя              |
 |                 | `/users/{id}`         | PUT    | UpdateUserToggle  |          +          | Обновление данных пользователей   |
 | **account-minibank**| `/account-minibank-health`| GET |              |                     | Health Check                     |
-|                 | `/accounts`           | POST   | CreateAccountToggle|         +          | Создание счета                   |
-|                 | `/accounts`           | GET    | ListAccountsToggle|         +          | Список счетов                    |
-|                 | `/accounts/{id}`      | PUT    | UpdateAccountToggle|        +          | Обновить данные по счету         |
-|                 | `/accounts/{id}`      | GET    | GetAccountToggle  |         +          | Информация о счете               |
-|                 | `/accounts/{id}`      | DELETE | DeleteAccountToggle|        +          | Удалить (деактивировать) счет    |
-|                 | `/accounts/{id}/topup`| PUT    | TopUpToggle       |         +          | Пополнить счет                   |
-|                 | `/accounts/{id}/withdraw`| PUT | WithdrawToggle   |         +          | Снять деньги со счета            |
+|                 | `/users/{userid}/accounts`           | POST   | CreateAccountToggle|         +          | Создание счета                   |
+|                 | `/users/{userid}/accounts`           | GET    | ListAccountsToggle|         +          | Список счетов                    |
+|                 | `/users/{userid}/accounts/{id}`      | PUT    | UpdateAccountToggle|        +          | Обновить данные по счету         |
+|                 | `/users/{userid}/accounts/{id}`      | GET    | GetAccountToggle  |         +          | Информация о счете               |
+|                 | `/users/{userid}/accounts/{id}`      | DELETE | DeleteAccountToggle|        +          | Удалить (деактивировать) счет    |
+|                 | `/users/{userid}/accounts/{id}/topup`| PUT    | TopUpToggle       |         +          | Пополнить счет                   |
+|                 | `/users/{userid}/accounts/{id}/withdraw`| PUT | WithdrawToggle   |         +          | Снять деньги со счета            |
 
 
 ### Github secrets and variables
@@ -127,9 +127,13 @@
 **POSTGRES_PASSWORD** = `superSecure123`  
 
 *адреса сервисов в сети docker (для общения между сервисами)*  
-**AUTH_HOST** = `"http://nginx/api/v1/secureAuth"`  
+**AUTH_HOST** = `"http://nginx/api/v1/secureAuth"`
+**AUTH_VERIFY_HOST** = `"http://nginx/api/v1/secureVerify"`  
 **USER_HOST** = `"http://nginx/api/v1/secureUsers"`  
-**ACCOUNT_HOST** = `"http://nginx/api/v1/secureAccounts"`  
+**ACCOUNT_HOST** = `"http://nginx/api/v1/secureAccounts"` 
+
+*адрес для package-config.json*
+**PUBLIC_URL** = `"http://minibank.su"` 
 
 *для миграции текущего сервиса при выполнении скрипта deploy.sh*  
 **MINIBANK_DB** = `orchestraDB`  
@@ -165,5 +169,6 @@
 **ACCOUNT_APP_VERSION** = `latest`  
 **ACCOUNT_CONFIG_PATH** = `/etc/securePath/account-config.yml`  
 **MGMT_APP_VERSION** = `latest`  
-**MGMT_CONFIG_PATH** = `/etc/securePath/mgmt-config.yml`  
+**MGMT_CONFIG_PATH** = `/etc/securePath/mgmt-config.yml`
+**WEB_APP_VERSION** = `latest`     
 </details>

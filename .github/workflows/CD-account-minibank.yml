@@ -90,6 +90,7 @@ jobs:
             export ACCOUNT_CONFIG_PATH=${{ vars.ACCOUNT_CONFIG_PATH }}
             export ACCOUNT_APP_VERSION=${{ needs.build.outputs.version }}
             export AUTH_HOST=${{ secrets.AUTH_HOST }}
+            export AUTH_VERIFY_HOST=${{secrets.AUTH_VERIFY_HOST}}
             echo 'Переменные для миграции'
             export MIGRATE=YES
             export SERVICE=account-minibank
