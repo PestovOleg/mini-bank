@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "BUILD_PATH='/opt/minibank-web' PUBLIC_URL='http://localhost' react-scripts build",
+    "build": "BUILD_PATH='./build' PUBLIC_URL='http://localhost' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

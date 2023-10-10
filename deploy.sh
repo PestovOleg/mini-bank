@@ -14,39 +14,39 @@ echo "Nginx template for ${SERVICE} not found"
 
 if grep -q "proxy_pass http://${SERVICE}-blue" "./nginx/conf.d/${SERVICE}.nginx.conf"
 then
-    export CURRENT_BACKEND="${SERVICE}-blue"
-    export NEXT_BACKEND="${SERVICE}-green"
-    echo "$CURRENT_BACKEND is running"
+    export CURRENT_SERVICE="${SERVICE}-blue"
+    export NEXT_SERVICE="${SERVICE}-green"
+    echo "$CURRENT_SERVICE is running"
 else 
-    export CURRENT_BACKEND="${SERVICE}-green"
-    export NEXT_BACKEND="${SERVICE}-blue"
-    echo "$CURRENT_BACKEND is running"
+    export CURRENT_SERVICE="${SERVICE}-green"
+    export NEXT_SERVICE="${SERVICE}-blue"
+    echo "$CURRENT_SERVICE is running"
 fi
 
 echo "Removing old container if it hasn't been removed..."
-docker compose rm -f -s -v $NEXT_BACKEND 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
+docker compose rm -f -s -v $NEXT_SERVICE 2>&1 | grep -v 'variable is not set'
 printf "%s\n" "Done"
 
 if [ "$MIGRATE" == "YES" ]; then
   echo "Migrating database ..."
-  docker compose run -d migrate 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
+  docker compose run -d migrate 2>&1 | grep -v 'variable is not set'
   printf "%s\n" "Done...waiting 3 sec"
   sleep 3
 else 
   echo "Skipping database migration."
 fi
 
-echo "Starting $NEXT_BACKEND"
-docker compose up -d $NEXT_BACKEND 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
+echo "Starting $NEXT_SERVICE"
+docker compose up -d $NEXT_SERVICE 2>&1 | grep -v 'variable is not set'
 echo "Waiting 3 sec"
 sleep 3
 
 echo "Copying current nginx.conf to nginx.conf.back"
 cp ./nginx/conf.d/${SERVICE}.nginx.conf ./nginx/conf.d/${SERVICE}.conf.back 2>/dev/null
 
-echo "Checking nginx config for next backend"
-docker exec -e NEXT_BACKEND=$NEXT_BACKEND \
--i nginx envsubst '$NEXT_BACKEND' < ./nginx/conf.d/${SERVICE}.conf.template > ./nginx/conf.d/${SERVICE}.nginx.conf \
+echo "Checking nginx config for next service"
+docker exec -e NEXT_SERVICE=$NEXT_SERVICE \
+-i nginx envsubst '$NEXT_SERVICE' < ./nginx/conf.d/${SERVICE}.conf.template > ./nginx/conf.d/${SERVICE}.nginx.conf \
 && docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -t
 rv=$?
 if [ $rv != 0 ]; then
@@ -56,8 +56,8 @@ if [ $rv != 0 ]; then
     exit 1
 fi
 
-echo "Reloading nginx with $NEXT_BACKEND"
-docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
+echo "Reloading nginx with $NEXT_SERVICE"
+docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload 
 rv=$?
 if [ $rv != 0 ]; then
     echo "Reloading is failed with exit code: $rv"
@@ -76,15 +76,15 @@ if [ $rv != 0 ]; then
     echo "Aborting..."
     cp ./nginx/conf.d/${SERVICE}.nginx.conf ./nginx/conf.d/${SERVICE}.error.conf.back 2>/dev/null
     cp ./nginx/conf.d/${SERVICE}.nginx.conf.back ./nginx/conf.d/${SERVICE}.nginx.conf 2>/dev/null
-    echo "Reloading nginx with $CURRENT_BACKEND"
-    docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
+    echo "Reloading nginx with $CURRENT_SERVICE"
+    docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -s reload 
     echo "Nothing has happend,do not forget about migration..."
     exit 1
 else    
     echo "Testing is OK"
 fi
 
-echo "Deleting old container: $CURRENT_BACKEND"
-docker compose rm -f -s -v $CURRENT_BACKEND 2>&1 | tee >(grep 'level=warning' > warnings.log) | grep -v 'level=warning'
+echo "Deleting old container: $CURRENT_SERVICE"
+docker compose rm -f -s -v $CURRENT_SERVICE 
 
 echo "Blue-Green deployment is done!"

@@ -165,7 +165,7 @@ func (a *AuthHandler) DeleteAuth() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "User not found"
 // @Security BasicAuth
-// @router /users [get]
+// @router /auth/login [post]
 func (a *AuthHandler) Authenticate() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		username, pass, _ := r.BasicAuth()
@@ -203,7 +203,7 @@ func (a *AuthHandler) Authenticate() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "User not found"
 // @Security BasicAuth
-// @router /auth [get]
+// @router /auth/verify [post]
 func (a *AuthHandler) Authorize() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")

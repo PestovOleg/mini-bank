@@ -25,7 +25,8 @@ export class UserStore {
         const base64Credentials = btoa(username + ":" + password);
         console.log("Вывод из STORE: username:", username, " password: ", password);
         try {
-            const response = await fetch(`${URL}/users`, {
+            const response = await fetch(`${URL}/auth/login`, {
+                method: "POST",
                 headers: {
                     Authorization: "Basic " + base64Credentials,
                 },
@@ -63,21 +64,21 @@ export class UserStore {
         username: string,
         password: string,
         phone: string,
-        birthday: Date
+        birthday: string
     ): Promise<void> {
         const userData = {
             email,
-            lastName,
+            last_name:lastName,
             name: firstName,
             password,
             patronymic,
             username,
             phone: phone.replace(/\D/g, ""),
-            birthday: birthday.toISOString(),
+            birthday: birthday,
         };
 
         try {
-            const response = await fetch(`${URL}/users`, {
+            const response = await fetch(`${URL}/mgmt`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

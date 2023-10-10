@@ -28,7 +28,6 @@ func NewAccountHandler(s *account.Service) *AccountHandler {
 // AccountCreateRequest represents the request payload for account creation.
 // swagger:model
 type AccountCreateRequest struct {
-	UserID   string `json:"user_id" example:"fdee7aae-f79f-4653-8a16-9207e6805b93"`
 	Currency string `json:"currency" example:"810"`
 	Name     string `json:"name" example:"Удачный"`
 }
@@ -54,12 +53,13 @@ type ChangeBalanceRequest struct {
 // @Tags account-minibank
 // @Accept  json
 // @Produce  json
+// @Param userid path string true "User ID"
 // @Param user body AccountCreateRequest true "Account details for creation"
 // @Success 201 {string} string "A new account has been created with number: {string}"
 // @Error 404 {string} "Page not found"
 // @Failure 500 {string} string "Internal server error"
 // @Security BasicAuth
-// @Router /accounts [post]
+// @Router /users/{userid}/accounts [post]
 func (a *AccountHandler) CreateAccount() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -77,7 +77,8 @@ func (a *AccountHandler) CreateAccount() http.Handler {
 			return
 		}
 
-		userID, err := uuid.Parse(input.UserID)
+		vars := mux.Vars(r)
+		userID, err := uuid.Parse(vars["userid"])
 		if err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -137,13 +138,14 @@ func (a *AccountHandler) CreateAccount() http.Handler {
 // @tags account-minibank
 // @accept json
 // @produce json
+// @Param userid path string true "User ID"
 // @param id path string true "Account ID"
 // @param userid path string true "User ID"
 // @success 200 {object} mapper.Account "Successfully retrieved account details"
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
-// @router /accounts/{id} [get]
+// @router /users/{userid}/accounts/{id} [get]
 func (a *AccountHandler) GetAccountByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -234,7 +236,7 @@ func (a *AccountHandler) GetAccountByID() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
-// @router /accounts/{id} [put]
+// @router /users/{userid}/accounts/{id} [put]
 func (a *AccountHandler) UpdateAccount() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -320,7 +322,7 @@ func (a *AccountHandler) UpdateAccount() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
-// @router /accounts/{id} [delete]
+// @router /users/{userid}/accounts/{id} [delete]
 func (a *AccountHandler) DeleteAccount() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -388,12 +390,12 @@ func (a *AccountHandler) DeleteAccount() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Accounts not found"
 // @Security BasicAuth
-// @router /accounts [get]
+// @router /users/{userid}/accounts [get]
 func (a *AccountHandler) ListAccountsByUserID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		w.Header().Set("Content-Type", "application/json")
-		userID, err := uuid.Parse(vars["id"])
+		userID, err := uuid.Parse(vars["userid"])
 		if err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -470,7 +472,7 @@ func (a *AccountHandler) ListAccountsByUserID() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
-// @router /accounts/{id}/topup [put]
+// @router /users/{userid}/accounts/{id}/topup [put]
 func (a *AccountHandler) TopUp() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -575,7 +577,7 @@ func (a *AccountHandler) TopUp() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
-// @router /accounts/{id}/withdraw [put]
+// @router /users/{userid}/accounts/{id}/withdraw [put]
 func (a *AccountHandler) Withdraw() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

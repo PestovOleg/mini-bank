@@ -6,7 +6,7 @@ services:
     container_name: db
     volumes:
       - pgdata:/var/lib/postgresql/data_minibank
-      - ./db/init-unleash.sh:/docker-entrypoint-initdb.d/init-unleash.sh
+      - ./db/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       UNLEASH_USER: ${UNLEASH_USER}
@@ -82,7 +82,7 @@ services:
     container_name: nginx
     volumes:
       - /var/log/nginx:/var/log/nginx
-      - /opt/minibank-web:/usr/share/nginx/html
+     # - /opt/minibank-web:/usr/share/nginx/html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
     ports:
@@ -94,6 +94,50 @@ services:
       minibank_net:
     restart: unless-stopped
 
+  web-minibank-blue:
+    image: pistollo/web-minibank:${WEB_APP_VERSION}
+    container_name: web-minibank-blue
+    hostname: web-minibank-blue
+    build: 
+      context: .
+      dockerfile: ./web/Dockerfile
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL}
+    volumes:
+      - /var/log/web:/var/log/nginx
+      - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./web/nginx/conf.d:/etc/nginx/conf.d  
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 8888:80
+    restart: unless-stopped
+  
+  web-minibank-green:
+    image: pistollo/web-minibank:${WEB_APP_VERSION}
+    container_name: web-minibank-blue
+    hostname: web-minibank-blue
+    build: 
+      context: .
+      dockerfile: ./web/Dockerfile
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL}
+    volumes:
+      - /var/log/web:/var/log/nginx
+      - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./web/nginx/conf.d:/etc/nginx/conf.d  
+    depends_on:
+      - db
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 8889:80
+    restart: unless-stopped
+
   account-minibank-blue:
     image: pistollo/account-minibank:${ACCOUNT_APP_VERSION}
     container_name: account-minibank-blue
@@ -103,7 +147,7 @@ services:
       dockerfile: ./backend/services/account/Dockerfile
     environment:
       CONFIG_PATH: ${ACCOUNT_CONFIG_PATH}
-      AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -127,7 +171,7 @@ services:
       dockerfile: ./backend/services/account/Dockerfile
     environment:
       CONFIG_PATH: ${ACCOUNT_CONFIG_PATH}
-      AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -151,7 +195,7 @@ services:
       dockerfile: ./backend/services/auth/Dockerfile
     environment:
       CONFIG_PATH: ${AUTH_CONFIG_PATH}
-      AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -175,7 +219,7 @@ services:
       dockerfile: ./backend/services/auth/Dockerfile
     environment:
       CONFIG_PATH: ${AUTH_CONFIG_PATH}
-      AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -199,7 +243,7 @@ services:
       dockerfile: ./backend/services/user/Dockerfile
     environment:
       CONFIG_PATH: ${USER_CONFIG_PATH}
-      AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -223,7 +267,7 @@ services:
       dockerfile: ./backend/services/user/Dockerfile
     environment:
       CONFIG_PATH: ${USER_CONFIG_PATH}
-      AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
     volumes:
       - /var/log/minibank/info.log:/app/info.log
       - /var/log/minibank/error.log:/app/error.log
@@ -248,6 +292,7 @@ services:
     environment:
       CONFIG_PATH: ${MGMT_CONFIG_PATH}
       AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
       USER_HOST: ${USER_HOST}
       ACCOUNT_HOST: ${ACCOUNT_HOST}
     volumes:
@@ -274,6 +319,7 @@ services:
     environment:
       CONFIG_PATH: ${MGMT_CONFIG_PATH}
       AUTH_HOST: ${AUTH_HOST}
+      AUTH_VERIFY_HOST: ${AUTH_VERIFY_HOST}
       USER_HOST: ${USER_HOST}
       ACCOUNT_HOST: ${ACCOUNT_HOST}
     volumes:

@@ -27,7 +27,7 @@ func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 				Handler: health.NewHealthCheckHandler(),
 			},
 		},
-		"/accounts": {
+		"/users/{userid}/accounts": {
 			http.MethodPost: {
 				Handler:     handlerAccount.NewAccountHandler(s.AccountService).CreateAccount(),
 				Feature:     "CreateAccountToggle",
@@ -39,7 +39,7 @@ func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
 			},
 		},
-		"/accounts/{id}": {
+		"/users/{userid}/accounts/{id}": {
 			http.MethodPut: {
 				Handler:     handlerAccount.NewAccountHandler(s.AccountService).UpdateAccount(),
 				Feature:     "UpdateAccountToggle",
@@ -56,14 +56,14 @@ func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
 			},
 		},
-		"/accounts/{id}/topup": {
+		"/users/{userid}/accounts/{id}/topup": {
 			http.MethodPut: {
 				Handler:     handlerAccount.NewAccountHandler(s.AccountService).TopUp(),
 				Feature:     "TopUpToggle",
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
 			},
 		},
-		"/accounts/{id}/withdraw": {
+		"/users/{userid}/accounts/{id}/withdraw": {
 			http.MethodPut: {
 				Handler:     handlerAccount.NewAccountHandler(s.AccountService).Withdraw(),
 				Feature:     "WithdrawToggle",

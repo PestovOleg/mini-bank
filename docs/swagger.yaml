@@ -8,9 +8,6 @@ definitions:
       name:
         example: Удачный
         type: string
-      user_id:
-        example: fdee7aae-f79f-4653-8a16-9207e6805b93
-        type: string
     type: object
   account.AccountUpdateRequest:
     properties:
@@ -192,292 +189,7 @@ paths:
       summary: Check the health status of the server
       tags:
       - account-minibank
-  /accounts:
-    get:
-      consumes:
-      - application/json
-      description: Fetch the list of accounts using the provided User ID.
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully retrieved account details
-          schema:
-            items:
-              $ref: '#/definitions/mapper.Account'
-            type: array
-        "404":
-          description: Accounts not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Retrieve list of accounts based on the provided User ID.
-      tags:
-      - account-minibank
-    post:
-      consumes:
-      - application/json
-      description: Create a new account using the provided details
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Account details for creation
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/account.AccountCreateRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: 'A new account has been created with number: {string}'
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Create a new account
-      tags:
-      - account-minibank
-  /accounts/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete the account using the provided account ID.
-      parameters:
-      - description: Account ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: User ID
-        in: path
-        name: userid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully deleted account
-          schema:
-            type: string
-        "404":
-          description: Account not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Delete account based on the provided ID.
-      tags:
-      - account-minibank
-    get:
-      consumes:
-      - application/json
-      description: Fetch the account details using the provided account ID.
-      parameters:
-      - description: Account ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: User ID
-        in: path
-        name: userid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully retrieved account details
-          schema:
-            $ref: '#/definitions/mapper.Account'
-        "404":
-          description: Account not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Retrieve account details based on the provided ID.
-      tags:
-      - account-minibank
-    put:
-      consumes:
-      - application/json
-      description: Update the account details using the provided user ID.
-      parameters:
-      - description: Account ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: User ID
-        in: path
-        name: userid
-        required: true
-        type: string
-      - description: Account Update Payload
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/account.AccountUpdateRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully updated account details
-          schema:
-            type: string
-        "404":
-          description: Account not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Update account details based on the provided ID.
-      tags:
-      - account-minibank
-  /accounts/{id}/topup:
-    put:
-      consumes:
-      - application/json
-      description: TopUp the account balance using the provided user ID and amount.
-      parameters:
-      - description: Account ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: User ID
-        in: path
-        name: userid
-        required: true
-        type: string
-      - description: TopUp Account Payload
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/account.ChangeBalanceRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully toped up account details
-          schema:
-            type: string
-        "404":
-          description: Account not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: TopUp account balance based on the provided ID.
-      tags:
-      - account-minibank
-  /accounts/{id}/withdraw:
-    put:
-      consumes:
-      - application/json
-      description: Withdraw money using the provided user ID and amount.
-      parameters:
-      - description: Account ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: User ID
-        in: path
-        name: userid
-        required: true
-        type: string
-      - description: Withdraw Account Payload
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/account.ChangeBalanceRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully Withdrawed account
-          schema:
-            type: string
-        "404":
-          description: Account not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Withdraw money based on the provided ID.
-      tags:
-      - account-minibank
   /auth:
-    get:
-      consumes:
-      - application/json
-      description: Authorize User with token.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Authorized
-          schema:
-            type: string
-        "404":
-          description: User not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Authorize User with token.
-      tags:
-      - auth-minibank
     post:
       consumes:
       - application/json
@@ -550,6 +262,56 @@ paths:
       summary: Deactivate authentication record based on the provided ID.
       tags:
       - auth-minibank
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Get User ID with credentials.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved User ID
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Authenticate User with credentials.
+      tags:
+      - auth-minibank
+  /auth/verify:
+    post:
+      consumes:
+      - application/json
+      description: Authorize User with token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Authorized
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Authorize User with token.
+      tags:
+      - auth-minibank
   /mgmt:
     post:
       consumes:
@@ -609,30 +371,6 @@ paths:
       tags:
       - user-minibank
   /users:
-    get:
-      consumes:
-      - application/json
-      description: Get User ID with credentials.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully retrieved User ID
-          schema:
-            type: string
-        "404":
-          description: User not found
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - BasicAuth: []
-      summary: Authenticate User with credentials.
-      tags:
-      - auth-minibank
     post:
       consumes:
       - application/json
@@ -725,6 +463,272 @@ paths:
       summary: Update user details based on the provided ID.
       tags:
       - user-minibank
+  /users/{userid}/accounts:
+    get:
+      consumes:
+      - application/json
+      description: Fetch the list of accounts using the provided User ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved account details
+          schema:
+            items:
+              $ref: '#/definitions/mapper.Account'
+            type: array
+        "404":
+          description: Accounts not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Retrieve list of accounts based on the provided User ID.
+      tags:
+      - account-minibank
+    post:
+      consumes:
+      - application/json
+      description: Create a new account using the provided details
+      parameters:
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      - description: Account details for creation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/account.AccountCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 'A new account has been created with number: {string}'
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Create a new account
+      tags:
+      - account-minibank
+  /users/{userid}/accounts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the account using the provided account ID.
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted account
+          schema:
+            type: string
+        "404":
+          description: Account not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Delete account based on the provided ID.
+      tags:
+      - account-minibank
+    get:
+      consumes:
+      - application/json
+      description: Fetch the account details using the provided account ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved account details
+          schema:
+            $ref: '#/definitions/mapper.Account'
+        "404":
+          description: Account not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Retrieve account details based on the provided ID.
+      tags:
+      - account-minibank
+    put:
+      consumes:
+      - application/json
+      description: Update the account details using the provided user ID.
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      - description: Account Update Payload
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/account.AccountUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated account details
+          schema:
+            type: string
+        "404":
+          description: Account not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Update account details based on the provided ID.
+      tags:
+      - account-minibank
+  /users/{userid}/accounts/{id}/topup:
+    put:
+      consumes:
+      - application/json
+      description: TopUp the account balance using the provided user ID and amount.
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      - description: TopUp Account Payload
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/account.ChangeBalanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully toped up account details
+          schema:
+            type: string
+        "404":
+          description: Account not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: TopUp account balance based on the provided ID.
+      tags:
+      - account-minibank
+  /users/{userid}/accounts/{id}/withdraw:
+    put:
+      consumes:
+      - application/json
+      description: Withdraw money using the provided user ID and amount.
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      - description: Withdraw Account Payload
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/account.ChangeBalanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully Withdrawed account
+          schema:
+            type: string
+        "404":
+          description: Account not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Withdraw money based on the provided ID.
+      tags:
+      - account-minibank
 securityDefinitions:
   BasicAuth:
     type: basic

@@ -17,7 +17,7 @@ func BasicAuthMiddleware(next http.Handler) http.Handler {
 		client := &http.Client{
 			Timeout: time.Second * 3,
 		}
-		host := os.Getenv("AUTH_HOST")
+		host := os.Getenv("AUTH_VERIFY_HOST")
 
 		if host == "" {
 			logger.Error("sysvar AUTH_HOST is not enabled, URL to Auth server cannot be found")
@@ -26,7 +26,7 @@ func BasicAuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		authRequest, err := http.NewRequestWithContext(context.Background(), http.MethodGet, host, nil)
+		authRequest, err := http.NewRequestWithContext(context.Background(), http.MethodPost, host, nil)
 		if err != nil {
 			logger.Error(err.Error())
 			http.Error(w, "Internal server error", http.StatusInternalServerError)

@@ -14,7 +14,6 @@ function Login() {
         event.preventDefault();
         if (username && password) {
             await store.userStore.login(username, password);
-            
             navigate("/", { replace: true });
 
         }
