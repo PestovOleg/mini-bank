@@ -1,15 +1,11 @@
 import React from 'react';
 import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Paper, Divider, ListItemIcon, Collapse, ListItemButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FolderIcon from '@mui/icons-material/Folder';
-import { styled } from '@mui/system';
 import { IAccount } from '../models/types';
-import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
-import CurrencyRubleSharpIcon from '@mui/icons-material/CurrencyRubleSharp';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import ModeSharpIcon from '@mui/icons-material/ModeSharp';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoneySharp';
+import CurrencyRubleOutlined from '@mui/icons-material/CurrencyRubleOutlined';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import ModeIcon from '@mui/icons-material/ModeSharp';
 import DeleteForeverSharpIcon from '@mui/icons-material/DeleteForeverSharp';
 
 // Определение пропсов
@@ -24,11 +20,8 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
     );
 
     const handleClick = (index: number) => {
-        // Копируем текущий массив состояний
         const newOpen = [...open];
-        // Изменяем состояние для конкретного элемента
         newOpen[index] = !newOpen[index];
-        // Обновляем состояние
         setOpen(newOpen);
     };
 
@@ -51,15 +44,15 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                                 }
                             >
                                 <ListItemAvatar>
-                                    <Avatar>
+                                    <Avatar >
                                         {
-                                            item.currency === '810' ? (<CurrencyRubleSharpIcon />) :
-                                                item.currency === '840' ? (<AttachMoneySharpIcon />) : null
+                                             item.currency === '810' ? (<img alt="Ruble" src="/ruble.png" />) :
+                                             item.currency === '840' ? (<img alt="Dollar" src="/dollar.png" />) : null
                                         }
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText
-                                    primary={item.name}
+                                    primary={item.name} 
                                     secondary={item.amount.toLocaleString('ru-Ru', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 />
 
@@ -70,7 +63,7 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                                         <ListItemText sx={{ ml: 7 }} primary={item.account} secondary={item.interestRate * 100 + '%'} />
                                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 1 }}>
                                             <IconButton size='small'>
-                                                <ModeSharpIcon />
+                                                <ModeIcon />
                                             </IconButton>
                                             <IconButton size='small'>
                                                 <DeleteIcon />

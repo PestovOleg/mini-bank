@@ -30,21 +30,16 @@ import {
   Typography,
 } from "@mui/material";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import { blue, deepPurple, red } from "@mui/material/colors";
-import { ExpandMore } from "@mui/icons-material";
+import { blue } from "@mui/material/colors";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
-import RestoreIcon from "@mui/icons-material/Restore";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ArchiveIcon from "@mui/icons-material/Archive";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FolderIcon from "@mui/icons-material/Folder";
 import Account from "./components/Account";
 import ModeSharpIcon from "@mui/icons-material/ModeSharp";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Fab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
 import NewAccountDialog from "./components/NewAccount";
+import PaymentDialog from "./components/Payment";
+import SpeedDialMenu from "./components/SpeedMenu";
 
 function MainPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -176,25 +171,31 @@ function MainPage() {
         >
           <Container maxWidth="xs">
             <AppBar
-              position="static" // Changed to static because it's already inside a fixed position Box
+              position="static"
               color="primary"
             >
-              <Toolbar>
-                <IconButton color="inherit" aria-label="open drawer">
-                  <BottomNavigationAction
-                    component="a"
-                    href="https://github.com/PestovOleg/mini-bank"
-                    label="Github"
-                    icon={<GitHubIcon />}
-                  />
-                </IconButton>
-                <Typography variant="caption" sx={{ fontSize: 14, ml: -3 }}>
-                  &copy; by Pestov
-                </Typography>
-                <NewAccountDialog/>
+              <Toolbar sx={{ justifyContent: 'center' }}>
+                
+                
+              <SpeedDialMenu />
                 <Box sx={{ flexGrow: 1 }} />
               </Toolbar>
+              
+              <Box sx={{ position: 'absolute',marginLeft:17,marginTop:1 }}>
+                  <IconButton color="inherit" aria-label="open drawer">
+                    <BottomNavigationAction
+                      component="a"
+                      href="https://github.com/PestovOleg/mini-bank"
+                      label="Github"
+                      icon={<GitHubIcon />}
+                    />
+                  </IconButton>
+                  <Typography variant="caption" sx={{ fontSize: 12, ml: -3 }}>
+                    &copy; by Pestov
+                  </Typography>
+                </Box>
             </AppBar>
+            
           </Container>
         </Box>
 

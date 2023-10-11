@@ -17,7 +17,7 @@ import InputMask from "react-input-mask";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { formatDate } from "../utils/utils"
 import StyledFab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
+import RedeemIcon from '@mui/icons-material/Redeem';
 import { styled } from "@mui/material/styles";
 import Fab from "@mui/material/Fab";
 import InputLabel from '@mui/material/InputLabel';
@@ -34,12 +34,8 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-interface NewAccountDialogProps {
-    open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  }
-
-export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps) {
+export default function WithdrawDialog() {
+    const [open, setOpen] = React.useState(false);
     const [accountName, setAccountName] = useState("");
     const [showAlert, setShowAlert] = React.useState(false);
     const [currency, setCurrency] = React.useState("");
@@ -57,6 +53,15 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
         setOpen(false);
     };
 
+    const StyledFab = styled(Fab)({
+        position: "absolute",
+        zIndex: 1,
+        top: -30,
+        left: 50,
+        right: 0,
+        margin: "0",
+    });
+
     const openAccount = async (
         event: React.FormEvent<HTMLFormElement>
     ): Promise<void> => {
@@ -70,15 +75,13 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                 accountName
             );
 
-            // Show the alert            
-            setAccountName("");
-            setCurrency("");          
-            navigate("/", { replace: true });
+            // Show the alert
             setShowAlert(true);
+            navigate("/", { replace: true });
             setTimeout(() => {
+                
                 setShowAlert(false);
-                handleClose();                
-            }, 2000);
+            }, 3000);
         }
     };
 
@@ -89,7 +92,10 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                 flexDirection: "column",
             }}
         >
-           
+            <StyledFab color="info" aria-label="add" onClick={handleClickOpen}>
+                <RedeemIcon />
+            </StyledFab>
+
             <Dialog
                 open={open}
                 onClose={handleClose}
@@ -120,21 +126,18 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                     noValidate
                     sx={{ mt: 1, pr: 5, pl: 5 }}
                 >
-                    
+                    <InputLabel id="demo-simple-select-label" >Валюта</InputLabel>
                     <Select
+                        labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={currency}
-                        label="Without label"
+                        label="Валюта"
                         onChange={handleChange}
                         autoWidth
-                        required                        
-                        displayEmpty
+                        required
                     >
-                        <MenuItem disabled value="">
-                            <em>Валюта счета </em>
-                        </MenuItem>
-                        <MenuItem key={810} value={"810"}>Рубль</MenuItem>
-                        <MenuItem key={840} value={"840"}>Доллар</MenuItem>
+                        <MenuItem value={"810"}>Рубль</MenuItem>
+                        <MenuItem value={"840"}>Доллар</MenuItem>
                     </Select>
                     <TextField
                         margin="normal"
@@ -151,7 +154,6 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                         type="submit"
                         fullWidth
                         variant="contained"
-                        disabled={!currency || !accountName}
                         sx={{ mt: 3, mb: 2 }}
                     >
                         Открыть счет

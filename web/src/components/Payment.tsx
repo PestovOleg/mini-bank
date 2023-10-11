@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, Link, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, InputAdornment, Link, OutlinedInput, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -17,13 +17,15 @@ import InputMask from "react-input-mask";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { formatDate } from "../utils/utils"
 import StyledFab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
+import PaymentIcon from '@mui/icons-material/Payment';
 import { styled } from "@mui/material/styles";
 import Fab from "@mui/material/Fab";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import AccountSelect from "./AccountSelect";
+import { IAccount } from "../models/types";
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -34,20 +36,18 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-interface NewAccountDialogProps {
+interface NewPaymentDialogProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  }
+}
 
-export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps) {
+export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) {
     const [accountName, setAccountName] = useState("");
     const [showAlert, setShowAlert] = React.useState(false);
-    const [currency, setCurrency] = React.useState("");
+    const [selectedAccountTo, setSelectedAccountTo] = React.useState<IAccount | null>(null);
+    const [selectedAccountFrom, setSelectedAccountFrom] = React.useState<IAccount | null>(null);
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setCurrency(event.target.value as string);
-    };
-
+    
     let navigate = useNavigate();
     const handleClickOpen = () => {
         setOpen(true);
@@ -57,28 +57,32 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
         setOpen(false);
     };
 
+    const accountItems = store.accountStore.Accounts;
+
     const openAccount = async (
         event: React.FormEvent<HTMLFormElement>
     ): Promise<void> => {
         event.preventDefault();
-        if (
-            currency &&
-            accountName
-        ) {
-            await store.accountStore.openAccount(
-                currency,
-                accountName
-            );
+        if (selectedAccountFrom && selectedAccountTo){
+            if (
+                selectedAccountFrom.account &&
+                selectedAccountTo.account
+            ) {
+                await store.accountStore.withdrawAccount(
+                    selectedAccountFrom.amount,
+                    selectedAccountFrom.account
+                    
+                );
+        }
+        
 
-            // Show the alert            
-            setAccountName("");
-            setCurrency("");          
-            navigate("/", { replace: true });
+            // Show the alert
             setShowAlert(true);
+            navigate("/", { replace: true });
             setTimeout(() => {
+
                 setShowAlert(false);
-                handleClose();                
-            }, 2000);
+            }, 3000);
         }
     };
 
@@ -89,7 +93,7 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                 flexDirection: "column",
             }}
         >
-           
+
             <Dialog
                 open={open}
                 onClose={handleClose}
@@ -110,7 +114,7 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                             variant="h6"
                             component="div"
                         >
-                            Открыть счет
+                            Перевод между счетами
                         </Typography>
                     </Toolbar>
                 </AppBar>
@@ -120,47 +124,39 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                     noValidate
                     sx={{ mt: 1, pr: 5, pl: 5 }}
                 >
-                    
-                    <Select
-                        id="demo-simple-select"
-                        value={currency}
-                        label="Without label"
-                        onChange={handleChange}
-                        autoWidth
-                        required                        
-                        displayEmpty
-                    >
-                        <MenuItem disabled value="">
-                            <em>Валюта счета </em>
-                        </MenuItem>
-                        <MenuItem key={810} value={"810"}>Рубль</MenuItem>
-                        <MenuItem key={840} value={"840"}>Доллар</MenuItem>
-                    </Select>
-                    <TextField
-                        margin="normal"
-                        required
+                    <AccountSelect
+                        accounts={accountItems}
+                        placeHolder="Со счета"
+                        style={{ margin: '50px' }}
+                        onAccountSelected={(account) => setSelectedAccountFrom(account)}
+                    ></AccountSelect>
+                    <AccountSelect
+                        accounts={accountItems}
+                        placeHolder="На счет"
+                        onAccountSelected={(account) => setSelectedAccountTo(account)}
+                    ></AccountSelect>
+                    <InputLabel htmlFor="outlined-adornment-amount"></InputLabel>
+                    <OutlinedInput
+                        id="outlined-adornment-amount"
                         fullWidth
-                        id="accountName"
-                        label="Название счета"
-                        name="accountName"
-                        value={accountName}
-                        autoFocus
-                        onChange={(e) => setAccountName(e.target.value)}
+                        startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                        
+                        
                     />
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
-                        disabled={!currency || !accountName}
                         sx={{ mt: 3, mb: 2 }}
+                        disabled={!selectedAccountTo || !selectedAccountFrom}
                     >
-                        Открыть счет
+                        Перевести
                     </Button>
                 </Box>
                 {showAlert && (
                     <Snackbar open={open} onClose={handleClose}>
                         <Alert onClose={handleClose} severity="info" sx={{ width: "100%" }}>
-                            Счет открыт.
+                            Перевод осуществлен.
                         </Alert>
                     </Snackbar>
                 )}

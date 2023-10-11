@@ -1,0 +1,15 @@
+go 1.20
+
+use (
+	./pkg/config
+	./pkg/database
+	./pkg/logger
+	./pkg/middleware
+	./pkg/server
+	./pkg/signal
+	./pkg/unleash
+	./services/account
+	./services/auth
+	./services/mgmt
+	./services/user
+)
