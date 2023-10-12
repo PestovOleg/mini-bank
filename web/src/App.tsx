@@ -5,7 +5,7 @@ import ProtectedRouteObserver from './ProtectedRoute';
 import MainPageObserver from './MainPage';
 import LoginObserver from './components/Login';
 
-function App() {
+function App() {  
   return (
     <Router>
       <Routes>

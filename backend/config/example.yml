@@ -11,8 +11,6 @@ http_server_app_config:
   read_header_timeout: 5s
   idle_timeout: 120s
 
-env: "prod" #окружение local/prod
-
 #конфигурация логгера
 logger_cfgs:
   - encoding: "console"

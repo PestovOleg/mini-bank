@@ -21,9 +21,9 @@ func NewServices() *Services {
 }
 
 type App struct {
-	services *Services
 	cfg      *config.AppConfig
 	router   http.Handler
+	services *Services
 }
 
 func NewRouter(s *Services) http.Handler {
@@ -31,22 +31,20 @@ func NewRouter(s *Services) http.Handler {
 	subRouter := r.PathPrefix("/api/v1").Subrouter()
 	SetHandler(subRouter, BaseRoutes(s))
 
-	// Настраиваем CORS (как минимум для swagger'а)
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"}, // TODO: ограничить
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"*"},
 	})
 
-	// Оборачиваем роутер в CORS
 	return c.Handler(r)
 }
 
 func NewApp(cfg *config.AppConfig) App {
-	logger := logger.GetLogger("Mgmt")
+	logger := logger.GetLogger("uProxy")
 
-	err := unleashServer.InitUnleash(cfg, "Mgmt")
+	err := unleashServer.InitUnleash(cfg, "uProxy")
 	if err != nil {
 		logger.Sugar().Fatalf("Couldn't establish a connection to the Unleash Server: %s", err.Error())
 		panic(err.Error())
@@ -72,7 +70,7 @@ func (a *App) Run() error {
 		ReadHeaderTimeout: a.cfg.HTTPServerAppConfig.ReadHeaderTimeout,
 		IdleTimeout:       a.cfg.HTTPServerAppConfig.IdleTimeout,
 	}
-	logger := logger.GetLogger("Mgmt")
+	logger := logger.GetLogger("uProxy")
 	ctx := signal.NewSignalContextHandle(unix.SIGINT, unix.SIGTERM)
 	errChan := make(chan error)
 

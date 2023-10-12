@@ -1,0 +1,8 @@
+.MuiSpeedDialAction-staticTooltipLabel {
+    background-color: gray !important;
+    color: aliceblue !important;
+    font-size: 12px !important;
+    max-width: none !important;
+    width: fit-content !important;
+    white-space: nowrap !important; 
+  }

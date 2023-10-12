@@ -36,56 +36,22 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-interface NewPaymentDialogProps {
+interface CloseAccountDialogProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    account: IAccount | null;
 }
 
-export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) {
-    const [accountName, setAccountName] = useState("");
+export default function CloseAccountDialog({ open, setOpen,account }: CloseAccountDialogProps) {
     const [showAlert, setShowAlert] = React.useState(false);
-    const [selectedAccountTo, setSelectedAccountTo] = React.useState<IAccount | null>(null);
-    const [selectedAccountFrom, setSelectedAccountFrom] = React.useState<IAccount | null>(null);
     const [amount, setAmount] = React.useState("");
+    const [selectedAccountTo, setSelectedAccountTo] = React.useState<IAccount | null>(null);
 
     let navigate = useNavigate();
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
 
     const handleClose = () => {
         setOpen(false);
-    };
-
-    const checkAmountForPayment = () => {
-        if (selectedAccountFrom && selectedAccountTo && Number(amount) > 0) {
-            return selectedAccountFrom.amount < Number(amount);
-        }
-        return true;
-    };
-
-    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value;
-
-        // Удалить все символы, кроме цифр и точки
-        value = value.replace(/[^0-9.]/g, "");
-
-        // Проверка на наличие более чем одной точки
-        const dotCount = value.split(".").length - 1;
-        if (dotCount > 1) {
-            value = value.slice(0, value.lastIndexOf("."));
-        }
-
-        // Ограничить количество знаков после запятой до двух
-        if (dotCount === 1) {
-            const [integerPart, decimalPart] = value.split(".");
-            if (decimalPart.length > 2) {
-                value = `${integerPart}.${decimalPart.slice(0, 2)}`;
-            }
-        }
-
-        setAmount(value);
-    };
+    };    
 
     const accountItems = React.useMemo(() => {
         return store.accountStore.Accounts.sort((a, b) => b.amount - a.amount);
@@ -94,29 +60,25 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
     const makePayment = async (
         event: React.FormEvent<HTMLFormElement>
     ): Promise<void> => {
-        event.preventDefault();
-        if (selectedAccountFrom && selectedAccountTo) {
-            if (selectedAccountFrom.account && selectedAccountTo.account) {
+        event.preventDefault();       
+            if (account!=null && selectedAccountTo!=null) {
                 try {
-                    await store.accountStore.withdrawAccount(
-                        Number(amount),
-                        String(selectedAccountFrom.id)
+                    await store.accountStore.closeAccount(
+                        String(account.id)
                     );
-    
-                    // Если withdrawAccount прошел успешно, вызываем topUpAccount
-                    await store.accountStore.topUpAccount(
-                        Number(amount),
-                        String(selectedAccountTo.id)
-                    );
-    
-                    // Показываем уведомление об успехе
-                    //setSelectedAccountTo(null);
-                    //setSelectedAccountFrom(null);
-                    //setAmount("");
                     
+                    if (Number(account.amount>0)){
+                        await store.accountStore.topUpAccount(
+                            Number(account.amount),
+                            String(selectedAccountTo.id)
+    
+                        );
+                    }
+                    
+                    // Показываем уведомление об успехе
+                                        
                     navigate("/", { replace: true });  
-                    setShowAlert(true);
-                    store.accountStore.getList();                 
+                    setShowAlert(true);              
                     
                     setTimeout(() => {
                         setShowAlert(false);
@@ -127,8 +89,7 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
                     // Выводим ошибку в консоль
                     console.error("An error occurred:", error);
                 }
-            }
-        }
+            }        
     };
     
 
@@ -160,7 +121,7 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
                             variant="h6"
                             component="div"
                         >
-                            Перевод между счетами
+                            Закрыть счет
                         </Typography>
                     </Toolbar>
                 </AppBar>
@@ -168,45 +129,48 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
                     component="form"
                     onSubmit={makePayment}
                     noValidate
-                    sx={{ mt: 1, pr: 5, pl: 5 }}
-                >
-                    <AccountSelect
-                        accounts={accountItems}
-                        placeHolder="Со счета"
-                        style={{ margin: '50px' }}
-                        onAccountSelected={(account) => setSelectedAccountFrom(account)}
-                    ></AccountSelect>
-                    <AccountSelect
-                        accounts={accountItems}
-                        placeHolder="На счет"
-                        onAccountSelected={(account) => setSelectedAccountTo(account)}
-                    ></AccountSelect>
-                    <InputLabel htmlFor="outlined-adornment-amount"></InputLabel>
-
+                    sx={{ mt: 1, pr: 5, pl: 5 }}           >    
+                    <InputLabel htmlFor="accountName">Текущее имя</InputLabel>
                     <TextField
                         margin="normal"
                         required
                         fullWidth
-                        id="amount"
-                        label="Сумма"
-                        value={amount}
-                        onChange={handleAmountChange}
+                        id="accountName"
+                        label="Закрыть счет"
+                        name="accountName"
+                        value={account ? account.name : ""}
+                        disabled
                     />
-
+                     <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="accountName"
+                        label="Будет списана сумма"
+                        name="accountName"
+                        value={account ? account.amount : ""}
+                        disabled
+                    />
+                    <AccountSelect
+                        accounts={accountItems}
+                        placeHolder="Зачислить остаток на счет"
+                        style={{ margin: '50px' }}
+                        onAccountSelected={(account) => setSelectedAccountTo(account)}
+                    ></AccountSelect>
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-                        disabled={!selectedAccountTo || !selectedAccountFrom || checkAmountForPayment()}
+                        disabled={!selectedAccountTo}
                     >
-                        Перевести
+                        Закрыть счет
                     </Button>
                 </Box>
                 {showAlert && (
                     <Snackbar open={open} onClose={handleClose}>
                         <Alert onClose={handleClose} severity="info" sx={{ width: "100%" }}>
-                            Перевод осуществлен успешно.
+                            Счет закрыт успешно.
                         </Alert>
                     </Snackbar>
                 )}

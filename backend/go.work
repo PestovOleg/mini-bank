@@ -12,4 +12,5 @@ use (
 	./services/auth
 	./services/mgmt
 	./services/user
+	./services/uproxy
 )

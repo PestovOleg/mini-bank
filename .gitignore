@@ -44,3 +44,4 @@ frontend/dist
 *.conf.back
 *.error.conf.back
 *.nginx.conf
+unleash.json

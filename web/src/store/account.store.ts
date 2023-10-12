@@ -182,8 +182,8 @@ export class AccountStore {
         };
 
         try {
-            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
-                method: "POST",
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}/topup`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     'Authorization': this.rootStore.userStore.User.token,
@@ -214,8 +214,8 @@ export class AccountStore {
         };
 
         try {
-            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
-                method: "POST",
+            const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}/withdraw`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     'Authorization': this.rootStore.userStore.User.token,

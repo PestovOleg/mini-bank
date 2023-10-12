@@ -21,6 +21,7 @@ const AccountSelect: React.FC<AccountSelectProps> = ({ accounts, placeHolder,onA
       sx={{ marginBottom: 1, marginTop: 1 }}
       fullWidth
       options={accounts}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       onChange={(event, newValue) => {
         onAccountSelected(newValue);
       }}

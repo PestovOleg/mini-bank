@@ -41,27 +41,19 @@ interface NewPaymentDialogProps {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) {
-    const [accountName, setAccountName] = useState("");
+export default function TopupDialog({ open, setOpen }: NewPaymentDialogProps) {
     const [showAlert, setShowAlert] = React.useState(false);
-    const [selectedAccountTo, setSelectedAccountTo] = React.useState<IAccount | null>(null);
     const [selectedAccountFrom, setSelectedAccountFrom] = React.useState<IAccount | null>(null);
     const [amount, setAmount] = React.useState("");
 
     let navigate = useNavigate();
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
 
     const handleClose = () => {
         setOpen(false);
     };
 
-    const checkAmountForPayment = () => {
-        if (selectedAccountFrom && selectedAccountTo && Number(amount) > 0) {
-            return selectedAccountFrom.amount < Number(amount);
-        }
-        return true;
+    const checkAmountForTopup = () => {
+        if (Number(amount) > 0) return false;
     };
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,24 +87,18 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
         event: React.FormEvent<HTMLFormElement>
     ): Promise<void> => {
         event.preventDefault();
-        if (selectedAccountFrom && selectedAccountTo) {
-            if (selectedAccountFrom.account && selectedAccountTo.account) {
+        if (selectedAccountFrom) {
+            if (selectedAccountFrom.account && Number(amount)) {
                 try {
-                    await store.accountStore.withdrawAccount(
+                    await store.accountStore.topUpAccount(
                         Number(amount),
                         String(selectedAccountFrom.id)
                     );
     
-                    // Если withdrawAccount прошел успешно, вызываем topUpAccount
-                    await store.accountStore.topUpAccount(
-                        Number(amount),
-                        String(selectedAccountTo.id)
-                    );
-    
                     // Показываем уведомление об успехе
-                    //setSelectedAccountTo(null);
-                    //setSelectedAccountFrom(null);
-                    //setAmount("");
+                    
+                    setSelectedAccountFrom(null);
+                    setAmount("");
                     
                     navigate("/", { replace: true });  
                     setShowAlert(true);
@@ -160,7 +146,7 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
                             variant="h6"
                             component="div"
                         >
-                            Перевод между счетами
+                            Пополнить счет
                         </Typography>
                     </Toolbar>
                 </AppBar>
@@ -172,14 +158,9 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
                 >
                     <AccountSelect
                         accounts={accountItems}
-                        placeHolder="Со счета"
+                        placeHolder="Счет"
                         style={{ margin: '50px' }}
                         onAccountSelected={(account) => setSelectedAccountFrom(account)}
-                    ></AccountSelect>
-                    <AccountSelect
-                        accounts={accountItems}
-                        placeHolder="На счет"
-                        onAccountSelected={(account) => setSelectedAccountTo(account)}
                     ></AccountSelect>
                     <InputLabel htmlFor="outlined-adornment-amount"></InputLabel>
 
@@ -198,15 +179,15 @@ export default function PaymentDialog({ open, setOpen }: NewPaymentDialogProps) 
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-                        disabled={!selectedAccountTo || !selectedAccountFrom || checkAmountForPayment()}
+                        disabled={!selectedAccountFrom || checkAmountForTopup()}
                     >
-                        Перевести
+                        Пополнить
                     </Button>
                 </Box>
                 {showAlert && (
                     <Snackbar open={open} onClose={handleClose}>
                         <Alert onClose={handleClose} severity="info" sx={{ width: "100%" }}>
-                            Перевод осуществлен успешно.
+                            Пополнение баланса осуществлено успешно.
                         </Alert>
                     </Snackbar>
                 )}

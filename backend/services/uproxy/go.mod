@@ -1,16 +1,15 @@
-module github.com/PestovOleg/mini-bank/backend/services/account
+module github.com/PestovOleg/mini-bank/backend/services/uproxy
 
 go 1.20
 
 require (
 	github.com/PestovOleg/mini-bank/backend/pkg/config v0.0.0
-	github.com/PestovOleg/mini-bank/backend/pkg/database v0.0.0
 	github.com/PestovOleg/mini-bank/backend/pkg/logger v0.0.0
 	github.com/PestovOleg/mini-bank/backend/pkg/middleware v0.0.0
 	github.com/PestovOleg/mini-bank/backend/pkg/server v0.0.0
 	github.com/PestovOleg/mini-bank/backend/pkg/signal v0.0.0
-	github.com/PestovOleg/mini-bank/backend/pkg/unleash v0.0.0-00010101000000-000000000000
-	github.com/google/uuid v1.3.1
+	github.com/PestovOleg/mini-bank/backend/pkg/unleash v0.0.0
+	github.com/PestovOleg/mini-bank/backend/services/mgmt v0.0.0-20231010182124-02086e3317f7
 	github.com/gorilla/mux v1.8.0
 	github.com/rs/cors v1.10.1
 	go.uber.org/zap v1.26.0
@@ -24,7 +23,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.5.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
@@ -34,7 +32,6 @@ require (
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
 
-//nolint:gomoddirectives
 replace github.com/PestovOleg/mini-bank/backend/pkg/logger => ../../../backend/pkg/logger
 
 replace github.com/PestovOleg/mini-bank/backend/pkg/config => ../../../backend/pkg/config

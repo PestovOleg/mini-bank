@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Paper, Divider, ListItemIcon, Collapse, ListItemButton } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Paper, Divider, ListItemIcon, Collapse, ListItemButton, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IAccount } from '../models/types';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoneySharp';
@@ -7,6 +7,8 @@ import CurrencyRubleOutlined from '@mui/icons-material/CurrencyRubleOutlined';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import ModeIcon from '@mui/icons-material/ModeSharp';
 import DeleteForeverSharpIcon from '@mui/icons-material/DeleteForeverSharp';
+import ChangeAccountNameDialog from './ChangeAccountName';
+import CloseAccountDialog from './CloseAccount';
 
 // Определение пропсов
 interface AccountProps {
@@ -18,6 +20,28 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
     const [open, setOpen] = React.useState(
         Array(accounts.length).fill(false)
     );
+    const [changeNameDialogOpen, setChangeNameDialogOpen] = React.useState(false);
+    const [closeAccountDialogOpen, setCloseAccountDialogOpen] = React.useState(false);
+    const [currentAccount, setCurrentAccount] = React.useState<IAccount | null>(null);
+
+
+    const openChangeNameDialog = (account: IAccount) => {
+        setCurrentAccount(account);
+        setChangeNameDialogOpen(true);
+    };
+    
+    const openCloseAccountDialog = (account: IAccount) => {
+        setCurrentAccount(account);
+        setCloseAccountDialogOpen(true);
+    };
+
+    const closeCloseAccountDialog = (account: IAccount) => {        
+        setCloseAccountDialogOpen(false);
+    };
+
+    const closeChangeNameDialog = () => {
+        setChangeNameDialogOpen(false);
+    };
 
     const handleClick = (index: number) => {
         const newOpen = [...open];
@@ -25,18 +49,27 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
         setOpen(newOpen);
     };
 
-    const sortedAccounts = [...accounts].sort((a, b) => a.currency.localeCompare(b.currency));
+    const sortedAccounts = React.useMemo(() => {
+        return [...accounts].sort((a, b) => {
+            const currencyCompare = a.currency.localeCompare(b.currency);
+            if (currencyCompare !== 0) {
+                return currencyCompare;
+            }
+            return b.amount - a.amount;
+        });
+    }, [accounts]);
+
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%',marginBottom:8 }}>
             <Typography variant="h6" component="div" sx={{ textAlign: 'center' }}>
                 {title}
             </Typography>
-            <div>
+            <div >
                 <List>
                     {sortedAccounts.map((item, index) => (
-                        <div>
-                            <ListItem sx={{ boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)', mb: 1 }} key={index}
+                        <div key={index}>
+                            <ListItem sx={{ boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)', mb: 1 }}
                                 secondaryAction={
                                     <ListItemButton onClick={() => handleClick(index)}>
                                         {open[index] ? <ExpandLess /> : <ExpandMore />}
@@ -46,13 +79,13 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                                 <ListItemAvatar>
                                     <Avatar >
                                         {
-                                             item.currency === '810' ? (<img alt="Ruble" src="/ruble.png" />) :
-                                             item.currency === '840' ? (<img alt="Dollar" src="/dollar.png" />) : null
+                                            item.currency === '810' ? (<img alt="Ruble" src="/ruble.png" />) :
+                                                item.currency === '840' ? (<img alt="Dollar" src="/dollar.png" />) : null
                                         }
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText
-                                    primary={item.name} 
+                                    primary={item.name}
                                     secondary={item.amount.toLocaleString('ru-Ru', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 />
 
@@ -62,12 +95,16 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                                     <ListItemButton sx={{ display: 'flex', justifyContent: 'space-around' }}>
                                         <ListItemText sx={{ ml: 7 }} primary={item.account} secondary={item.interestRate * 100 + '%'} />
                                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 1 }}>
-                                            <IconButton size='small'>
-                                                <ModeIcon />
-                                            </IconButton>
-                                            <IconButton size='small'>
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            <Tooltip title="Сменить имя счета">
+                                                <IconButton size='small' onClick={() => { openChangeNameDialog(item) }}>
+                                                    <ModeIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Закрыть счет">
+                                            <IconButton size='small' onClick={() => { openCloseAccountDialog(item) }}>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Tooltip>
                                         </Box>
                                     </ListItemButton>
                                 </List>
@@ -78,6 +115,16 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                     ))}
                 </List>
             </div>
+            <ChangeAccountNameDialog
+                open={changeNameDialogOpen}
+                setOpen={setChangeNameDialogOpen}
+                account={currentAccount}
+            />
+            <CloseAccountDialog
+                open={closeAccountDialogOpen}
+                setOpen={setCloseAccountDialogOpen}
+                account={currentAccount}
+            />
         </Box>
     );
 };

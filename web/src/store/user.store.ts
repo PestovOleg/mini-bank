@@ -55,6 +55,7 @@ export class UserStore {
     public logout(): void {
         this.isAuth = false;
         this.User = { ...EMPTY_USER };
+        console.log("logout")
     }
 
     public async signup(

@@ -27,6 +27,7 @@ import {
   Paper,
   TextField,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
@@ -40,12 +41,20 @@ import Fab from "@mui/material/Fab";
 import NewAccountDialog from "./components/NewAccount";
 import PaymentDialog from "./components/Payment";
 import SpeedDialMenu from "./components/SpeedMenu";
+import ChangeUserDetailsDialog from "./components/ChangeUserDetails";
+import React from "react";
+import LogoutIcon from '@mui/icons-material/Logout';
+import DeleteUserDialog from "./components/DeleteUser";
 
 function MainPage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [changeUserDetailsDialogOpen, setChangeUserDetailsDialogOpen] = React.useState(false);
+
+  const openChangeUserDetailsDialog = () => {
+    setChangeUserDetailsDialogOpen(true);
+  };
 
   useEffect(() => {
-    // Сделайте функцию getUser асинхронной или вызовите другую асинхронную функцию
     store.userStore.getUser().finally(() => setIsLoading(false)); // измените эту строку
     store.accountStore.getList().finally(() => setIsLoading(false));
   }, []);
@@ -100,6 +109,17 @@ function MainPage() {
             >
               МИНИБАНК
             </Typography>
+            <Tooltip title="Выход">
+              <IconButton
+                size="large"
+                color="inherit"
+                aria-label="menu"
+                sx={{ ml: 5 }}
+                onClick={() => { store.userStore.logout() }}
+              >
+                <LogoutIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
           </Toolbar>
         </AppBar>
         <Card sx={{ mt: 1, width: "100%" }}>
@@ -112,9 +132,13 @@ function MainPage() {
               </Avatar>
             }
             action={
-              <IconButton aria-label="settings" sx={{ m: 1 }}>
-                <ModeSharpIcon />
-              </IconButton>
+              <Box><Tooltip title="Изменить контактные данные">
+                <IconButton aria-label="settings" sx={{ m: 1 }} onClick={() => { openChangeUserDetailsDialog() }}>
+                  <ModeSharpIcon />
+                </IconButton>
+              </Tooltip>
+                <DeleteUserDialog /></Box>
+
             }
             title={
               user && user.name && user.lastName
@@ -175,13 +199,14 @@ function MainPage() {
               color="primary"
             >
               <Toolbar sx={{ justifyContent: 'center' }}>
-                
-                
-              <SpeedDialMenu />
+
+
+                <SpeedDialMenu />
                 <Box sx={{ flexGrow: 1 }} />
               </Toolbar>
-              
-              <Box sx={{ position: 'absolute',marginLeft:17,marginTop:1 }}>
+
+              <Box sx={{ position: 'absolute' }}>
+                <Box>
                   <IconButton color="inherit" aria-label="open drawer">
                     <BottomNavigationAction
                       component="a"
@@ -191,15 +216,20 @@ function MainPage() {
                     />
                   </IconButton>
                   <Typography variant="caption" sx={{ fontSize: 12, ml: -3 }}>
-                    &copy; by Pestov
+                    &copy; by Pestov Oleg
                   </Typography>
                 </Box>
+              </Box>
             </AppBar>
-            
+
           </Container>
         </Box>
 
       </Box>
+      <ChangeUserDetailsDialog
+        open={changeUserDetailsDialogOpen}
+        setOpen={setChangeUserDetailsDialogOpen}
+      />
     </Container>
   );
 }

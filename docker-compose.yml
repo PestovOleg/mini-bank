@@ -136,6 +136,54 @@ services:
       - 8889:80
     restart: unless-stopped
 
+  uproxy-minibank-blue:
+    image: pistollo/uproxy-minibank:${UPROXY_APP_VERSION}
+    container_name: uproxy-minibank-blue
+    hostname: uproxy-minibank-blue
+    build: 
+      context: .
+      dockerfile: ./backend/services/uproxy/Dockerfile
+    environment:
+      CONFIG_PATH: ${UPROXY_CONFIG_PATH}
+      UNLEASH_TOGGLES_URL: ${UNLEASH_TOGGLES_URL}
+      UNLEASH_ADMIN_TOKEN: ${UNLEASH_ADMIN_TOKEN}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log 
+      - /etc/minibank/uproxy-config.yaml:/etc/minibank/uproxy-config.yaml   
+    depends_on:
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4494:3333
+    restart: unless-stopped
+
+  uproxy-minibank-green:
+    image: pistollo/uproxy-minibank:${UPROXY_APP_VERSION}
+    container_name: uproxy-minibank-green
+    hostname: uproxy-minibank-green
+    build: 
+      context: .
+      dockerfile: ./backend/services/uproxy/Dockerfile
+    environment:
+      CONFIG_PATH: ${UPROXY_CONFIG_PATH}
+      UNLEASH_TOGGLES_URL: ${UNLEASH_TOGGLES_URL}
+      UNLEASH_ADMIN_TOKEN: ${UNLEASH_ADMIN_TOKEN}
+    volumes:
+      - /var/log/minibank/info.log:/app/info.log
+      - /var/log/minibank/error.log:/app/error.log
+      - /var/log/minibank/debug.log:/app/debug.log
+      - /etc/minibank/uproxy-config.yaml:/etc/minibank/uproxy-config.yaml
+    depends_on:
+      - unleash
+    networks:
+      minibank_net:
+    ports:
+      - 4495:3333
+    restart: unless-stopped
+
   account-minibank-blue:
     image: pistollo/account-minibank:${ACCOUNT_APP_VERSION}
     container_name: account-minibank-blue

@@ -1,7 +1,7 @@
 go 1.20
 
 use (
-	./backend/pkg/config	
+	./backend/pkg/config
 	./backend/pkg/database
 	./backend/pkg/logger
 	./backend/pkg/middleware
@@ -11,5 +11,6 @@ use (
 	./backend/services/account
 	./backend/services/auth
 	./backend/services/mgmt
+	./backend/services/uproxy
 	./backend/services/user
 )
