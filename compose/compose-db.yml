@@ -1,0 +1,88 @@
+services:
+
+  db-unleash-minibank:
+    image: postgres:15.4-alpine
+    container_name: db-unleash-minibank
+    volumes:
+      - pgdata_unleash:/var/lib/postgresql/data-unleash-minibank
+      - ${PWD}/db/init-db-unleash.sh:/docker-entrypoint-initdb.d/init-db.sh
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      UNLEASH_USER: ${UNLEASH_USER}
+      UNLEASH_PASSWORD: ${UNLEASH_PASSWORD}
+      UNLEASH_DB: ${UNLEASH_DB}
+    ports:
+      - 5432:5432
+    networks:
+      minibank_net:
+    restart: unless-stopped
+    
+  db-account-minibank:
+    image: postgres:15.4-alpine
+    container_name: db-account-minibank
+    volumes:
+      - pgdata_account:/var/lib/postgresql/data-account-minibank
+      - ${PWD}/db/init-db-account.sh:/docker-entrypoint-initdb.d/init-db.sh
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      ACCOUNT_MINIBANK_DB: ${ACCOUNT_MINIBANK_DB}
+      ACCOUNT_MINIBANK_USER: ${ACCOUNT_MINIBANK_USER}
+      ACCOUNT_MINIBANK_PASSWORD: ${ACCOUNT_MINIBANK_PASSWORD}
+    ports:
+      - 5433:5432
+    networks:
+      minibank_net:
+    restart: unless-stopped
+
+  db-auth-minibank:
+    image: postgres:15.4-alpine
+    container_name: db-auth-minibank
+    volumes:
+      - pgdata_auth:/var/lib/postgresql/data-auth-minibank
+      - ${PWD}/db/init-db-auth.sh:/docker-entrypoint-initdb.d/init-db.sh
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      AUTH_MINIBANK_DB: ${AUTH_MINIBANK_DB}
+      AUTH_MINIBANK_USER: ${AUTH_MINIBANK_USER}
+      AUTH_MINIBANK_PASSWORD: ${AUTH_MINIBANK_PASSWORD}
+    ports:
+      - 5434:5432
+    networks:
+      minibank_net:
+    restart: unless-stopped
+
+  db-user-minibank:
+    image: postgres:15.4-alpine
+    container_name: db-user-minibank
+    volumes:
+      - pgdata_user:/var/lib/postgresql/data-user-minibank
+      - ${PWD}/db/init-db-user.sh:/docker-entrypoint-initdb.d/init-db.sh
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      USER_MINIBANK_DB: ${USER_MINIBANK_DB}
+      USER_MINIBANK_USER: ${USER_MINIBANK_USER}
+      USER_MINIBANK_PASSWORD: ${USER_MINIBANK_PASSWORD}
+    ports:
+      - 5435:5432
+    networks:
+      minibank_net:
+    restart: unless-stopped
+    
+  adminer:
+    image: adminer:4.8.1
+    ports:
+      - 8002:8080
+    networks:
+      minibank_net:
+    depends_on: 
+      - db-account-minibank
+      - db-auth-minibank
+      - db-unleash-minibank
+      - db-user-minibank
+    restart: unless-stopped
+
+volumes:
+  pgdata_unleash:
+  pgdata_auth:
+  pgdata_account:
+  pgdata_user:

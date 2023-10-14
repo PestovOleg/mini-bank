@@ -1,10 +1,11 @@
 import { IUser } from "../models/types";
-import { action, makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { runInAction } from "mobx";
 import { EMPTY_USER } from "../const/empties";
 import { Store } from "./store";
 
-const URL = "http://localhost/api/v1";
+const URL = process.env.REACT_APP_URL;
+//const URL = "http://localhost/api/v1"
 
 export class UserStore {
     public User: IUser;
@@ -44,6 +45,7 @@ export class UserStore {
                 this.User.id = res.id;
                 this.User.username = username;
                 this.User.password = password;
+                this.User.token = "Basic " + base64Credentials;
             });
         } catch (error) {
             console.error("Login error:", error);
@@ -54,6 +56,7 @@ export class UserStore {
     public logout(): void {
         this.isAuth = false;
         this.User = { ...EMPTY_USER };
+        console.log("logout")
     }
 
     public async signup(
@@ -68,7 +71,7 @@ export class UserStore {
     ): Promise<void> {
         const userData = {
             email,
-            last_name:lastName,
+            last_name: lastName,
             name: firstName,
             password,
             patronymic,
@@ -100,14 +103,11 @@ export class UserStore {
     }
 
     public async getUser(): Promise<void> {
-        const base64Credentials = btoa(
-            this.User.username + ":" + this.User.password
-        );
 
         try {
             const response = await fetch(`${URL}/users/${this.User.id}`, {
                 headers: {
-                    Authorization: "Basic " + base64Credentials,
+                    Authorization: this.User.token,
                 },
             });
 
@@ -133,10 +133,7 @@ export class UserStore {
         }
     }
 
-    public async updateUser(email:string,phone:string):Promise<void>{
-        const base64Credentials = btoa(
-            this.User.username + ":" + this.User.password
-        );
+    public async updateUser(email: string, phone: string): Promise<void> {
 
         const userData = {
             email,
@@ -144,10 +141,11 @@ export class UserStore {
         };
 
         try {
-            const response = await fetch(`${URL}/users${this.User.id}`, {
+            const response = await fetch(`${URL}/users/${this.User.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: this.User.token,
                 },
                 body: JSON.stringify(userData),
             });
@@ -158,10 +156,36 @@ export class UserStore {
 
             const res: any = await response.json();
             runInAction(() => {
-                this.signUpSuccess = true;
+                this.getUser();
+                
             });
-        } catch(error){
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
 
+    public async deleteUser(): Promise<void> {        
+
+        try {
+            const response = await fetch(`${URL}/mgmt/${this.User.id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: this.User.token,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const res: any = await response.json();
+            runInAction(() => {
+                this.logout();
+                
+            });
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
         }
     }
 }

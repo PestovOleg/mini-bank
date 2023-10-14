@@ -1,16 +1,12 @@
 import React from 'react';
-import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Paper, Divider, ListItemIcon, Collapse, ListItemButton } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Collapse, ListItemButton, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FolderIcon from '@mui/icons-material/Folder';
-import { styled } from '@mui/system';
 import { IAccount } from '../models/types';
-import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
-import CurrencyRubleSharpIcon from '@mui/icons-material/CurrencyRubleSharp';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import ModeSharpIcon from '@mui/icons-material/ModeSharp';
-import DeleteForeverSharpIcon from '@mui/icons-material/DeleteForeverSharp';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import ModeIcon from '@mui/icons-material/ModeSharp';
+import ChangeAccountNameDialog from './ChangeAccountName';
+import CloseAccountDialog from './CloseAccount';
+import store from '../store/store';
 
 // Определение пропсов
 interface AccountProps {
@@ -22,28 +18,75 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
     const [open, setOpen] = React.useState(
         Array(accounts.length).fill(false)
     );
+    const [changeNameDialogOpen, setChangeNameDialogOpen] = React.useState(false);
+    const [closeAccountDialogOpen, setCloseAccountDialogOpen] = React.useState(false);
+    const [currentAccount, setCurrentAccount] = React.useState<IAccount | null>(null);
+
+
+    const openChangeNameDialog = (account: IAccount) => {
+        setCurrentAccount(account);
+        setChangeNameDialogOpen(true);
+    };
+
+    const openCloseAccountDialog = (account: IAccount) => {
+        setCurrentAccount(account);
+        setCloseAccountDialogOpen(true);
+    };
 
     const handleClick = (index: number) => {
-        // Копируем текущий массив состояний
         const newOpen = [...open];
-        // Изменяем состояние для конкретного элемента
         newOpen[index] = !newOpen[index];
-        // Обновляем состояние
         setOpen(newOpen);
     };
 
-    const sortedAccounts = [...accounts].sort((a, b) => a.currency.localeCompare(b.currency));
+    const sortedAccounts = React.useMemo(() => {
+        return [...accounts].sort((a, b) => {
+            const currencyCompare = a.currency.localeCompare(b.currency);
+            if (currencyCompare !== 0) {
+                return currencyCompare;
+            }
+            return b.amount - a.amount;
+        });
+    }, [accounts]);
+
+    const deleteAccount = (item:IAccount) => {
+        if (store.toggleStore.getFeature("GetAccountToggle")) {
+            return (
+                <Tooltip title="Закрыть счет">
+                    <IconButton size='small' onClick={() => { openCloseAccountDialog(item) }}>
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
+            );
+        } else {
+            return null;
+        }
+    };
+
+    const changeAccountInfo = (item:IAccount) => {
+        if (store.toggleStore.getFeature("UpdateAccountToggle")) {
+            return (
+                <Tooltip title="Сменить имя счета">
+                    <IconButton size='small' onClick={() => { openChangeNameDialog(item) }}>
+                        <ModeIcon />
+                    </IconButton>
+                </Tooltip>
+            );
+        } else {
+            return null;
+        }
+    };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', marginBottom: 8 }}>
             <Typography variant="h6" component="div" sx={{ textAlign: 'center' }}>
                 {title}
             </Typography>
-            <div>
+            <div >
                 <List>
                     {sortedAccounts.map((item, index) => (
-                        <div>
-                            <ListItem sx={{ boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)', mb: 1 }} key={index}
+                        <div key={index}>
+                            <ListItem sx={{ boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)', mb: 1 }}
                                 secondaryAction={
                                     <ListItemButton onClick={() => handleClick(index)}>
                                         {open[index] ? <ExpandLess /> : <ExpandMore />}
@@ -51,10 +94,10 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                                 }
                             >
                                 <ListItemAvatar>
-                                    <Avatar>
+                                    <Avatar >
                                         {
-                                            item.currency === '810' ? (<CurrencyRubleSharpIcon />) :
-                                                item.currency === '840' ? (<AttachMoneySharpIcon />) : null
+                                            item.currency === '810' ? (<img alt="Ruble" src="/ruble.png" />) :
+                                                item.currency === '840' ? (<img alt="Dollar" src="/dollar.png" />) : null
                                         }
                                     </Avatar>
                                 </ListItemAvatar>
@@ -69,12 +112,8 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                                     <ListItemButton sx={{ display: 'flex', justifyContent: 'space-around' }}>
                                         <ListItemText sx={{ ml: 7 }} primary={item.account} secondary={item.interestRate * 100 + '%'} />
                                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 1 }}>
-                                            <IconButton size='small'>
-                                                <ModeSharpIcon />
-                                            </IconButton>
-                                            <IconButton size='small'>
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            {changeAccountInfo(item)}
+                                            {deleteAccount(item)}
                                         </Box>
                                     </ListItemButton>
                                 </List>
@@ -85,6 +124,16 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                     ))}
                 </List>
             </div>
+            <ChangeAccountNameDialog
+                open={changeNameDialogOpen}
+                setOpen={setChangeNameDialogOpen}
+                account={currentAccount}
+            />
+            <CloseAccountDialog
+                open={closeAccountDialogOpen}
+                setOpen={setCloseAccountDialogOpen}
+                account={currentAccount}
+            />
         </Box>
     );
 };

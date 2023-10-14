@@ -34,6 +34,13 @@ func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
 			},
 		},
+		"/mgmt/{id}": {
+			http.MethodDelete: {
+				Handler:     handlerMgmt.NewMgmtHandler().DeleteUser(),
+				Feature:     "DeleteUserToggle",
+				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
+			},
+		},
 	}
 }
 

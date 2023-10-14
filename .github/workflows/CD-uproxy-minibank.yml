@@ -1,0 +1,99 @@
+name: CD uproxy service
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+    paths:
+      - 'mini-bank/backend/services/uproxy/**'
+      - '.github/workflows/CD-uproxy**'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Name the reason"
+        default: "Just because"
+        required: true
+      version:
+        description: 'Docker image version'
+        required: true
+        default: 'latest'
+  
+jobs:
+  build:
+    name: Build and push Docker image to Dockerhub
+    runs-on: ubuntu-20.04
+    outputs:
+      version: ${{ env.VERSION }}
+
+    steps:
+# определяем версию (из пуша или при диспатче)
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Running workflow_dispatch, version is ${{ github.event.inputs.version }}"
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            TAG_VERSION=$(echo ${GITHUB_REF#refs/tags/} | sed 's/^v//')
+            echo "Running on push to tag, version is $TAG_VERSION"
+            echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
+          else
+            echo "Unknown event, exiting"
+            exit 1
+          fi
+
+# заливаем исходники
+      - name: Check out code                        
+        uses: actions/checkout@v3
+
+# ставим Go
+      - name: Setup Go                              
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.6
+
+# логинимся в докерхаб      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+# собираем образ и пушим в докерхаб      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./backend/services/uproxy/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/uproxy-minibank:${{ env.VERSION }}
+          labels: ${{ secrets.DOCKERHUB_USERNAME }}/uproxy-minibank:${{ env.VERSION }}
+  
+  deploy:
+    needs: build
+    name: Deploy 
+    runs-on: ubuntu-20.04
+    
+# коннектимся по SSH,скачиваем образ и запускаем 
+    steps:
+      - name: SSH connect
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_SERVER_IP }}
+          username: ${{ secrets.SSH_SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/mini-bank
+            git pull
+            export ACCOUNT_CONFIG_PATH=${{ vars.ACCOUNT_CONFIG_PATH }}
+            export ACCOUNT_APP_VERSION=${{ needs.build.outputs.version }}
+            export UNLEASH_ADMIN_TOKEN=${{ secrets.UNLEASH_ADMIN_TOKEN }}
+            export UNLEASH_TOGGLES_URL=${{secrets.UNLEASH_TOGGLES_URL}}
+            echo 'Переменные для миграции'
+            export MIGRATE=NO
+            export SERVICE=uproxy-minibank
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/uproxy-minibank:${{ needs.build.outputs.version }}
+            /bin/bash deploy.sh
+            

@@ -288,7 +288,102 @@ const docTemplate = `{
                 "summary": "Check the health status of the server",
                 "responses": {
                     "200": {
-                        "description": "User Service is healthy - Hello from Health Check Handler Endpoint\" \"StatusOK",
+                        "description": "Mgmt Service is healthy - Hello from Health Check Handler Endpoint\" \"StatusOK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "StatusInternalError",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/mgmt/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Delete(deactivate) a  user using the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mgmt"
+                ],
+                "summary": "Orchestrate deactivation of a  user with services auth, user and account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The user has been deactivated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/uproxy": {
+            "get": {
+                "description": "Unleash Proxy for Web",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "uProxy"
+                ],
+                "summary": "Unleash Proxy for Web",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved feature toggles",
+                        "schema": {
+                            "$ref": "#/definitions/mapper.ToggleList"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/uproxy-minibank-health": {
+            "get": {
+                "description": "Returns the server's health status.",
+                "tags": [
+                    "uProxy"
+                ],
+                "summary": "Check the health status of the server",
+                "responses": {
+                    "200": {
+                        "description": "Unleash Proxy Service is healthy - Hello from Health Check Handler Endpoint\" \"StatusOK",
                         "schema": {
                             "type": "string"
                         }
@@ -492,7 +587,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "id",
+                        "name": "userid",
                         "in": "path",
                         "required": true
                     }
@@ -974,6 +1069,51 @@ const docTemplate = `{
                 "user_id": {
                     "type": "string",
                     "example": "fdee7aae-f79f-4653-8a16-9207e6805b93"
+                }
+            }
+        },
+        "mapper.ToggleList": {
+            "type": "object",
+            "properties": {
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "description": {
+                                "type": "string",
+                                "example": "Create User Toggle"
+                            },
+                            "environments": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "development"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "development"
+                                        }
+                                    }
+                                }
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "CreateUserToggle"
+                            }
+                        }
+                    }
+                },
+                "version": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },

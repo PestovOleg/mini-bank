@@ -1,0 +1,24 @@
+services:
+  migrate-auth:
+    image: migrate/migrate
+    networks:
+      minibank_net:  
+    volumes:
+    - ${PWD}/backend/services/auth/internal/migrations:/migrations/auth-minibank
+    command: ["-path", "/migrations/auth-minibank", "-database",  "postgres://${AUTH_MINIBANK_USER}:${AUTH_MINIBANK_PASSWORD}@db-auth-minibank:5432/${AUTH_MINIBANK_DB}?sslmode=disable", "up", "1"]
+
+  migrate-user:
+    image: migrate/migrate
+    networks:
+      minibank_net:  
+    volumes:
+    - ${PWD}/backend/services/user/internal/migrations:/migrations/user-minibank
+    command: ["-path", "/migrations/user-minibank", "-database",  "postgres://${USER_MINIBANK_USER}:${USER_MINIBANK_PASSWORD}@db-user-minibank:5432/${USER_MINIBANK_DB}?sslmode=disable", "up", "1"]
+
+  migrate-account:
+    image: migrate/migrate
+    networks:
+      minibank_net:  
+    volumes:
+    - ${PWD}/backend/services/account/internal/migrations:/migrations/account-minibank
+    command: ["-path", "/migrations/account-minibank", "-database",  "postgres://${ACCOUNT_MINIBANK_USER}:${ACCOUNT_MINIBANK_PASSWORD}@db-account-minibank:5432/${ACCOUNT_MINIBANK_DB}?sslmode=disable", "up", "1"]

@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, Link, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, Container, FormHelperText, Link, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -26,7 +26,7 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function FullScreenDialog() {
+export default function SignUpDialog() {
   const [open, setOpen] = React.useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -84,7 +84,33 @@ export default function FullScreenDialog() {
     }
   };
 
+  const handleEmailChange = (value: string) => {
+
+    // Удалить все символы, кроме цифр и точки
+    value = value.replace(/[^0-9.^a-z^A-Z@]/g, "");
+
+    // Проверка на наличие более чем одной точки
+    const dotCount = value.split(".").length - 1;
+    if (dotCount > 1) {
+      value = value.slice(0, value.lastIndexOf("."));
+    }
+
+    // Проверка на наличие более чем одной собаки
+    const dogCount = value.split("@").length - 1;
+    if (dogCount > 1) {
+      value = value.slice(0, value.lastIndexOf("."));
+    }
+
+    setEmail(value);
+  };
+
+  const handleLoginChange = (value: string) => {
+    value = value.replace(/[^0-9^a-z^A-Z]/g, "");
+    setUsername(value);
+  };
+
   return (
+
     <Box
       sx={{
         display: "flex",
@@ -100,6 +126,7 @@ export default function FullScreenDialog() {
         onClose={handleClose}
         TransitionComponent={Transition}
       >
+
         <AppBar sx={{ position: "relative", pr: 2, pl: 2 }}>
           <Toolbar>
             <IconButton
@@ -119,121 +146,123 @@ export default function FullScreenDialog() {
             </Typography>
           </Toolbar>
         </AppBar>
-        <Box
-          component="form"
-          onSubmit={signup}
-          noValidate
-          sx={{ mt: 1, pr: 5, pl: 5 }}
-        >
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="Логин"
-            name="username"
-            value={username}
-            autoComplete="username"
-            autoFocus
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Пароль"
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="firstName"
-            label="Имя"
-            name="firstName"
-            value={firstName}
-            autoComplete="firstName"
-            autoFocus
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="lastName"
-            label="Фамилия"
-            name="lastName"
-            value={lastName}
-            autoComplete="lastName"
-            autoFocus
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="patronymic"
-            label="Отчество"
-            name="patronymic"
-            value={patronymic}
-            autoComplete="patronymic"
-            autoFocus
-            onChange={(e) => setPatronymic(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="email"
-            name="email"
-            value={email}
-            autoComplete="email"
-            autoFocus
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="phone"
-            label="Телефон"
-            name="phone"
-            value={phone}
-            autoComplete="phone"
-            autoFocus
-            onChange={(e) => setPhone(e.target.value)}
-            InputProps={{
-              inputComponent: InputMask,
-              inputProps: { mask: "+7 (999) 999-99-99" },
-            }}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            type="date"
-            id="birthday"
-            name="birthday"
-            value={birthday}
-            autoFocus
-            onChange={(e) => setBirthday(e.target.value)}
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+        <Container className="mainPage" component="main" maxWidth="xs">
+          <Box
+            component="form"
+            onSubmit={signup}
+            noValidate
           >
-            Зарегистрироваться
-          </Button>
-        </Box>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="Логин"
+              name="username"
+              value={username}
+              autoComplete="username"
+              autoFocus
+              helperText="Только цифры и латинские символы"
+              onChange={(e) => handleLoginChange(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Пароль"
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="firstName"
+              label="Имя"
+              name="firstName"
+              value={firstName}
+              autoComplete="firstName"
+              autoFocus
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="lastName"
+              label="Фамилия"
+              name="lastName"
+              value={lastName}
+              autoComplete="lastName"
+              autoFocus
+              onChange={(e) => setLastName(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="patronymic"
+              label="Отчество"
+              name="patronymic"
+              value={patronymic}
+              autoComplete="patronymic"
+              autoFocus
+              onChange={(e) => setPatronymic(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="email"
+              name="email"
+              value={email}
+              autoComplete="email"
+              autoFocus
+              onChange={(e) => handleEmailChange(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="phone"
+              label="Телефон"
+              name="phone"
+              value={phone}
+              autoComplete="phone"
+              autoFocus
+              onChange={(e) => setPhone(e.target.value)}
+              InputProps={{
+                inputComponent: InputMask,
+                inputProps: { mask: "+7 (999) 999-99-99" },
+              }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              type="date"
+              id="birthday"
+              name="birthday"
+              value={birthday}
+              autoFocus
+              onChange={(e) => setBirthday(e.target.value)}
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Зарегистрироваться
+            </Button>
+          </Box>
+        </Container>
         {showAlert && (
           <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="info" sx={{ width: "100%" }}>
@@ -241,7 +270,10 @@ export default function FullScreenDialog() {
             </Alert>
           </Snackbar>
         )}
+
+
       </Dialog>
     </Box>
+
   );
 }

@@ -14,7 +14,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/rs/cors v1.10.1
 	go.uber.org/zap v1.26.0
-	golang.org/x/sys v0.12.0
+	golang.org/x/sys v0.13.0
 )
 
 require (
@@ -33,6 +33,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
+
 //nolint:gomoddirectives
 replace github.com/PestovOleg/mini-bank/backend/pkg/logger => ../../../backend/pkg/logger
 

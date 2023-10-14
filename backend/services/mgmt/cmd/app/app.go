@@ -46,7 +46,7 @@ func NewRouter(s *Services) http.Handler {
 func NewApp(cfg *config.AppConfig) App {
 	logger := logger.GetLogger("Mgmt")
 
-	err := unleashServer.InitUnleash(cfg, "user")
+	err := unleashServer.InitUnleash(cfg, "Mgmt")
 	if err != nil {
 		logger.Sugar().Fatalf("Couldn't establish a connection to the Unleash Server: %s", err.Error())
 		panic(err.Error())
