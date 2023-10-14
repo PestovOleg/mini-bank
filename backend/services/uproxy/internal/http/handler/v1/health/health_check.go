@@ -21,11 +21,11 @@ func NewHealthCheckHandler() *healthCheckHandler {
 // @version 	 1.0
 // @summary      Check the health status of the server
 // @description  Returns the server's health status.
-// @tags         mgmt
-// @success 200 {string} string "User Service is healthy - Hello from Health Check Handler Endpoint" "StatusOK"
-// @example 200 {string} "User Service is healthy - Hello from Health Check Handler Endpoint"
+// @tags         uProxy
+// @success 200 {string} string "Unleash Proxy Service is healthy - Hello from Health Check Handler Endpoint" "StatusOK"
+// @example 200 {string} "Unleash Proxy Service is healthy - Hello from Health Check Handler Endpoint"
 // @failure 500 {string} string "StatusInternalError"
-// @router       /mgmt-minibank-health [get]
+// @router       /uproxy-minibank-health [get]
 func (h *healthCheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_, err := io.WriteString(w, "Unleash Proxy Service is healthy - Hello from Health Check Handler Endpoint")
 

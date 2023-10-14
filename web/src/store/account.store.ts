@@ -1,10 +1,11 @@
-import { IAccount, IUser } from "../models/types";
-import { action, makeAutoObservable, observable } from "mobx";
+import { IAccount } from "../models/types";
+import {  makeAutoObservable } from "mobx";
 import { runInAction } from "mobx";
-import { EMPTY_USER, EMPTY_ACCOUNT } from "../const/empties"
+import { EMPTY_ACCOUNT } from "../const/empties"
 import { Store } from './store';
 
-const URL = "http://localhost/api/v1";
+const URL = process.env.REACT_APP_URL;
+//const URL = "http://localhost/api/v1";
 
 export class AccountStore {
     public Accounts: IAccount[];

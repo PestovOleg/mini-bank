@@ -1,0 +1,17 @@
+services:
+ 
+ unleash:
+    image: unleashorg/unleash-server
+    environment:
+      DATABASE_HOST: db-unleash-minibank
+      DATABASE_NAME: ${UNLEASH_DB}
+      DATABASE_PASSWORD: ${UNLEASH_PASSWORD}
+      DATABASE_USERNAME: ${UNLEASH_USER}
+      DATABASE_SSL: false
+    networks:
+      minibank_net:
+    ports:
+      - 4242:4242
+    depends_on:
+      - db-unleash-minibank
+    restart: unless-stopped

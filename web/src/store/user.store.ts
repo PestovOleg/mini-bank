@@ -1,10 +1,11 @@
 import { IUser } from "../models/types";
-import { action, makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { runInAction } from "mobx";
 import { EMPTY_USER } from "../const/empties";
 import { Store } from "./store";
 
-const URL = "http://localhost/api/v1";
+const URL = process.env.REACT_APP_URL;
+//const URL = "http://localhost/api/v1"
 
 export class UserStore {
     public User: IUser;
@@ -166,7 +167,7 @@ export class UserStore {
     public async deleteUser(): Promise<void> {        
 
         try {
-            const response = await fetch(`${URL}/users/${this.User.id}`, {
+            const response = await fetch(`${URL}/mgmt/${this.User.id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

@@ -2,9 +2,9 @@ import { observer } from "mobx-react-lite";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { AppBar, Avatar, Box, Button, Container, CssBaseline, IconButton, Link, TextField, Toolbar, Typography } from "@mui/material";
+import { AppBar, Avatar, Box, Button, Container, CssBaseline, FormHelperText, IconButton, Link, TextField, Toolbar, Typography } from "@mui/material";
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
-import FullScreenDialog from "./SignUp";
+import SignUpDialog from "./SignUp";
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -19,6 +19,23 @@ function Login() {
         }
     };
 
+    const signUp = () => {
+        if (store.toggleStore.getFeature("CreateUserToggle")) {
+            return (
+                <Box component="form" onSubmit={(e) => { e.preventDefault(); }} noValidate sx={{ mt: 1 }}>
+                    <SignUpDialog />
+                </Box>
+            );
+        } else {
+            return null;
+        }
+    };
+
+    const handleLoginChange = (value: string) => {
+        value = value.replace(/[^0-9^a-z^A-Z]/g, "");
+        setUsername(value);
+    };
+    
     return (
         <Container className="login" component="main" maxWidth="xs" >
             <CssBaseline />
@@ -42,13 +59,14 @@ function Login() {
                         >
                             <SavingsOutlinedIcon fontSize="large" />
                         </IconButton>
-                        <Typography variant="h6" component="div" sx={{ ml: 5,letterSpacing: 5 }}>
+                        <Typography variant="h6" component="div" sx={{ ml: 5, letterSpacing: 5 }}>
                             МИНИБАНК
                         </Typography>
 
                     </Toolbar>
                 </AppBar>
-                <Box component="form" onSubmit={login} noValidate sx={{ mt: 1 }}>
+                
+                <Box component="form" onSubmit={login} noValidate sx={{ mt: 1}}>
                     <TextField
                         margin="normal"
                         required
@@ -59,7 +77,8 @@ function Login() {
                         value={username}
                         autoComplete="username"
                         autoFocus
-                        onChange={(e) => setUsername(e.target.value)}
+                        helperText="Только цифры и латинские символы"
+                        onChange={(e) => handleLoginChange(e.target.value)}
                     />
                     <TextField
                         margin="normal"
@@ -84,9 +103,8 @@ function Login() {
                     </Button>
 
                 </Box>
-                <Box component="form" onSubmit={(e) => { e.preventDefault(); }} noValidate sx={{ mt: 1 }}>
-                    <FullScreenDialog />
-                </Box>
+               
+                {signUp()}
             </Box>
         </Container>
     );

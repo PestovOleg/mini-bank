@@ -22,7 +22,7 @@ package main
 import (
 	"github.com/PestovOleg/mini-bank/backend/pkg/config"
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
-	"github.com/PestovOleg/mini-bank/backend/services/mgmt/cmd/app"
+	"github.com/PestovOleg/mini-bank/backend/services/uproxy/cmd/app"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 		panic("Logger cannot be initialized")
 	}
 
-	logger := logger.GetLogger("Mgmt")
+	logger := logger.GetLogger("uProxy")
 	app := app.NewApp(&cfg)
 
 	err = app.Run()

@@ -9,7 +9,6 @@ require (
 	github.com/PestovOleg/mini-bank/backend/pkg/server v0.0.0
 	github.com/PestovOleg/mini-bank/backend/pkg/signal v0.0.0
 	github.com/PestovOleg/mini-bank/backend/pkg/unleash v0.0.0
-	github.com/PestovOleg/mini-bank/backend/services/mgmt v0.0.0-20231010182124-02086e3317f7
 	github.com/gorilla/mux v1.8.0
 	github.com/rs/cors v1.10.1
 	go.uber.org/zap v1.26.0

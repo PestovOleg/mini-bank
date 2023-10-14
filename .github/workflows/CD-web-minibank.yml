@@ -1,21 +1,93 @@
 name: CD web service
 
 on:
+  push:
+    tags:
+      - "v*.*.*"
+    paths:
+      - 'mini-bank/web/**'
+      - '.github/workflows/CD-web*'
   workflow_dispatch:
     inputs:
       reason:
-        description: "Reason for manual run"
-        required: true
+        description: "Name the reason"
         default: "Just because"
-
+        required: true
+      version:
+        description: 'Docker image version'
+        required: true
+        default: 'latest'
+  
 jobs:
-  justJob:
+  build:
+    name: Build and push Docker image to Dockerhub
     runs-on: ubuntu-20.04
-
+    outputs:
+      version: ${{ env.VERSION }}
+      
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+# определяем версию (из пуша или при диспатче)
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Running workflow_dispatch, version is ${{ github.event.inputs.version }}"
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            TAG_VERSION=$(echo ${GITHUB_REF#refs/tags/} | sed 's/^v//')
+            echo "Running on push to tag, version is $TAG_VERSION"
+            echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
+          else
+            echo "Unknown event, exiting"
+            exit 1
+          fi
 
-    - name: Print reason
-      run: |
-        echo "Workflow run because of: ${{ github.event.inputs.reason }}"
+# заливаем исходники
+      - name: Check out code                        
+        uses: actions/checkout@v3
+
+# ставим Node
+      - name: Setup Node                              
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.5.0
+
+# логинимся в докерхаб      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+# собираем образ и пушим в докерхаб      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./web/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/web-minibank:${{ env.VERSION }}
+          labels: ${{ secrets.DOCKERHUB_USERNAME }}/web-minibank:${{ env.VERSION }}
+  
+  deploy:
+    needs: build
+    name: Deploy 
+    runs-on: ubuntu-20.04
+    
+# коннектимся по SSH,скачиваем образ и запускаем 
+    steps:
+      - name: SSH connect
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_SERVER_IP }}
+          username: ${{ secrets.SSH_SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/mini-bank
+            git pull
+            export WEB_APP_VERSION=${{ needs.build.outputs.version }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-minibank:${{ needs.build.outputs.version }}
+            /bin/bash deploy.sh
+            

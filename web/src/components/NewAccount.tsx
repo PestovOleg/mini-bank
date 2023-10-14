@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, Link, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, Container, Link, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -55,6 +55,8 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
 
     const handleClose = () => {
         setOpen(false);
+        setAccountName("");
+        setCurrency("");  
     };
 
     const openAccount = async (
@@ -114,11 +116,12 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                         </Typography>
                     </Toolbar>
                 </AppBar>
+                <Container className="mainPage" component="main" maxWidth="xs">
                 <Box
                     component="form"
                     onSubmit={openAccount}
                     noValidate
-                    sx={{ mt: 1, pr: 5, pl: 5 }}
+                    sx={{ mt: 1}}
                 >
                     
                     <Select
@@ -126,7 +129,7 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                         value={currency}
                         label="Without label"
                         onChange={handleChange}
-                        autoWidth
+                        fullWidth
                         required                        
                         displayEmpty
                     >
@@ -157,6 +160,7 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
                         Открыть счет
                     </Button>
                 </Box>
+                </Container>
                 {showAlert && (
                     <Snackbar open={open} onClose={handleClose}>
                         <Alert onClose={handleClose} severity="info" sx={{ width: "100%" }}>

@@ -1,14 +1,12 @@
 import React from 'react';
-import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Paper, Divider, ListItemIcon, Collapse, ListItemButton, Tooltip } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, Collapse, ListItemButton, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IAccount } from '../models/types';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoneySharp';
-import CurrencyRubleOutlined from '@mui/icons-material/CurrencyRubleOutlined';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import ModeIcon from '@mui/icons-material/ModeSharp';
-import DeleteForeverSharpIcon from '@mui/icons-material/DeleteForeverSharp';
 import ChangeAccountNameDialog from './ChangeAccountName';
 import CloseAccountDialog from './CloseAccount';
+import store from '../store/store';
 
 // Определение пропсов
 interface AccountProps {
@@ -29,18 +27,10 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
         setCurrentAccount(account);
         setChangeNameDialogOpen(true);
     };
-    
+
     const openCloseAccountDialog = (account: IAccount) => {
         setCurrentAccount(account);
         setCloseAccountDialogOpen(true);
-    };
-
-    const closeCloseAccountDialog = (account: IAccount) => {        
-        setCloseAccountDialogOpen(false);
-    };
-
-    const closeChangeNameDialog = () => {
-        setChangeNameDialogOpen(false);
     };
 
     const handleClick = (index: number) => {
@@ -59,9 +49,36 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
         });
     }, [accounts]);
 
+    const deleteAccount = (item:IAccount) => {
+        if (store.toggleStore.getFeature("GetAccountToggle")) {
+            return (
+                <Tooltip title="Закрыть счет">
+                    <IconButton size='small' onClick={() => { openCloseAccountDialog(item) }}>
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
+            );
+        } else {
+            return null;
+        }
+    };
+
+    const changeAccountInfo = (item:IAccount) => {
+        if (store.toggleStore.getFeature("UpdateAccountToggle")) {
+            return (
+                <Tooltip title="Сменить имя счета">
+                    <IconButton size='small' onClick={() => { openChangeNameDialog(item) }}>
+                        <ModeIcon />
+                    </IconButton>
+                </Tooltip>
+            );
+        } else {
+            return null;
+        }
+    };
 
     return (
-        <Box sx={{ width: '100%',marginBottom:8 }}>
+        <Box sx={{ width: '100%', marginBottom: 8 }}>
             <Typography variant="h6" component="div" sx={{ textAlign: 'center' }}>
                 {title}
             </Typography>
@@ -95,16 +112,8 @@ const Account: React.FC<AccountProps> = ({ title, accounts }) => {
                                     <ListItemButton sx={{ display: 'flex', justifyContent: 'space-around' }}>
                                         <ListItemText sx={{ ml: 7 }} primary={item.account} secondary={item.interestRate * 100 + '%'} />
                                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 1 }}>
-                                            <Tooltip title="Сменить имя счета">
-                                                <IconButton size='small' onClick={() => { openChangeNameDialog(item) }}>
-                                                    <ModeIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Закрыть счет">
-                                            <IconButton size='small' onClick={() => { openCloseAccountDialog(item) }}>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Tooltip>
+                                            {changeAccountInfo(item)}
+                                            {deleteAccount(item)}
                                         </Box>
                                     </ListItemButton>
                                 </List>

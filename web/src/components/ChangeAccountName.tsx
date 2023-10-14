@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, InputAdornment, Link, OutlinedInput, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, Container, InputAdornment, Link, OutlinedInput, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -115,13 +115,14 @@ export default function ChangeAccountNameDialog({ open, setOpen, account }: Chan
                         </Typography>
                     </Toolbar>
                 </AppBar>
+                <Container className="mainPage" component="main" maxWidth="xs">
                 <Box
                     component="form"
                     onSubmit={changeAccountName}
                     noValidate
-                    sx={{ mt: 1, pr: 5, pl: 5 }}
+                    sx={{ mt: 1}}
                 >
-                    <InputLabel htmlFor="accountName">Текущее имя</InputLabel>
+                    <InputLabel htmlFor="accountName"></InputLabel>
 
                     <TextField
                         margin="normal"
@@ -154,6 +155,7 @@ export default function ChangeAccountNameDialog({ open, setOpen, account }: Chan
                         Изменить
                     </Button>
                 </Box>
+                </Container>
                 {showAlert && (
                     <Snackbar open={open} onClose={handleClose}>
                         <Alert onClose={handleClose} severity="info" sx={{ width: "100%" }}>

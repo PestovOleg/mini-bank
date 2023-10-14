@@ -1,4 +1,4 @@
-import { IAccount, IUser } from "../models/types";
+import { IAccount, IFeature, IFeatureEnvironment, IUser } from "../models/types";
 
 export const EMPTY_USER: IUser = {
     id: '',
@@ -23,4 +23,16 @@ export const EMPTY_ACCOUNT: IAccount={
     createdAt: new Date(0),
     interestRate: 0,
     userID: '',
+}
+
+export const EMPTY_FEATURE: IFeature={
+    name: '',
+    description: '',
+    environments: [],
+}
+
+export const EMPTY_ENVIRONMENT: IFeatureEnvironment={
+    name: '',
+    enabled: false,
+    type: '',
 }

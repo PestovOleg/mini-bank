@@ -76,7 +76,7 @@ export default function DeleteUserDialog() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Несогласен</Button>
+                    <Button onClick={handleClose}>Не согласен</Button>
                     <Button  onClick={() => { deleteUser() }} autoFocus>
                         Согласен
                     </Button>
@@ -93,6 +93,3 @@ export default function DeleteUserDialog() {
     );
 }
 
-function preventDefault() {
-    throw new Error('Function not implemented.');
-}

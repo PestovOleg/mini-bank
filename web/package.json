@@ -28,7 +28,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "BUILD_PATH='./build' PUBLIC_URL='http://localhost' react-scripts build",
+    "build": "BUILD_PATH='./build' PUBLIC_URL='http://localhost:8888' react-scripts build",
+    "docker-build": "BUILD_PATH='./build' PUBLIC_URL=${PUBLIC_URL} REACT_APP_URL=${REACT_APP_URL} react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

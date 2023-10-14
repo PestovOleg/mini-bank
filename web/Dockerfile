@@ -6,7 +6,15 @@ COPY ./web/tsconfig.json ./
 COPY ./web/src /app/src
 COPY ./web/public /app/public
 RUN npm install
-RUN npm run build
+
+ARG public_url
+ARG react_app_url
+ENV PUBLIC_URL=$public_url
+ENV REACT_APP_URL=$react_app_url
+RUN echo "$PUBLIC_URL"
+RUN echo "$REACT_APP_URL"
+#RUN PUBLIC_URL="http://localhost" REACT_APP_URL="http://localhost/api/v1" npm run docker-build
+RUN PUBLIC_URL="$PUBLIC_URL" REACT_APP_URL="$REACT_APP_URL" npm run docker-build
 
 # Стадия развертывания
 FROM nginx:1.25.2-alpine

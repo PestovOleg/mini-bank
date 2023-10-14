@@ -4,10 +4,8 @@ package uproxy
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
@@ -21,7 +19,7 @@ type UnleashProxyHandler struct {
 
 func NewUnleashProxyHandler() *UnleashProxyHandler {
 	return &UnleashProxyHandler{
-		logger: logger.GetLogger("MgmtAPI"),
+		logger: logger.GetLogger("UProxyAPI"),
 	}
 }
 
@@ -69,16 +67,7 @@ func (u *UnleashProxyHandler) ListToggles() http.Handler {
 
 		// Если статус отличен от успешного - возвращаем ошибку
 		if err != nil {
-			u.logger.Debug("Status code of response (unleash) = " + strconv.Itoa(resp.StatusCode))
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				u.logger.Sugar().Error("Failed to get features: %s", err.Error())
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-				return
-			}
-
-			u.logger.Sugar().Error("Failed to get features:, body: %s", string(body))
+			u.logger.Debug("Error from unleash: " + err.Error())
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 			return

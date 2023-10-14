@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
 
@@ -249,5 +251,217 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 			}
 		}
 		m.logger.Sugar().Infof("New user was created with ID: ", userResp.ID)
+	})
+}
+
+// DeleteUser godoc
+// @Version 1.0
+// @title CreateUser
+// @Summary Orchestrate deactivation of a  user with services auth, user and account
+// @Description Delete(deactivate) a  user using the provided details
+// @Tags mgmt
+// @Accept  json
+// @Produce  json
+// @param id path string true "User ID"
+// @Success 200 {string} string "The user has been deactivated"
+// @Error 404 {string} "Page not found"
+// @Failure 500 {string} string "Internal server error"
+// @Router /mgmt/{id} [delete]
+// @Security BasicAuth
+//
+//nolint:gocognit
+func (m *MgmtHandler) DeleteUser() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		userID, err := uuid.Parse(vars["id"])
+		if err != nil {
+			m.logger.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Couldn't parse ID:" + err.Error()))
+			if err != nil {
+				m.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		// Часть 1. Получаем список счетов пользователя
+		client := &http.Client{
+			Timeout: time.Second * 3,
+		}
+		authHost := os.Getenv("AUTH_HOST")
+		accountHost := os.Getenv("ACCOUNT_HOST")
+		verifyHost := os.Getenv("AUTH_VERIFY_HOST")
+
+		if authHost == "" || accountHost == "" || verifyHost == "" {
+			m.logger.Error(
+				"sysvar AUTH_HOST or ACCOUNT_HOST or AUTH_VERIFY_HOST," +
+					"is not enabled,URL to Auth and Account services cannot be found",
+			)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+		m.logger.Error("Sysvars 're OK")
+		accountListRequest, err := http.NewRequestWithContext(
+			r.Context(),
+			http.MethodGet,
+			accountHost+"/"+userID.String()+"/accounts", nil,
+		)
+		if err != nil {
+			m.logger.Sugar().Error("Failed to create new HTTP request:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+
+		accountListRequest.Header.Set("Authorization", r.Header.Get("Authorization"))
+		accountListRequest.Header.Set("Content-Type", "application/json")
+
+		resp, err := client.Do(accountListRequest)
+		if err != nil {
+			m.logger.Sugar().Error("Failed to send HTTP request:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+
+		// Если статус отличен от успешного - возвращаем ошибку
+		if resp.StatusCode != http.StatusOK {
+			m.logger.Debug("Status code of response (account) = " + strconv.Itoa(resp.StatusCode))
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				m.logger.Sugar().Error("Failed to get account list: %s", err.Error())
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+				return
+			}
+
+			m.logger.Sugar().Error("Failed to get account list, body: %s", string(body))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+
+		m.logger.Debug("Список счетов получен")
+
+		// Чтение ответа
+		type AccountListResponse struct {
+			ID           string    `json:"id"`
+			UserID       string    `json:"user_id"`
+			Account      string    `json:"account"`
+			Currency     string    `json:"currency"`
+			Name         string    `json:"name"`
+			Amount       float64   `json:"amount"`
+			InterestRate float64   `json:"interest_rate"`
+			IsActive     bool      `json:"is_active"`
+			CreatedAt    time.Time `json:"created_at"`
+			UpdatedAt    time.Time `json:"updated_at"`
+		}
+
+		var accounts []AccountListResponse
+
+		body, _ := io.ReadAll(resp.Body)
+
+		if err := json.Unmarshal(body, &accounts); err != nil {
+			m.logger.Error("Failed to get unmarshall account list, body:")
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+		resp.Body.Close()
+
+		// Часть 2. Закрываем все счета клиента
+
+		var host string
+		for _, account := range accounts {
+			host = accountHost + "/" + account.UserID + "/accounts/" + account.ID
+			accountDeleteRequest, err := http.NewRequestWithContext(
+				r.Context(),
+				http.MethodDelete,
+				host, nil,
+			)
+			if err != nil {
+				m.logger.Sugar().Error("Failed to create new HTTP request for deleting account:", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+				return
+			}
+
+			accountDeleteRequest.Header.Set("Authorization", r.Header.Get("Authorization"))
+			accountDeleteRequest.Header.Set("Content-Type", "application/json")
+
+			// делаем запрос в account сервис
+			resp, err := client.Do(accountDeleteRequest)
+			if err != nil {
+				m.logger.Sugar().Error("Failed to send HTTP request to delete account:", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+				return
+			}
+
+			// Если статус отличен от успешного - возвращаем ошибку
+			if resp.StatusCode != http.StatusOK {
+				m.logger.Debug("Status code of response (account) = " + strconv.Itoa(resp.StatusCode))
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					m.logger.Sugar().Error("Failed to delete account: %s", err.Error())
+					http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+					return
+				}
+
+				m.logger.Sugar().Error("Failed to delete account, body: %s", string(body))
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+				return
+			}
+			m.logger.Debug("Счет удален: " + account.ID)
+			resp.Body.Close()
+		}
+
+		// Часть 3,удаляем самого клиента
+		userDeleteRequest, err := http.NewRequestWithContext(
+			r.Context(),
+			http.MethodDelete,
+			authHost+"/"+userID.String(), nil,
+		)
+		if err != nil {
+			m.logger.Sugar().Error("Failed to create new HTTP request:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+
+		userDeleteRequest.Header.Set("Authorization", r.Header.Get("Authorization"))
+		userDeleteRequest.Header.Set("Content-Type", "application/json")
+
+		// делаем запрос в auth сервис
+		resp, err = client.Do(userDeleteRequest)
+		if err != nil {
+			m.logger.Sugar().Error("Failed to send HTTP request:", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+
+		// Если статус отличен от успешного - возвращаем ошибку
+		if resp.StatusCode != http.StatusOK {
+			m.logger.Debug("Status code of response (auth) = " + strconv.Itoa(resp.StatusCode))
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				m.logger.Sugar().Error("Failed to delete user: %s", err.Error())
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+				return
+			}
+
+			m.logger.Sugar().Error("Failed to delete user, body: %s", string(body))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
+		}
+		resp.Body.Close()
+		m.logger.Debug("User was deleted: " + userID.String())
 	})
 }

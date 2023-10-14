@@ -24,3 +24,16 @@ export interface IAccount {
     interestRate: number;
     userID: UUID | null;
 }
+
+export interface IFeatureEnvironment  {
+    name: string;
+    enabled: boolean;
+    type: string;
+  };
+  
+export  interface IFeature  {
+    name: string;
+    description: string;
+    environments: IFeatureEnvironment[];
+  };
+  

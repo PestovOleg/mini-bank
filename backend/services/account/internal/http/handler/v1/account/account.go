@@ -385,7 +385,7 @@ func (a *AccountHandler) DeleteAccount() http.Handler {
 // @tags account-minibank
 // @accept json
 // @produce json
-// @param id path string true "User ID"
+// @param userid path string true "User ID"
 // @success 200 {array} mapper.Account "Successfully retrieved account details"
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Accounts not found"
@@ -422,8 +422,10 @@ func (a *AccountHandler) ListAccountsByUserID() http.Handler {
 		if errors.Is(err, account.ErrNotFound) || data == nil {
 			a.logger.Error("Accounts not found")
 			w.WriteHeader(http.StatusOK)
-			_, err = w.Write([]byte(err.Error()))
-			if err != nil {
+
+			emptyJSON := make(map[string]interface{})
+
+			if err := json.NewEncoder(w).Encode(emptyJSON); err != nil {
 				a.logger.Error(err.Error())
 			}
 

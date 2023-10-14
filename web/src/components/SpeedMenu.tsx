@@ -9,7 +9,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import PrintIcon from '@mui/icons-material/Print';
 import ShareIcon from '@mui/icons-material/Share';
 import styled from '@emotion/styled';
-import {   makeStyles, useTheme } from '@mui/material/styles';
+import { makeStyles, useTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
 import PaymentIcon from '@mui/icons-material/Payment';
 import AddCardIcon from '@mui/icons-material/AddCard';
@@ -18,6 +18,8 @@ import PaymentDialog from './Payment';
 import TopupDialog from './TopUp';
 import '../styles.css';
 import RedeemIcon from '@mui/icons-material/Redeem';
+import store from '../store/store';
+import { Height } from '@mui/icons-material';
 
 
 
@@ -56,16 +58,46 @@ export default function SpeedDialMenu() {
     const handleTopupDialogClose = () => {
         setTopupOpen(false);
     };
-    
-    const actions = [
-        { icon: <AddCardIcon />, name: 'Открыть счет', action: handleNewAccountDialogOpen },
-        { icon: <RedeemIcon />, name: 'Переводы', action: handlePaymentDialogOpen },
-        { icon: <PaymentIcon />, name: 'Пополнение', action: handleTopupDialogOpen },
-    ];
+
+    const createAccountToggle = store.toggleStore.getFeature("CreateAccountToggle")
+    const topupToggle = store.toggleStore.getFeature("TopUpToggle")
+    const WithdrawToggle = store.toggleStore.getFeature("WithdrawToggle")
+
+    const createAccountToggleNumber = createAccountToggle ? 1 : 0
+    const topupToggleNumber = topupToggle ? 1 : 0
+    const WithdrawToggleNumber = WithdrawToggle ? 1 : 0
+
+    const boxHeight = () => {
+        const countToggles = createAccountToggleNumber + topupToggleNumber + WithdrawToggleNumber
+        if (countToggles === 3) { return '275px' }
+        else if (countToggles === 2) { return '220px' }
+        else if (countToggles === 1) { return '160px' }
+        else return '105px'
+    }
+
+    interface Action {
+        icon: JSX.Element;
+        name: string;
+        action: () => void;
+    }
+    const actions: Action[] = [];
+
+    if (createAccountToggle) {
+        actions.push({ icon: <AddCardIcon />, name: 'Открыть счет', action: handleNewAccountDialogOpen },)
+    } 
+
+    if (topupToggle) {
+        actions.push({ icon: <PaymentIcon />, name: 'Пополнение', action: handleTopupDialogOpen },)
+    }
+
+    if (WithdrawToggle) {
+        actions.push({ icon: <RedeemIcon />, name: 'Переводы', action: handlePaymentDialogOpen },)
+    }
+
     return (
-        
+
         <Box sx={{
-            height: 275,
+            height: boxHeight(),
             position: 'absolute',
 
             bottom: '0px', // position it at the bottom of the AppBar        
@@ -74,7 +106,7 @@ export default function SpeedDialMenu() {
             transform: 'translateZ(0px)',
         }}>
             <Backdrop open={open} invisible={true} />
-           
+
             <SpeedDial
                 ariaLabel="SpeedDial tooltip example"
                 sx={{ position: 'relative' }}
@@ -102,7 +134,7 @@ export default function SpeedDialMenu() {
                             sx: {
                                 bgcolor: 'main.main',
                                 '&:hover': {
-                                    bgcolor: 'secondary.main',
+                                    bgcolor: 'gray.main',
                                 }
                             }
                         }}

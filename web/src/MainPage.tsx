@@ -1,31 +1,18 @@
 import { useEffect, useState } from "react";
 import store from "./store/store";
-import { styled } from "@mui/material/styles";
 import { observer } from "mobx-react-lite";
 import {
   AppBar,
   Avatar,
-  BottomNavigation,
   BottomNavigationAction,
   Box,
-  Button,
   Card,
-  CardActions,
   CardContent,
   CardHeader,
-  CardMedia,
   Container,
   CssBaseline,
   Divider,
-  Grid,
   IconButton,
-  Link,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Paper,
-  TextField,
   Toolbar,
   Tooltip,
   Typography,
@@ -37,9 +24,6 @@ import EmailIcon from "@mui/icons-material/Email";
 import Account from "./components/Account";
 import ModeSharpIcon from "@mui/icons-material/ModeSharp";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import Fab from "@mui/material/Fab";
-import NewAccountDialog from "./components/NewAccount";
-import PaymentDialog from "./components/Payment";
 import SpeedDialMenu from "./components/SpeedMenu";
 import ChangeUserDetailsDialog from "./components/ChangeUserDetails";
 import React from "react";
@@ -55,21 +39,13 @@ function MainPage() {
   };
 
   useEffect(() => {
-    store.userStore.getUser().finally(() => setIsLoading(false)); // измените эту строку
+    store.userStore.getUser().finally(() => setIsLoading(false));
     store.accountStore.getList().finally(() => setIsLoading(false));
   }, []);
 
   const user = store.userStore.User;
   const accountItems = store.accountStore.Accounts;
   const currentDate = () => new Date();
-  const StyledFab = styled(Fab)({
-    position: "absolute",
-    zIndex: 1,
-    top: -30,
-    left: 0,
-    right: 0,
-    margin: "0 auto",
-  });
 
   function formatPhone(phoneNumber: string) {
     return phoneNumber.replace(
@@ -78,8 +54,82 @@ function MainPage() {
     );
   }
 
+  const accountList = () => {
+    if ((store.toggleStore.getFeature("ListAccountsToggle")) && (accountItems.length>0)) {
+      return (
+        <Box sx={{ width: "100%" }}>
+          <Account title="" accounts={accountItems} />
+        </Box>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const userDetails = () => {
+    if (store.toggleStore.getFeature("GetUserToggle")) {
+      return (
+        <CardContent sx={{ mt: -2, mb: -2, width: "100%" }}>
+          <Divider></Divider>
+          <Box display="flex" alignItems="center" sx={{ mr: 1 }}>
+            <IconButton aria-label="settings" sx={{ ml: 1 }}>
+              <PhoneIcon />
+            </IconButton>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ marginLeft: 3, color: "black" }}
+            >
+              {user && user.phone
+                ? formatPhone(user.phone)
+                : "No phone available"}
+            </Typography>
+          </Box>
+          <Box display="flex" alignItems="center">
+            <IconButton aria-label="settings" sx={{ ml: 1 }}>
+              <EmailIcon />
+            </IconButton>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ marginLeft: 3, color: "black" }}
+            >
+              {user && user.email ? user.email : "No email available"}
+            </Typography>
+          </Box>
+        </CardContent>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const editUserDetails = () => {
+    if (store.toggleStore.getFeature("UpdateUserToggle")) {
+      return (
+        <Tooltip title="Изменить контактные данные">
+          <IconButton aria-label="settings" sx={{ m: 1 }} onClick={() => { openChangeUserDetailsDialog() }}>
+            <ModeSharpIcon />
+          </IconButton>
+        </Tooltip>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const deleteUser =()=>{
+    if (store.toggleStore.getFeature("DeleteUserToggle")) {
+      return (
+        <DeleteUserDialog />
+      );
+    } else {
+      return null;
+    }
+  };
+  
   if (isLoading) {
-    return <div>Loading...</div>; // или другой компонент "загрузка"
+    return <div>Loading...</div>;
   }
   return (
     <Container className="mainPage" component="main" maxWidth="xs">
@@ -132,12 +182,10 @@ function MainPage() {
               </Avatar>
             }
             action={
-              <Box><Tooltip title="Изменить контактные данные">
-                <IconButton aria-label="settings" sx={{ m: 1 }} onClick={() => { openChangeUserDetailsDialog() }}>
-                  <ModeSharpIcon />
-                </IconButton>
-              </Tooltip>
-                <DeleteUserDialog /></Box>
+
+              <Box>{editUserDetails()}
+          {deleteUser()}</Box>
+              
 
             }
             title={
@@ -148,40 +196,10 @@ function MainPage() {
             titleTypographyProps={{ variant: "h6" }}
             subheader={currentDate().toLocaleDateString()}
           />
-          <CardContent sx={{ mt: -2, mb: -2, width: "100%" }}>
-            <Divider></Divider>
-            <Box display="flex" alignItems="center" sx={{ mr: 1 }}>
-              <IconButton aria-label="settings" sx={{ ml: 1 }}>
-                <PhoneIcon />
-              </IconButton>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ marginLeft: 3, color: "black" }}
-              >
-                {user && user.phone
-                  ? formatPhone(user.phone)
-                  : "No phone available"}
-              </Typography>
-            </Box>
-            <Box display="flex" alignItems="center">
-              <IconButton aria-label="settings" sx={{ ml: 1 }}>
-                <EmailIcon />
-              </IconButton>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ marginLeft: 3, color: "black" }}
-              >
-                {user && user.email ? user.email : "No email available"}
-              </Typography>
-            </Box>
-          </CardContent>
+          {userDetails()}
         </Card>
 
-        <Box sx={{ width: "100%" }}>
-          <Account title="" accounts={accountItems} />
-        </Box>
+        {accountList()}
 
         <Box
           sx={{
