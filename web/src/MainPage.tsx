@@ -1,70 +1,51 @@
 import { useEffect, useState } from "react";
 import store from "./store/store";
-import { styled } from "@mui/material/styles";
 import { observer } from "mobx-react-lite";
 import {
   AppBar,
   Avatar,
-  BottomNavigation,
   BottomNavigationAction,
   Box,
-  Button,
   Card,
-  CardActions,
   CardContent,
   CardHeader,
-  CardMedia,
   Container,
   CssBaseline,
   Divider,
-  Grid,
   IconButton,
-  Link,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Paper,
-  TextField,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import { blue, deepPurple, red } from "@mui/material/colors";
-import { ExpandMore } from "@mui/icons-material";
+import { blue } from "@mui/material/colors";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
-import RestoreIcon from "@mui/icons-material/Restore";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ArchiveIcon from "@mui/icons-material/Archive";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FolderIcon from "@mui/icons-material/Folder";
 import Account from "./components/Account";
 import ModeSharpIcon from "@mui/icons-material/ModeSharp";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import Fab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
+import SpeedDialMenu from "./components/SpeedMenu";
+import ChangeUserDetailsDialog from "./components/ChangeUserDetails";
+import React from "react";
+import LogoutIcon from '@mui/icons-material/Logout';
+import DeleteUserDialog from "./components/DeleteUser";
 
 function MainPage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [changeUserDetailsDialogOpen, setChangeUserDetailsDialogOpen] = React.useState(false);
+
+  const openChangeUserDetailsDialog = () => {
+    setChangeUserDetailsDialogOpen(true);
+  };
 
   useEffect(() => {
-    // Сделайте функцию getUser асинхронной или вызовите другую асинхронную функцию
-    store.userStore.getUser().finally(() => setIsLoading(false)); // измените эту строку
+    store.userStore.getUser().finally(() => setIsLoading(false));
     store.accountStore.getList().finally(() => setIsLoading(false));
   }, []);
 
   const user = store.userStore.User;
   const accountItems = store.accountStore.Accounts;
   const currentDate = () => new Date();
-  const StyledFab = styled(Fab)({
-    position: "absolute",
-    zIndex: 1,
-    top: -30,
-    left: 0,
-    right: 0,
-    margin: "0 auto",
-  });
 
   function formatPhone(phoneNumber: string) {
     return phoneNumber.replace(
@@ -73,8 +54,82 @@ function MainPage() {
     );
   }
 
+  const accountList = () => {
+    if ((store.toggleStore.getFeature("ListAccountsToggle")) && (accountItems.length>0)) {
+      return (
+        <Box sx={{ width: "100%" }}>
+          <Account title="" accounts={accountItems} />
+        </Box>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const userDetails = () => {
+    if (store.toggleStore.getFeature("GetUserToggle")) {
+      return (
+        <CardContent sx={{ mt: -2, mb: -2, width: "100%" }}>
+          <Divider></Divider>
+          <Box display="flex" alignItems="center" sx={{ mr: 1 }}>
+            <IconButton aria-label="settings" sx={{ ml: 1 }}>
+              <PhoneIcon />
+            </IconButton>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ marginLeft: 3, color: "black" }}
+            >
+              {user && user.phone
+                ? formatPhone(user.phone)
+                : "No phone available"}
+            </Typography>
+          </Box>
+          <Box display="flex" alignItems="center">
+            <IconButton aria-label="settings" sx={{ ml: 1 }}>
+              <EmailIcon />
+            </IconButton>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ marginLeft: 3, color: "black" }}
+            >
+              {user && user.email ? user.email : "No email available"}
+            </Typography>
+          </Box>
+        </CardContent>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const editUserDetails = () => {
+    if (store.toggleStore.getFeature("UpdateUserToggle")) {
+      return (
+        <Tooltip title="Изменить контактные данные">
+          <IconButton aria-label="settings" sx={{ m: 1 }} onClick={() => { openChangeUserDetailsDialog() }}>
+            <ModeSharpIcon />
+          </IconButton>
+        </Tooltip>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const deleteUser =()=>{
+    if (store.toggleStore.getFeature("DeleteUserToggle")) {
+      return (
+        <DeleteUserDialog />
+      );
+    } else {
+      return null;
+    }
+  };
+  
   if (isLoading) {
-    return <div>Loading...</div>; // или другой компонент "загрузка"
+    return <div>Loading...</div>;
   }
   return (
     <Container className="mainPage" component="main" maxWidth="xs">
@@ -104,6 +159,17 @@ function MainPage() {
             >
               МИНИБАНК
             </Typography>
+            <Tooltip title="Выход">
+              <IconButton
+                size="large"
+                color="inherit"
+                aria-label="menu"
+                sx={{ ml: 5 }}
+                onClick={() => { store.userStore.logout() }}
+              >
+                <LogoutIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
           </Toolbar>
         </AppBar>
         <Card sx={{ mt: 1, width: "100%" }}>
@@ -116,9 +182,11 @@ function MainPage() {
               </Avatar>
             }
             action={
-              <IconButton aria-label="settings" sx={{ m: 1 }}>
-                <ModeSharpIcon />
-              </IconButton>
+
+              <Box>{editUserDetails()}
+          {deleteUser()}</Box>
+              
+
             }
             title={
               user && user.name && user.lastName
@@ -128,40 +196,10 @@ function MainPage() {
             titleTypographyProps={{ variant: "h6" }}
             subheader={currentDate().toLocaleDateString()}
           />
-          <CardContent sx={{ mt: -2, mb: -2, width: "100%" }}>
-            <Divider></Divider>
-            <Box display="flex" alignItems="center" sx={{ mr: 1 }}>
-              <IconButton aria-label="settings" sx={{ ml: 1 }}>
-                <PhoneIcon />
-              </IconButton>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ marginLeft: 3, color: "black" }}
-              >
-                {user && user.phone
-                  ? formatPhone(user.phone)
-                  : "No phone available"}
-              </Typography>
-            </Box>
-            <Box display="flex" alignItems="center">
-              <IconButton aria-label="settings" sx={{ ml: 1 }}>
-                <EmailIcon />
-              </IconButton>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ marginLeft: 3, color: "black" }}
-              >
-                {user && user.email ? user.email : "No email available"}
-              </Typography>
-            </Box>
-          </CardContent>
+          {userDetails()}
         </Card>
 
-        <Box sx={{ width: "100%" }}>
-          <Account title="" accounts={accountItems} />
-        </Box>
+        {accountList()}
 
         <Box
           sx={{
@@ -175,31 +213,41 @@ function MainPage() {
         >
           <Container maxWidth="xs">
             <AppBar
-              position="static" // Changed to static because it's already inside a fixed position Box
+              position="static"
               color="primary"
             >
-              <Toolbar>
-                <IconButton color="inherit" aria-label="open drawer">
-                  <BottomNavigationAction
-                    component="a"
-                    href="https://github.com/PestovOleg/mini-bank"
-                    label="Github"
-                    icon={<GitHubIcon />}
-                  />
-                </IconButton>
-                <Typography variant="caption" sx={{ fontSize: 14, ml: -3 }}>
-                  &copy; by Pestov
-                </Typography>
-                <StyledFab color="secondary" aria-label="add">
-                  <AddIcon />
-                </StyledFab>
+              <Toolbar sx={{ justifyContent: 'center' }}>
+
+
+                <SpeedDialMenu />
                 <Box sx={{ flexGrow: 1 }} />
               </Toolbar>
+
+              <Box sx={{ position: 'absolute' }}>
+                <Box>
+                  <IconButton color="inherit" aria-label="open drawer">
+                    <BottomNavigationAction
+                      component="a"
+                      href="https://github.com/PestovOleg/mini-bank"
+                      label="Github"
+                      icon={<GitHubIcon />}
+                    />
+                  </IconButton>
+                  <Typography variant="caption" sx={{ fontSize: 12, ml: -3 }}>
+                    &copy; by Pestov Oleg
+                  </Typography>
+                </Box>
+              </Box>
             </AppBar>
+
           </Container>
         </Box>
 
       </Box>
+      <ChangeUserDetailsDialog
+        open={changeUserDetailsDialogOpen}
+        setOpen={setChangeUserDetailsDialogOpen}
+      />
     </Container>
   );
 }

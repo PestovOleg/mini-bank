@@ -1,0 +1,92 @@
+# # Options for analysis running.
+run:
+  skip-files:
+    - pkg/logger/logger.go
+# output:
+#   # See the dedicated "output" documentation section.
+#   option: value
+# # All available settings of specific linters.
+linters-settings:
+  gomoddirectives:
+    # Allow local `replace` directives. Default is false.
+    replace-local: true
+    # List of allowed `replace` directives. Default is empty.
+    replace-allow-list:
+      - launchpad.net/gocheck
+    # Allow to not explain why the version has been retracted in the `retract` directives. Default is false.
+    retract-allow-no-explanation: false
+    # Forbid the use of the `exclude` directives. Default is false.
+    exclude-forbidden: false
+  tagliatelle:
+    # Check the struck tag name case.
+    case:
+      # Use the struct field name to check the name of the struct tag.
+      # Default: false
+      use-field-name: true
+      rules:
+        # Any struct tag type can be used.
+        # Support string case: `camel`, `pascal`, `kebab`, `snake`, `upperSnake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`, `header`.
+        json: camel
+        yaml: snake
+        xml: camel
+  depguard:
+    rules:
+      main:
+        files:
+          - $all
+          - "!$test"
+        allow:
+          - $gostd
+          - github.com/ # all github packages
+      test:
+        files:
+          - $all
+        allow:
+          - $gostd
+          - github.com/
+linters:
+  # See the dedicated "linters" documentation section.
+  enable-all: true
+  disable:
+    - exhaustivestruct
+    - forbidigo
+    - gomnd
+    - godot
+    - exhaustruct
+    - gofmt
+    - gofumpt
+    - godox
+    - varnamelen
+    - revive
+    - paralleltest
+    - testpackage
+    - tagalign
+    - wrapcheck
+    - tagliatelle
+    - cyclop
+    - funlen
+    - gosec
+    - maintidx
+    - nilnil #включить
+    # are deprecated by authors
+    - maligned
+    - ifshort
+    - golint
+    - scopelint
+    - interfacer
+    - varcheck
+    - deadcode
+    - nosnakecase
+    # are disabled because of generics
+    - contextcheck
+    - rowserrcheck
+    - sqlclosecheck
+    - structcheck
+    - wastedassign
+
+# issues:
+#   # See the dedicated "issues" documentation section.
+#   #option: value
+# severity:
+#   # See the dedicated "severity" documentation section.
+#   option: value

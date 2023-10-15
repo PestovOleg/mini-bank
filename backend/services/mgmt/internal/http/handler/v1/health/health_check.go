@@ -22,8 +22,8 @@ func NewHealthCheckHandler() *healthCheckHandler {
 // @summary      Check the health status of the server
 // @description  Returns the server's health status.
 // @tags         mgmt
-// @success 200 {string} string "User Service is healthy - Hello from Health Check Handler Endpoint" "StatusOK"
-// @example 200 {string} "User Service is healthy - Hello from Health Check Handler Endpoint"
+// @success 200 {string} string "Mgmt Service is healthy - Hello from Health Check Handler Endpoint" "StatusOK"
+// @example 200 {string} "Mgmt Service is healthy - Hello from Health Check Handler Endpoint"
 // @failure 500 {string} string "StatusInternalError"
 // @router       /mgmt-minibank-health [get]
 func (h *healthCheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

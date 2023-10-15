@@ -24,12 +24,14 @@ else
 fi
 
 echo "Removing old container if it hasn't been removed..."
-docker compose rm -f -s -v $NEXT_SERVICE 2>&1 | grep -v 'variable is not set'
+docker compose rm -f -s -v $NEXT_SERVICE 
+echo "Waiting 3 sec"
+sleep 3
 printf "%s\n" "Done"
 
 if [ "$MIGRATE" == "YES" ]; then
   echo "Migrating database ..."
-  docker compose run -d migrate 2>&1 | grep -v 'variable is not set'
+  docker compose run -d migrate 
   printf "%s\n" "Done...waiting 3 sec"
   sleep 3
 else 
@@ -37,7 +39,7 @@ else
 fi
 
 echo "Starting $NEXT_SERVICE"
-docker compose up -d $NEXT_SERVICE 2>&1 | grep -v 'variable is not set'
+docker compose up -d $NEXT_SERVICE 
 echo "Waiting 3 sec"
 sleep 3
 

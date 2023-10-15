@@ -10,6 +10,7 @@ import (
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
 	"github.com/PestovOleg/mini-bank/backend/services/user/domain/user"
 	"github.com/PestovOleg/mini-bank/backend/services/user/internal/http/mapper"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -30,21 +31,24 @@ func NewUserHandler(s *user.Service) *UserHandler {
 // UserCreateRequest represents the request payload for user creation.
 // swagger:model
 type UserCreateRequest struct {
-	ID         string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
-	Email      string `json:"email" example:"Ivanych@gmail.com"`
-	Phone      string `json:"phone" example:"+7(495)999-99-99"`
-	Birthday   string `json:"birthday" example:"02.01.2006"`
-	Name       string `json:"name" example:"Ivan"`
-	LastName   string `json:"last_name" example:"Ivanov"`
-	Patronymic string `json:"patronymic" example:"Ivanych"`
+	ID         string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" validate:"required,uuid"`
+	Email      string `json:"email" example:"Ivanych@gmail.com" validate:"required,email"`
+	Phone      string `json:"phone" example:"+7(495)999-99-99" validate:"required"`
+	Birthday   string `json:"birthday" example:"02.01.2006" validate:"required"`
+	Name       string `json:"name" example:"Ivan" validate:"required"`
+	LastName   string `json:"last_name" example:"Ivanov" validate:"required"`
+	Patronymic string `json:"patronymic" example:"Ivanych" validate:"required"`
 }
 
 // UserUpdateRequest represents the request payload for user update.
 // swagger:model
 type UserUpdateRequest struct {
-	Email string `json:"email" example:"Ivanych@gmail.com"`
+	Email string `json:"email" example:"Ivanych@gmail.com" validate:"required,email"`
 	Phone string `json:"phone" example:"+7(495)999-99-99"`
 }
+
+//nolint:gochecknoglobals
+var validate *validator.Validate
 
 // CreateUser godoc
 // @Version 1.0
@@ -59,6 +63,8 @@ type UserUpdateRequest struct {
 // @Error 404 {string} "Page not found"
 // @Failure 500 {string} string "Internal server error"
 // @Router /users [post]
+//
+//nolint:gocognit
 func (u *UserHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input UserCreateRequest
@@ -73,6 +79,35 @@ func (u *UserHandler) CreateUser() http.Handler {
 
 			return
 		}
+
+		// валидация входных данных
+		validate = validator.New(validator.WithRequiredStructEnabled())
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				u.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					u.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				u.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+			if err != nil {
+				u.logger.Error(err.Error())
+			}
+
+			return
+		}
+
 		birthday, err := time.Parse("02.01.2006", input.Birthday)
 		if err != nil {
 			u.logger.Error(err.Error())
@@ -244,16 +279,41 @@ func (u *UserHandler) UpdateUser() http.Handler {
 
 			return
 		}
-		var input struct {
-			Email string `json:"email"`
-			Phone string `json:"phone"`
-		}
+		var input UserUpdateRequest
 
 		err = json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			u.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Couldn't decode request"))
+			if err != nil {
+				u.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		// валидация входных данных
+		validate = validator.New(validator.WithRequiredStructEnabled())
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				u.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					u.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				u.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
 			if err != nil {
 				u.logger.Error(err.Error())
 			}

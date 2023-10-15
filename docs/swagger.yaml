@@ -3,11 +3,17 @@ definitions:
   account.AccountCreateRequest:
     properties:
       currency:
+        enum:
+        - "810"
+        - "840"
         example: "810"
         type: string
       name:
         example: Удачный
         type: string
+    required:
+    - currency
+    - name
     type: object
   account.AccountUpdateRequest:
     properties:
@@ -17,12 +23,16 @@ definitions:
       name:
         example: Удачный
         type: string
+    required:
+    - name
     type: object
   account.ChangeBalanceRequest:
     properties:
       amount:
         example: 9999.99
         type: number
+    required:
+    - amount
     type: object
   backend_services_auth_internal_http_handler_v1_auth.AuthCreateRequest:
     properties:
@@ -32,6 +42,9 @@ definitions:
       username:
         example: Ivanec
         type: string
+    required:
+    - password
+    - username
     type: object
   mapper.Account:
     properties:
@@ -65,6 +78,37 @@ definitions:
       user_id:
         example: fdee7aae-f79f-4653-8a16-9207e6805b93
         type: string
+    type: object
+  mapper.ToggleList:
+    properties:
+      features:
+        items:
+          properties:
+            description:
+              example: Create User Toggle
+              type: string
+            environments:
+              items:
+                properties:
+                  enabled:
+                    example: true
+                    type: boolean
+                  name:
+                    example: development
+                    type: string
+                  type:
+                    example: development
+                    type: string
+                type: object
+              type: array
+            name:
+              example: CreateUserToggle
+              type: string
+          type: object
+        type: array
+      version:
+        example: 2
+        type: integer
     type: object
   mapper.User:
     properties:
@@ -122,6 +166,15 @@ definitions:
       username:
         example: Ivanec
         type: string
+    required:
+    - birthday
+    - email
+    - last_name
+    - name
+    - password
+    - patronymic
+    - phone
+    - username
     type: object
   user.UserCreateRequest:
     properties:
@@ -146,6 +199,14 @@ definitions:
       phone:
         example: +7(495)999-99-99
         type: string
+    required:
+    - birthday
+    - email
+    - id
+    - last_name
+    - name
+    - patronymic
+    - phone
     type: object
   user.UserUpdateRequest:
     properties:
@@ -155,6 +216,8 @@ definitions:
       phone:
         example: +7(495)999-99-99
         type: string
+    required:
+    - email
     type: object
 externalDocs:
   description: OpenAPI
@@ -343,7 +406,7 @@ paths:
       description: Returns the server's health status.
       responses:
         "200":
-          description: User Service is healthy - Hello from Health Check Handler Endpoint"
+          description: Mgmt Service is healthy - Hello from Health Check Handler Endpoint"
             "StatusOK
           schema:
             type: string
@@ -354,6 +417,68 @@ paths:
       summary: Check the health status of the server
       tags:
       - mgmt
+  /mgmt/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete(deactivate) a  user using the provided details
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The user has been deactivated
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Orchestrate deactivation of a  user with services auth, user and account
+      tags:
+      - mgmt
+  /uproxy:
+    get:
+      consumes:
+      - application/json
+      description: Unleash Proxy for Web
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved feature toggles
+          schema:
+            $ref: '#/definitions/mapper.ToggleList'
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Unleash Proxy for Web
+      tags:
+      - uProxy
+  /uproxy-minibank-health:
+    get:
+      description: Returns the server's health status.
+      responses:
+        "200":
+          description: Unleash Proxy Service is healthy - Hello from Health Check
+            Handler Endpoint" "StatusOK
+          schema:
+            type: string
+        "500":
+          description: StatusInternalError
+          schema:
+            type: string
+      summary: Check the health status of the server
+      tags:
+      - uProxy
   /user-minibank-health:
     get:
       description: Returns the server's health status.
@@ -471,7 +596,7 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: id
+        name: userid
         required: true
         type: string
       produces:

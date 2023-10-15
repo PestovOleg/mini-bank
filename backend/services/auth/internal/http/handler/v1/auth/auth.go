@@ -3,9 +3,11 @@ package auth
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
 	"github.com/PestovOleg/mini-bank/backend/services/auth/domain/auth"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -26,22 +28,25 @@ func NewAuthHandler(s *auth.Service) *AuthHandler {
 // AuthCreateRequest represents the request payload for authentication record creation.
 // swagger:model
 type AuthCreateRequest struct {
-	Username string `json:"username" example:"Ivanec"`
-	Password string `json:"password" example:"mypass"`
+	Username string `json:"username" example:"Ivanec" validate:"required,latinusername"`
+	Password string `json:"password" example:"mypass" validate:"required"`
 }
 
 // AuthWithCredentials represents the request payload for authentication with credentials.
 // swagger:model
 type AuthWithCredentials struct {
-	Username string `json:"username" example:"username"`
-	Password string `json:"password" example:"password"`
+	Username string `json:"username" example:"username" validate:"required,latinusername"`
+	Password string `json:"password" example:"password" validate:"required"`
 }
 
 // AuthWithToken represents the request payload for Basic authorization .
 // swagger:model
 type AuthWithToken struct {
-	Token string `json:"token" example:"Basic dXNlcjE6cGFzc3dvcmQx"`
+	Token string `json:"token" example:"Basic dXNlcjE6cGFzc3dvcmQx" validate:"required"`
 }
+
+//nolint:gochecknoglobals
+var validate *validator.Validate
 
 // CreateAuth godoc
 // @Version 1.0
@@ -64,6 +69,40 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Unable to decode request"))
+			if err != nil {
+				a.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		// валидация входных данных
+		validate = validator.New()
+
+		validate.RegisterValidation("latinusername", func(fl validator.FieldLevel) bool { //nolint:errcheck
+			// только латинские символы и цифры
+			return regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString(fl.Field().String())
+		})
+
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				a.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					a.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				a.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
 			if err != nil {
 				a.logger.Error(err.Error())
 			}

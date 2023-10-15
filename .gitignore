@@ -18,7 +18,7 @@
 # vendor/
 
 # Go workspace file
-go.work
+go.work.sum
 /build/backend/minibank
 ./backend/build
 /.vscode
@@ -39,3 +39,9 @@ web/node_modules
 web/dist
 frontend/node_modules
 frontend/dist
+
+#nginx
+*.conf.back
+*.error.conf.back
+*.nginx.conf
+unleash.json
