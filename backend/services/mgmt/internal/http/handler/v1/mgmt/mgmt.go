@@ -7,10 +7,12 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -29,15 +31,18 @@ func NewMgmtHandler() *MgmtHandler {
 // UserCreateRequest represents the request payload for user creation.
 // swagger:model
 type MgmtCreateUserRequest struct {
-	Username   string `json:"username" example:"Ivanec"`
-	Password   string `json:"password" example:"mypass"`
-	Email      string `json:"email" example:"Ivanych@gmail.com"`
-	Phone      string `json:"phone" example:"+7(495)999-99-99"`
-	Birthday   string `json:"birthday" example:"02.01.2006"`
-	Name       string `json:"name" example:"Ivan"`
-	LastName   string `json:"last_name" example:"Ivanov"`
-	Patronymic string `json:"patronymic" example:"Ivanych"`
+	Username   string `json:"username" example:"Ivanec" validate:"required,latinusername"`
+	Password   string `json:"password" example:"mypass" validate:"required"`
+	Email      string `json:"email" example:"Ivanych@gmail.com" validate:"required,email"`
+	Phone      string `json:"phone" example:"+7(495)999-99-99" validate:"required"`
+	Birthday   string `json:"birthday" example:"02.01.2006" validate:"required"`
+	Name       string `json:"name" example:"Ivan" validate:"required"`
+	LastName   string `json:"last_name" example:"Ivanov" validate:"required"`
+	Patronymic string `json:"patronymic" example:"Ivanych" validate:"required"`
 }
+
+//nolint:gochecknoglobals
+var validate *validator.Validate
 
 // CreateUser godoc
 // @Version 1.0
@@ -62,6 +67,40 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 			m.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Unable to decode request"))
+			if err != nil {
+				m.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		// валидация входных данных
+		validate = validator.New()
+
+		validate.RegisterValidation("latinusername", func(fl validator.FieldLevel) bool { //nolint:errcheck
+			// только латинские символы и цифры
+			return regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString(fl.Field().String())
+		})
+
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				m.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					m.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				m.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
 			if err != nil {
 				m.logger.Error(err.Error())
 			}

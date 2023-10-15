@@ -108,6 +108,7 @@ export class UserStore {
             const response = await fetch(`${URL}/users/${this.User.id}`, {
                 headers: {
                     Authorization: this.User.token,
+                    'Cache-Control': 'no-cache',
                 },
             });
 

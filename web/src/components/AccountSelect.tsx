@@ -3,8 +3,6 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { IAccount } from '../models/types';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoneySharp';
-import CurrencyRubleOutlined from '@mui/icons-material/CurrencyRubleOutlined';
 import { Avatar } from '@mui/material';
 
 interface AccountSelectProps {

@@ -4,13 +4,6 @@ import Backdrop from '@mui/material/Backdrop';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
-import styled from '@emotion/styled';
-import { makeStyles, useTheme } from '@mui/material/styles';
-import { red } from '@mui/material/colors';
 import PaymentIcon from '@mui/icons-material/Payment';
 import AddCardIcon from '@mui/icons-material/AddCard';
 import NewAccountDialog from './NewAccount';
@@ -19,7 +12,6 @@ import TopupDialog from './TopUp';
 import '../styles.css';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import store from '../store/store';
-import { Height } from '@mui/icons-material';
 
 
 
@@ -37,26 +29,14 @@ export default function SpeedDialMenu() {
         setNewAccountOpen(true);
     };
 
-    const handleNewAccountDialogClose = () => {
-        setNewAccountOpen(false);
-    };
-
     const handlePaymentDialogOpen = () => {
         handleClose();
         setPaymentOpen(true);
     };
 
-    const handlePaymentDialogClose = () => {
-        setPaymentOpen(false);
-    };
-
     const handleTopupDialogOpen = () => {
         handleClose();
         setTopupOpen(true);
-    };
-
-    const handleTopupDialogClose = () => {
-        setTopupOpen(false);
     };
 
     const createAccountToggle = store.toggleStore.getFeature("CreateAccountToggle")

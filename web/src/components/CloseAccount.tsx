@@ -8,22 +8,10 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, InputAdornment, Link, OutlinedInput, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import AlertSuccess from "./AlertSignUp";
-import InputMask from "react-input-mask";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { formatDate } from "../utils/utils"
-import StyledFab from "@mui/material/Fab";
-import PaymentIcon from '@mui/icons-material/Payment';
-import { styled } from "@mui/material/styles";
-import Fab from "@mui/material/Fab";
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import AccountSelect from "./AccountSelect";
 import { IAccount } from "../models/types";
 
@@ -44,7 +32,6 @@ interface CloseAccountDialogProps {
 
 export default function CloseAccountDialog({ open, setOpen,account }: CloseAccountDialogProps) {
     const [showAlert, setShowAlert] = React.useState(false);
-    const [amount, setAmount] = React.useState("");
     const [selectedAccountTo, setSelectedAccountTo] = React.useState<IAccount | null>(null);
 
     let navigate = useNavigate();
@@ -83,7 +70,7 @@ export default function CloseAccountDialog({ open, setOpen,account }: CloseAccou
                     setTimeout(() => {
                         setShowAlert(false);
                         handleClose();
-                    }, 2000);
+                    }, 1000);
     
                 } catch (error) {
                     // Выводим ошибку в консоль

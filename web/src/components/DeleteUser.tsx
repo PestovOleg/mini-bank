@@ -41,7 +41,7 @@ export default function DeleteUserDialog() {
                 setTimeout(() => {
                     setShowAlert(false);
                     handleClose();
-                }, 2000);
+                }, 1000);
 
             } catch (error) {
                 // Выводим ошибку в консоль

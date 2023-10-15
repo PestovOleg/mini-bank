@@ -8,21 +8,11 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, Container, Link, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, Container, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import AlertSuccess from "./AlertSignUp";
-import InputMask from "react-input-mask";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { formatDate } from "../utils/utils"
-import StyledFab from "@mui/material/Fab";
-import AddIcon from "@mui/icons-material/Add";
-import { styled } from "@mui/material/styles";
-import Fab from "@mui/material/Fab";
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 const Transition = React.forwardRef(function Transition(
@@ -49,9 +39,6 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
     };
 
     let navigate = useNavigate();
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
 
     const handleClose = () => {
         setOpen(false);
@@ -80,7 +67,7 @@ export default function NewAccountDialog({ open, setOpen }:NewAccountDialogProps
             setTimeout(() => {
                 setShowAlert(false);
                 handleClose();                
-            }, 2000);
+            }, 1000);
         }
     };
 

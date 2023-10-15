@@ -25,6 +25,8 @@ fi
 
 echo "Removing old container if it hasn't been removed..."
 docker compose rm -f -s -v $NEXT_SERVICE 
+echo "Waiting 3 sec"
+sleep 3
 printf "%s\n" "Done"
 
 if [ "$MIGRATE" == "YES" ]; then

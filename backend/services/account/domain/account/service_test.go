@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateAccountTableDriven(t *testing.T) {
@@ -51,5 +52,88 @@ func TestCreateAccountTableDriven(t *testing.T) {
 				t.Errorf("got %v and %v, wants %v and %v", acc.ID, err, i.out.a.ID, i.out.err)
 			}
 		})
+	}
+}
+
+func TestGetAccountByID(t *testing.T) {
+	repo := NewMockAccountRepository()
+	service := NewService(repo)
+
+	// Создаем тестовый аккаунт и добавляем его в мок репозитория
+	account, _ := service.CreateAccount(uuid.New(), "810", "test")
+
+	// Вызываем функцию GetAccountByID
+	resultAccount, err := service.GetAccountByID(account.ID)
+
+	// Проверяем, что функция вернула ожидаемый аккаунт и нет ошибок
+	if err != nil {
+		t.Fatalf("Error occurred: %v", err)
+	}
+
+	if resultAccount == nil {
+		t.Fatalf("Expected account not to be nil")
+	}
+
+	if resultAccount != account {
+		t.Fatalf("Expected account ID to match, but got %v", resultAccount.ID)
+	}
+}
+
+func TestGetAccountByIDAndUserID(t *testing.T) {
+	// Создаем мок репозитория
+	repo := NewMockAccountRepository()
+	service := NewService(repo)
+
+	// Создаем тестовый аккаунт и добавляем его в мок репозитория
+	userID := uuid.New()
+	account, _ := service.CreateAccount(userID, "810", "test")
+
+	// Вызываем функцию GetAccountByIDAndUserID с верным userID
+	resultAccount, err := service.GetAccountByIDAndUserID(account.ID, userID)
+
+	// Проверяем, что функция вернула ожидаемый аккаунт и нет ошибок
+	assert.NoError(t, err)
+	assert.Equal(t, account, resultAccount)
+
+	// Вызываем функцию GetAccountByIDAndUserID с неверным userID
+	otherUserID := uuid.New()
+	_, err = service.GetAccountByIDAndUserID(account.ID, otherUserID)
+
+	// Проверяем, что функция вернула ошибку ErrNotFound
+	assert.EqualError(t, err, ErrNotFound.Error())
+}
+
+func TestListAccount(t *testing.T) {
+	// Создаем мок репозитория
+	repo := NewMockAccountRepository()
+	service := NewService(repo)
+	userID := uuid.New()
+
+	account1, _ := service.CreateAccount(userID, "810", "test1")
+	account2, _ := service.CreateAccount(userID, "840", "test2")
+	account3, _ := service.CreateAccount(userID, "810", "test3")
+
+	// Вызываем функцию ListAccount
+	resultAccounts, err := service.ListAccount(userID)
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, []*Account{account1, account2, account3}, resultAccounts)
+}
+
+func TestTopUpAccount(t *testing.T) {
+	repo := NewMockAccountRepository()
+	service := NewService(repo)
+	resultAmount := 100.34
+
+	// Создаем тестовый аккаунт и добавляем его в мок репозитория
+	account, _ := service.CreateAccount(uuid.New(), "810", "test")
+
+	// Вызываем функцию TopUp
+	resultAccount, err := service.TopUp(account.ID, resultAmount)
+	if err != nil {
+		t.Fatalf("Error occurred: %v", err)
+	}
+
+	if resultAmount != resultAccount {
+		t.Fatalf("Expected amount to match, but got %v", account.Amount)
 	}
 }

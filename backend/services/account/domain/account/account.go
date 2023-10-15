@@ -101,6 +101,10 @@ func (a *Account) Validate() error {
 		return ErrCurrencyMustBeEntered
 	}
 
+	if a.Currency != "810" && a.Currency != "840" {
+		return ErrCurrencyMustBeEntered
+	}
+
 	if a.Amount < 0 {
 		return ErrMustBePositiveOrZero
 	}
