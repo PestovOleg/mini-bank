@@ -1,4 +1,5 @@
 # mini-bank
+  [minibank.su](http://minibank.su)
 
 ## Содержимое
 
@@ -9,6 +10,10 @@
 - [Используемые сервисы](#используемые-сервисы-см-docker-compose)
 - [API Routes](#api-routes)
 - [Структура монорепо](#структура-монорепо)
+- [Сервисы](#сервисы)
+- [Сторонние сервисы](#используемые-сторонние-сервисы-см-docker-compose)
+- [Routes](#api-routes)
+- [Окружение](#github-secrets-and-variables)
 
 ## ТЗ
 ### Юзкейсы
@@ -43,6 +48,7 @@
 
 
 ## Реализация
+
 ### Структура монорепо
 
   - mini-bank/ 
@@ -63,10 +69,13 @@
     - └── services < *микросервисы* >
       - ├── account 
       - ├── auth 
-      - ├── mgmt 
+      - ├── mgmt
+      - ├── uproxy 
       - └── user 
   - ├── db < *скрипты для DB* >
-    - └── init-unleash.sh < *скрипт инициализации DB* >
+    - └── init-*unleash*.sh < *скриптs инициализации DB* >
+  - ├── compose < *доп скрипты для docker compose* >
+    - └── compose-*.sh < *скрипт инициализации DB* >  
   - ├── deploy.sh < *скрипт blue-green deployment* >
   - ├── docker-compose.yml 
   - ├── docs < *swagger docs* >
@@ -76,7 +85,8 @@
       - ├── account-minibank.conf.template 
       - ├── auth-minibank.conf.template 
       - ├── mgmt-minibank.conf.template 
-      - ├── user-minibank.conf.template 
+      - ├── user-minibank.conf.template
+      - ├── uproxy-minibank.conf.template 
       - ├── web.conf.template 
     - └── nginx.conf < *upstream конфиг* >
   - └── web < *frontend* >
@@ -86,37 +96,43 @@
    - **user-minibank** - сервис работы с пользователями.
    - **account-minibank** - сервис работы со счетами.
    - **auth-minibank** - сервис аутентификации/авторизации.
-   - **web** - frontend (to be)
+   - **uproxy-minibank** - сервис прокси для unleash (необходим для client-side сервисов).
+   - **web** - react-frontend 
 
-   ### Используемые сервисы (см. docker-compose)
+   ### Используемые сторонние сервисы (см. docker-compose)
    - **Unleash** - <http://minibank.su:4242>
    - **Swagger** - <http://minibank.su:8001>
 
 
   ### API Routes
    Пример: <http://minibank.su/api/v1/mgmt-minibank-health>
-| Service         | API (/api/v1)         | Method | Feature Toggle    | Basic Authorization | Description                      |
-|-----------------|-----------------------|--------|-------------------|---------------------|----------------------------------|
-| **mgmt-minibank**| `/mgmt-minibank-health`| GET   |                   |                     | Health Check                     |
-|                 | `/mgmt`               | POST   | CreateUserToggle  |                     | Создание пользователя            |
-|                 | `/mgmt/{id}`          | DELETE | DeleteUserToggle  |          +          | Удаление (деактивация) пользователя |
-| **auth-minibank**| `/auth-minibank-health`| GET  |                   |                     | Health Check                     |
-|                 | `/auth`               | POST   | CreateUserToggle  |                     | Создание записи аутентификации (логин/пароль) |
-|                 | `/auth/login`               | POST    | AuthenticateToggle|          +          | Аутентификация                   |
-|                 | `/auth/verify`          | POST    | AuthorizeToggle   |          +          | Авторизация пользователей к сервисам  |
-|                 | `/auth/{id}`          | DELETE | DeleteUserToggle  |          +          | Удаление (деактивация) пользователя |
-| **user-minibank**| `/user-minibank-health`| GET  |                   |                     | Health Check                     |
-|                 | `/users`              | POST   | CreateUserToggle  |          +          | Данные пользователя              |
-|                 | `/users/{id}`         | GET    | GetUserToggle     |          +          | Данные пользователя              |
-|                 | `/users/{id}`         | PUT    | UpdateUserToggle  |          +          | Обновление данных пользователей   |
-| **account-minibank**| `/account-minibank-health`| GET |              |                     | Health Check                     |
-|                 | `/users/{userid}/accounts`           | POST   | CreateAccountToggle|         +          | Создание счета                   |
-|                 | `/users/{userid}/accounts`           | GET    | ListAccountsToggle|         +          | Список счетов                    |
-|                 | `/users/{userid}/accounts/{id}`      | PUT    | UpdateAccountToggle|        +          | Обновить данные по счету         |
-|                 | `/users/{userid}/accounts/{id}`      | GET    | GetAccountToggle  |         +          | Информация о счете               |
-|                 | `/users/{userid}/accounts/{id}`      | DELETE | DeleteAccountToggle|        +          | Удалить (деактивировать) счет    |
-|                 | `/users/{userid}/accounts/{id}/topup`| PUT    | TopUpToggle       |         +          | Пополнить счет                   |
-|                 | `/users/{userid}/accounts/{id}/withdraw`| PUT | WithdrawToggle   |         +          | Снять деньги со счета            |
+| Service           | API (/api/v1)             | Method | Feature Toggle        | Basic Authorization | Description                              |
+| ----------------- | ------------------------- | ------ | --------------------- | ------------------- | ---------------------------------------- |
+| **mgmt-minibank** | `/mgmt-minibank-health`   | GET    |                       |                     | Health Check                             |
+|                   | `/mgmt`                   | POST   | CreateUserToggle      |                     | Create User                              |
+|                   | `/mgmt/{id}`              | DELETE | DeleteUserToggle      | +                   | Delete (Deactivate) User                 |
+| **auth-minibank** | `/auth-minibank-health`   | GET    |                       |                     | Health Check                             |
+|                   | `/auth`                   | POST   | CreateUserToggle      |                     | Create Authentication Entry (Login/Password) |
+|                   | `/auth/login`             | POST   | AuthenticateToggle    | +                   | Authenticate                             |
+|                   | `/auth/verify`            | POST   | AuthorizeToggle       | +                   | Authorize Users to Services              |
+|                   | `/auth/{id}`              | DELETE | DeleteUserToggle      | +                   | Delete (Deactivate) User                 |
+| **user-minibank** | `/user-minibank-health`   | GET    |                       |                     | Health Check                             |
+|                   | `/users`                  | POST   | CreateUserToggle      | +                   | User Data                                |
+|                   | `/users/{id}`             | GET    | GetUserToggle         | +                   | User Data                                |
+|                   | `/users/{id}`             | PUT    | UpdateUserToggle      | +                   | Update User Data                         |
+| **account-minibank** | `/account-minibank-health` | GET  |                       |                     | Health Check                             |
+|                   | `/users/{userid}/accounts` | POST   | CreateAccountToggle   | +                   | Create Account                           |
+|                   | `/users/{userid}/accounts` | GET    | ListAccountsToggle    | +                   | List Accounts                            |
+|                   | `/users/{userid}/accounts/{id}` | PUT | UpdateAccountToggle | +                   | Update Account Data                      |
+|                   | `/users/{userid}/accounts/{id}` | GET | GetAccountToggle   | +                   | Account Information                      |
+|                   | `/users/{userid}/accounts/{id}` | DELETE | DeleteAccountToggle | +                | Delete (Deactivate) Account              |
+|                   | `/users/{userid}/accounts/{id}/topup` | PUT | TopUpToggle     | +                   | Top Up Account                           |
+|                   | `/users/{userid}/accounts/{id}/withdraw` | PUT | WithdrawToggle | +                | Withdraw Money from Account              |
+| **uproxy-minibank** | `/uproxy-minibank-health` | GET  |                      |                     | Health Check                             |
+|                   | `/uproxy`                 | GET    |                       |                     | List Toggles                             |
+| **web**            | `/web-minibank-health`    | GET    |                       |                     | Health Check                             |
+|                   | `/`                       |       |                       |                     | Main Page                                |
+
 
 
 ### Github secrets and variables
@@ -131,14 +147,6 @@
 **AUTH_VERIFY_HOST** = `"http://nginx/api/v1/secureVerify"`  
 **USER_HOST** = `"http://nginx/api/v1/secureUsers"`  
 **ACCOUNT_HOST** = `"http://nginx/api/v1/secureAccounts"` 
-
-*адрес для package-config.json*
-**PUBLIC_URL** = `"http://minibank.su"` 
-
-*для миграции текущего сервиса при выполнении скрипта deploy.sh*  
-**MINIBANK_DB** = `orchestraDB`  
-**MINIBANK_USER** = `orchestraUser`  
-**MINIBANK_PASSWORD** = `orchestraPWD`  
 
 *одноименные доступы сервисов к БД (также необходимы при инициализации БД)*  
 **AUTH_MINIBANK_DB** = `authDB`  
@@ -170,5 +178,11 @@
 **ACCOUNT_CONFIG_PATH** = `/etc/securePath/account-config.yml`  
 **MGMT_APP_VERSION** = `latest`  
 **MGMT_CONFIG_PATH** = `/etc/securePath/mgmt-config.yml`
-**WEB_APP_VERSION** = `latest`     
+**WEB_APP_VERSION** = `latest`   
+**UPROXY_APP_VERSION**=latest
+**UPROXY_CONFIG_PATH**= `/etc/securePath/uproxy-config.yml`
+
+*для сборки web* 
+**REACT_APP_URL**= `http://localhost/api/v1`
+**PUBLIC_URL**= `http://localhost`
 </details>

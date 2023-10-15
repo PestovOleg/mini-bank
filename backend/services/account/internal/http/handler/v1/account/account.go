@@ -8,6 +8,7 @@ import (
 	"github.com/PestovOleg/mini-bank/backend/pkg/logger"
 	"github.com/PestovOleg/mini-bank/backend/services/account/domain/account"
 	"github.com/PestovOleg/mini-bank/backend/services/account/internal/http/mapper"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -28,22 +29,25 @@ func NewAccountHandler(s *account.Service) *AccountHandler {
 // AccountCreateRequest represents the request payload for account creation.
 // swagger:model
 type AccountCreateRequest struct {
-	Currency string `json:"currency" example:"810"`
-	Name     string `json:"name" example:"Удачный"`
+	Currency string `json:"currency" example:"810" validate:"required,oneof=810 840"`
+	Name     string `json:"name" example:"Удачный" validate:"required"`
 }
 
 // AccountCreateRequest represents the request payload for account creation.
 // swagger:model
 type AccountUpdateRequest struct {
-	Name         string  `json:"name" example:"Удачный"`
+	Name         string  `json:"name" example:"Удачный" validate:"required"`
 	InterestRate float64 `json:"interest_rate" example:"0.1250"`
 }
 
 // ChangeBalanceRequest represents the request payload for account creation.
 // swagger:model
 type ChangeBalanceRequest struct {
-	Amount float64 `json:"amount" example:"9999.99"`
+	Amount float64 `json:"amount" example:"9999.99" validate:"required"`
 }
+
+//nolint:gochecknoglobals
+var validate *validator.Validate
 
 // CreateAccount godoc
 // @Version 1.0
@@ -60,16 +64,47 @@ type ChangeBalanceRequest struct {
 // @Failure 500 {string} string "Internal server error"
 // @Security BasicAuth
 // @Router /users/{userid}/accounts [post]
+//
+//nolint:gocognit
 func (a *AccountHandler) CreateAccount() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		var input AccountCreateRequest
+
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Unable to decode request"))
+			if err != nil {
+				a.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		// валидация входных данных
+		validate = validator.New(validator.WithRequiredStructEnabled())
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				a.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					a.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				a.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
 			if err != nil {
 				a.logger.Error(err.Error())
 			}
@@ -237,6 +272,8 @@ func (a *AccountHandler) GetAccountByID() http.Handler {
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
 // @router /users/{userid}/accounts/{id} [put]
+//
+//nolint:gocognit
 func (a *AccountHandler) UpdateAccount() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -276,16 +313,41 @@ func (a *AccountHandler) UpdateAccount() http.Handler {
 			return
 		}
 
-		var input struct {
-			Name         string  `json:"name"`
-			InterestRate float64 `json:"interest_rate"`
-		}
+		var input AccountUpdateRequest
 
 		err = json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Couldn't decode request"))
+			if err != nil {
+				a.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		// валидация входных данных
+		validate = validator.New(validator.WithRequiredStructEnabled())
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				a.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					a.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				a.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
 			if err != nil {
 				a.logger.Error(err.Error())
 			}
@@ -475,6 +537,8 @@ func (a *AccountHandler) ListAccountsByUserID() http.Handler {
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
 // @router /users/{userid}/accounts/{id}/topup [put]
+//
+//nolint:gocognit
 func (a *AccountHandler) TopUp() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -514,9 +578,7 @@ func (a *AccountHandler) TopUp() http.Handler {
 			return
 		}
 
-		var input struct {
-			Amount float64 `json:"amount"`
-		}
+		var input ChangeBalanceRequest
 
 		a.logger.Sugar().Debugf("input.Amount %v", input.Amount)
 
@@ -525,6 +587,34 @@ func (a *AccountHandler) TopUp() http.Handler {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			_, err = w.Write([]byte("Couldn't decode request"))
+			if err != nil {
+				a.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		// валидация входных данных
+		validate = validator.New(validator.WithRequiredStructEnabled())
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				a.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					a.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				a.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
 			if err != nil {
 				a.logger.Error(err.Error())
 			}
@@ -580,6 +670,8 @@ func (a *AccountHandler) TopUp() http.Handler {
 // @failure 404 {string} string "Account not found"
 // @Security BasicAuth
 // @router /users/{userid}/accounts/{id}/withdraw [put]
+//
+//nolint:gocognit
 func (a *AccountHandler) Withdraw() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -619,9 +711,7 @@ func (a *AccountHandler) Withdraw() http.Handler {
 			return
 		}
 
-		var input struct {
-			Amount float64 `json:"amount"`
-		}
+		var input ChangeBalanceRequest
 
 		err = json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
@@ -636,6 +726,34 @@ func (a *AccountHandler) Withdraw() http.Handler {
 		}
 
 		a.logger.Sugar().Debugf("input.Amount %v", input.Amount)
+
+		// валидация входных данных
+		validate = validator.New(validator.WithRequiredStructEnabled())
+		err = validate.Struct(input)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok { //nolint:errorlint
+				a.logger.Error("Validation error:" + err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+				if err != nil {
+					a.logger.Error(err.Error())
+				}
+
+				return
+			}
+
+			for _, err := range err.(validator.ValidationErrors) { //nolint:forcetypeassert,errorlint
+				a.logger.Error("Validation Error, Field:" + err.Field() + " is " + err.ActualTag())
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Unable to validate request:" + err.Error()))
+			if err != nil {
+				a.logger.Error(err.Error())
+			}
+
+			return
+		}
 
 		balance, err := a.service.WithDraw(id, input.Amount)
 		if err != nil {

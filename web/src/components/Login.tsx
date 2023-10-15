@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { AppBar, Avatar, Box, Button, Container, CssBaseline, FormHelperText, IconButton, Link, TextField, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Container, CssBaseline,  IconButton,  TextField, Toolbar, Typography } from "@mui/material";
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import SignUpDialog from "./SignUp";
 

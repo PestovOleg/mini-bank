@@ -8,13 +8,11 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, Container, FormHelperText, Link, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, Container,  Link, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import AlertSuccess from "./AlertSignUp";
 import InputMask from "react-input-mask";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { formatDate } from "../utils/utils"
 
 const Transition = React.forwardRef(function Transition(
