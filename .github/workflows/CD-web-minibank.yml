@@ -70,6 +70,9 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/web-minibank:${{ env.VERSION }}
           labels: ${{ secrets.DOCKERHUB_USERNAME }}/web-minibank:${{ env.VERSION }}
+          build-args: |
+            public_url=${{ secrets.PUBLIC_URL }}  
+            react_app_url=${{ secrets.REACT_APP_URL }}          
   
   deploy:
     needs: build
@@ -88,7 +91,7 @@ jobs:
             cd /opt/mini-bank
             git pull
             export WEB_APP_VERSION=${{ needs.build.outputs.version }}
-            export SERVICE=user-minibank
+            export SERVICE=web-minibank
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-minibank:${{ needs.build.outputs.version }}
             /bin/bash deploy.sh
             
