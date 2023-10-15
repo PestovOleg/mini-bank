@@ -15,7 +15,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost",
+    "host": "minibank.su",
     "basePath": "/api/v1",
     "paths": {
         "/account-minibank-health": {
@@ -975,9 +975,17 @@
     "definitions": {
         "account.AccountCreateRequest": {
             "type": "object",
+            "required": [
+                "currency",
+                "name"
+            ],
             "properties": {
                 "currency": {
                     "type": "string",
+                    "enum": [
+                        "810",
+                        "840"
+                    ],
                     "example": "810"
                 },
                 "name": {
@@ -988,6 +996,9 @@
         },
         "account.AccountUpdateRequest": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "interest_rate": {
                     "type": "number",
@@ -1001,6 +1012,9 @@
         },
         "account.ChangeBalanceRequest": {
             "type": "object",
+            "required": [
+                "amount"
+            ],
             "properties": {
                 "amount": {
                     "type": "number",
@@ -1010,6 +1024,10 @@
         },
         "backend_services_auth_internal_http_handler_v1_auth.AuthCreateRequest": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
                     "type": "string",
@@ -1154,6 +1172,16 @@
         },
         "mgmt.MgmtCreateUserRequest": {
             "type": "object",
+            "required": [
+                "birthday",
+                "email",
+                "last_name",
+                "name",
+                "password",
+                "patronymic",
+                "phone",
+                "username"
+            ],
             "properties": {
                 "birthday": {
                     "type": "string",
@@ -1191,6 +1219,15 @@
         },
         "user.UserCreateRequest": {
             "type": "object",
+            "required": [
+                "birthday",
+                "email",
+                "id",
+                "last_name",
+                "name",
+                "patronymic",
+                "phone"
+            ],
             "properties": {
                 "birthday": {
                     "type": "string",
@@ -1224,6 +1261,9 @@
         },
         "user.UserUpdateRequest": {
             "type": "object",
+            "required": [
+                "email"
+            ],
             "properties": {
                 "email": {
                     "type": "string",
