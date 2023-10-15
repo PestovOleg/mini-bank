@@ -5,7 +5,7 @@ on:
     tags:
       - "v*.*.*"
     paths:
-      - 'mini-bank/backend/services/uproxy/**'
+      - 'backend/services/uproxy/**'
       - '.github/workflows/CD-uproxy**'
   workflow_dispatch:
     inputs:

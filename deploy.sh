@@ -6,7 +6,6 @@ if [[ -z $SERVICE ]]; then
 fi
 
 echo "Starting deploy ${SERVICE}..."
-# TODO: добавиь установку переменных для миграции и активного сервиса auth
 echo "Checking nginx template for service ${SERVICE}"
 [ -f "./nginx/conf.d/${SERVICE}.conf.template" ] && 
 echo "Nginx template for ${SERVICE} is found" || 
@@ -31,7 +30,7 @@ printf "%s\n" "Done"
 
 if [ "$MIGRATE" == "YES" ]; then
   echo "Migrating database ..."
-  docker compose run -d migrate 
+  docker compose run -d $MIGRATE_SERVICE 
   printf "%s\n" "Done...waiting 3 sec"
   sleep 3
 else 

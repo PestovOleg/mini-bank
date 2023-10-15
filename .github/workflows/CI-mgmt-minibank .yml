@@ -7,7 +7,7 @@ on:
       - develop
       - release/**
     paths:
-      - 'mini-bank/backend/services/mgmt/**'
+      - 'backend/services/mgmt/**'
       - '.github/workflows/CI-mgmt**'
   pull_request:
     branches:

@@ -21,6 +21,7 @@ export class AccountStore {
             const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts`, {
                 headers: {
                     'Authorization': this.rootStore.userStore.User.token,
+                    'Cache-Control': 'no-cache',
                 }
             });
 
@@ -58,6 +59,7 @@ export class AccountStore {
             const response = await fetch(`${URL}/users/${this.rootStore.userStore.User.id}/accounts/${id}`, {
                 headers: {
                     'Authorization': this.rootStore.userStore.User.token,
+                    'Cache-Control': 'no-cache',
                 }
             });
 

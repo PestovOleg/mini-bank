@@ -30,6 +30,7 @@ export class UserStore {
                 method: "POST",
                 headers: {
                     Authorization: "Basic " + base64Credentials,
+                    'Cache-Control': 'no-cache',
                 },
             });
 
@@ -147,6 +148,7 @@ export class UserStore {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: this.User.token,
+                    'Cache-Control': 'no-cache',
                 },
                 body: JSON.stringify(userData),
             });
@@ -173,6 +175,7 @@ export class UserStore {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: this.User.token,
+                    'Cache-Control': 'no-cache',                    
                 },
             });
 

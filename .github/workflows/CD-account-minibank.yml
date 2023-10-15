@@ -5,7 +5,7 @@ on:
     tags:
       - "v*.*.*"
     paths:
-      - 'mini-bank/backend/services/account/**'
+      - 'backend/services/account/**'
       - '.github/workflows/CD-account*'
   workflow_dispatch:
     inputs:
@@ -93,6 +93,7 @@ jobs:
             export AUTH_VERIFY_HOST=${{secrets.AUTH_VERIFY_HOST}}
             echo 'Переменные для миграции'
             export MIGRATE=YES
+            export MIGRATE_SERVICE=account-minibank
             export SERVICE=account-minibank
             ACCOUNT_MINIBANK_DB=${{ secrets.ACCOUNT_MINIBANK_DB }}
             ACCOUNT_MINIBANK_USER=${{ secrets.ACCOUNT_MINIBANK_USER }}

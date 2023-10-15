@@ -1,12 +1,11 @@
 name: CD mgmt service
 
-# Автосборка приостановлена //TODO: включить после полной настройки CD
 on:
   push:
     tags:
       - "v*.*.*"
     paths:
-      - 'mini-bank/backend/services/mgmt/**'
+      - 'backend/services/mgmt/**'
       - '.github/workflows/CD-mgmt*'
   workflow_dispatch:
     inputs:

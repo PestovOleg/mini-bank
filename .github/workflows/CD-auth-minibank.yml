@@ -5,7 +5,7 @@ on:
     tags:
       - "v*.*.*"
     paths:
-      - 'mini-bank/backend/services/auth/**'
+      - 'backend/services/auth/**'
       - '.github/workflows/CD-auth*'
   workflow_dispatch:
     inputs:
@@ -94,6 +94,7 @@ jobs:
             echo 'Переменные для миграции'
             export MIGRATE=YES
             export SERVICE=auth-minibank
+            export MIGRATE_SERVICE=auth-minibank
             AUTH_MINIBANK_DB=${{ secrets.AUTH_MINIBANK_DB }}
             AUTH_MINIBANK_USER=${{ secrets.AUTH_MINIBANK_USER }}
             AUTH_MINIBANK_PASSWORD=${{ secrets.AUTH_MINIBANK_PASSWORD }} 
