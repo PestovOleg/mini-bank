@@ -7,7 +7,7 @@ on:
       - develop
       - release/**
     paths:
-      - 'mini-bank/backend/services/user/**'
+      - 'backend/services/user/**'
       - '.github/workflows/CI-user**'
   pull_request:
     branches:

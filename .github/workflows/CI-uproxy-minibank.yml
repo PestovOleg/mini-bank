@@ -7,7 +7,7 @@ on:
       - develop
       - release/**
     paths:
-      - 'mini-bank/backend/services/uproxy/**'
+      - 'backend/services/uproxy/**'
       - '.github/workflows/CI-uproxy**'
   pull_request:
     branches:

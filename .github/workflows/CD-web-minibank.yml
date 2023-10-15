@@ -5,7 +5,7 @@ on:
     tags:
       - "v*.*.*"
     paths:
-      - 'mini-bank/web/**'
+      - 'web/**'
       - '.github/workflows/CD-web*'
   workflow_dispatch:
     inputs:
@@ -88,6 +88,7 @@ jobs:
             cd /opt/mini-bank
             git pull
             export WEB_APP_VERSION=${{ needs.build.outputs.version }}
+            export SERVICE=user-minibank
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-minibank:${{ needs.build.outputs.version }}
             /bin/bash deploy.sh
             

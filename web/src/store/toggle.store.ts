@@ -22,7 +22,10 @@ export class ToggleStore {
     public async getToggles(): Promise<void> {
 
         try {
-            const response = await fetch(`${URL}/uproxy`, {               
+            const response = await fetch(`${URL}/uproxy`, {  
+                headers: {
+                    'Cache-Control': 'no-cache',
+                }             
             });
 
             if (!response.ok) {
