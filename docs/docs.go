@@ -981,9 +981,17 @@ const docTemplate = `{
     "definitions": {
         "account.AccountCreateRequest": {
             "type": "object",
+            "required": [
+                "currency",
+                "name"
+            ],
             "properties": {
                 "currency": {
                     "type": "string",
+                    "enum": [
+                        "810",
+                        "840"
+                    ],
                     "example": "810"
                 },
                 "name": {
@@ -994,6 +1002,9 @@ const docTemplate = `{
         },
         "account.AccountUpdateRequest": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "interest_rate": {
                     "type": "number",
@@ -1007,6 +1018,9 @@ const docTemplate = `{
         },
         "account.ChangeBalanceRequest": {
             "type": "object",
+            "required": [
+                "amount"
+            ],
             "properties": {
                 "amount": {
                     "type": "number",
@@ -1016,6 +1030,10 @@ const docTemplate = `{
         },
         "backend_services_auth_internal_http_handler_v1_auth.AuthCreateRequest": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
                     "type": "string",
@@ -1160,6 +1178,16 @@ const docTemplate = `{
         },
         "mgmt.MgmtCreateUserRequest": {
             "type": "object",
+            "required": [
+                "birthday",
+                "email",
+                "last_name",
+                "name",
+                "password",
+                "patronymic",
+                "phone",
+                "username"
+            ],
             "properties": {
                 "birthday": {
                     "type": "string",
@@ -1197,6 +1225,15 @@ const docTemplate = `{
         },
         "user.UserCreateRequest": {
             "type": "object",
+            "required": [
+                "birthday",
+                "email",
+                "id",
+                "last_name",
+                "name",
+                "patronymic",
+                "phone"
+            ],
             "properties": {
                 "birthday": {
                     "type": "string",
@@ -1230,6 +1267,9 @@ const docTemplate = `{
         },
         "user.UserUpdateRequest": {
             "type": "object",
+            "required": [
+                "email"
+            ],
             "properties": {
                 "email": {
                     "type": "string",

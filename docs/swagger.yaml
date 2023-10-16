@@ -3,11 +3,17 @@ definitions:
   account.AccountCreateRequest:
     properties:
       currency:
+        enum:
+        - "810"
+        - "840"
         example: "810"
         type: string
       name:
         example: Удачный
         type: string
+    required:
+    - currency
+    - name
     type: object
   account.AccountUpdateRequest:
     properties:
@@ -17,12 +23,16 @@ definitions:
       name:
         example: Удачный
         type: string
+    required:
+    - name
     type: object
   account.ChangeBalanceRequest:
     properties:
       amount:
         example: 9999.99
         type: number
+    required:
+    - amount
     type: object
   backend_services_auth_internal_http_handler_v1_auth.AuthCreateRequest:
     properties:
@@ -32,6 +42,9 @@ definitions:
       username:
         example: Ivanec
         type: string
+    required:
+    - password
+    - username
     type: object
   mapper.Account:
     properties:
@@ -153,6 +166,15 @@ definitions:
       username:
         example: Ivanec
         type: string
+    required:
+    - birthday
+    - email
+    - last_name
+    - name
+    - password
+    - patronymic
+    - phone
+    - username
     type: object
   user.UserCreateRequest:
     properties:
@@ -177,6 +199,14 @@ definitions:
       phone:
         example: +7(495)999-99-99
         type: string
+    required:
+    - birthday
+    - email
+    - id
+    - last_name
+    - name
+    - patronymic
+    - phone
     type: object
   user.UserUpdateRequest:
     properties:
@@ -186,6 +216,8 @@ definitions:
       phone:
         example: +7(495)999-99-99
         type: string
+    required:
+    - email
     type: object
 externalDocs:
   description: OpenAPI
