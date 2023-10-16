@@ -1,9 +1,8 @@
 location /api/v1/auth-minibank-health {
-    proxy_pass http://${NEXT_SERVICE}:3333;
+    proxy_pass http://NEXT_SERVICE;
 }
 
 location /api/v1/auth {
-    proxy_pass http://${NEXT_SERVICE}:3333;
+    proxy_pass http://NEXT_SERVICE;
 }
-
 
