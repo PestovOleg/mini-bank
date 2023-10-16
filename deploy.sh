@@ -29,7 +29,7 @@ for file in "${files[@]}"; do
         service_name=$(basename "$file" | cut -d. -f1)
         # Копируем файл *.conf.template на место отсутствующего файла
         cp "$template_file" "$file"
-        sed -i "s|proxy_pass http://.*;|proxy_pass http://$service_name-blue;|g" "$file"
+        #sed -i "s|proxy_pass http://.*;|proxy_pass http://$service_name-blue;|g" "$file"
         echo "ALARM!!! Скопирован файл ${SERVICE} $template_file в $file ,необходимо изменение содержимого после деплоя файла"
     fi
 done
@@ -70,40 +70,17 @@ else
     echo "Aborting..."
     exit 1
 fi
-echo "Waiting for starting "
+echo "Waiting 10 sec for starting "
 sleep 10
-
-# Извлекаем динамический порт из запущенного контейнера
-PORT=$(docker port $NEXT_SERVICE | cut -d':' -f2)
-
-# Проверяем, что удалось получить порт
-if [ -z "$PORT" ]; then
-  echo "Failed to get port for $NEXT_SERVICE. Exiting."
-  exit 1
-fi
-
-# Создаем URL с динамическим портом
-URL="http://0.0.0.0:$PORT/api/v1/${SERVICE}-health"
-
-echo "Checking..."
-
-# Выполняем вызов через curl
-response=$(curl -s $URL)
-
-# Проверяем ответ
-if echo "$response" | grep -q "Service is healthy"; then
-  echo "Service is healthy"
-else
-  echo "Service is not healthy"
-fi
-#---------------------------------------------------------------
 
 echo "Copying current nginx.conf to nginx.conf.back"
 cp ./nginx/conf.d/${SERVICE}.nginx.conf ./nginx/conf.d/${SERVICE}.conf.back 2>/dev/null
 cp ./nginx/conf.d/${SERVICE}.conf.template ./nginx/conf.d/${SERVICE}.nginx.conf 2>/dev/null
 
 echo "Creating and checking nginx config for next service"
-sed -i "s|proxy_pass http://.*;|proxy_pass http://$NEXT_SERVICE:3333;|g" ./nginx/conf.d/${SERVICE}.nginx.conf
+sed -i "s|proxy_pass http://NEXT_SERVICE:|proxy_pass http://$NEXT_SERVICE:|g" ./nginx/conf.d/${SERVICE}.nginx.conf
+
+
 docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -t
 rv=$?
 if [ $rv != 0 ]; then
