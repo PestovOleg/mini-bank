@@ -1,7 +1,7 @@
 location / {       
-    proxy_pass http://NEXT_SERVICE;
+    proxy_pass http://NEXT_SERVICE:80;
 }
 
 location ~ ^/api/.+/web-minibank-health$ {        
-    proxy_pass http://NEXT_SERVICE;
+    proxy_pass http://NEXT_SERVICE:80;
 }
