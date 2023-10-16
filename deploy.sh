@@ -11,6 +11,30 @@ echo "Checking nginx template for service ${SERVICE}"
 echo "Nginx template for ${SERVICE} is found" || 
 echo "Nginx template for ${SERVICE} not found"
 
+# Список конфигов на проверку-TODO:удалить после dynamic upstream
+files=(
+    "./nginx/conf.d/mgmt-minibank.nginx.conf"
+    "./nginx/conf.d/account-minibank.nginx.conf"
+    "./nginx/conf.d/auth-minibank.nginx.conf"
+    "./nginx/conf.d/user-minibank.nginx.conf"
+    "./nginx/conf.d/uproxy-minibank.nginx.conf"
+    "./nginx/conf.d/web-minibank.nginx.conf"
+)
+
+# Проверяем наличие конфигов для всех сервисов
+for file in "${files[@]}"; do
+    if [ ! -e "$file" ]; then
+        # Генерируем имя файла *.conf.template на основе имени файла
+        template_file="${file%%.nginx.conf}.conf.template"
+        service_name=$(basename "$file" | cut -d. -f1)
+        # Копируем файл *.conf.template на место отсутствующего файла
+        cp "$template_file" "$file"
+        sed -i "s|proxy_pass http://.*;|proxy_pass http://$service_name-blue;|g" "$file"
+        echo "ALARM!!! Скопирован файл ${SERVICE} $template_file в $file ,необходимо изменение содержимого после деплоя файла"
+    fi
+done
+
+echo "Checking current nginx.conf"
 if grep -q "proxy_pass http://${SERVICE}-blue" "./nginx/conf.d/${SERVICE}.nginx.conf"
 then
     export CURRENT_SERVICE="${SERVICE}-blue"
@@ -22,11 +46,10 @@ else
     echo "$CURRENT_SERVICE is running"
 fi
 
-echo "Removing old container if it hasn't been removed..."
+echo "Removing old container of ${SERVICE} if it hasn't been removed..."
 docker compose rm -f -s -v $NEXT_SERVICE 
 echo "Waiting 3 sec"
 sleep 3
-printf "%s\n" "Done"
 
 if [ "$MIGRATE" == "YES" ]; then
   echo "Migrating database ..."
@@ -39,16 +62,49 @@ fi
 
 echo "Starting $NEXT_SERVICE"
 docker compose up -d $NEXT_SERVICE 
-echo "Waiting 3 sec"
-sleep 3
+rv=$?
+if [ $rv -eq 0 ]; then
+    echo "New \"$NEXT_SERVICE\" container started"
+else
+    echo "Docker compose failed with exit code: $rv"
+    echo "Aborting..."
+    exit 1
+fi
+echo "Waiting for starting "
+sleep 10
+
+# Извлекаем динамический порт из запущенного контейнера
+PORT=$(docker port $NEXT_SERVICE | cut -d':' -f2)
+
+# Проверяем, что удалось получить порт
+if [ -z "$PORT" ]; then
+  echo "Failed to get port for $NEXT_SERVICE. Exiting."
+  exit 1
+fi
+
+# Создаем URL с динамическим портом
+URL="http://0.0.0.0:$PORT/api/v1/${SERVICE}-health"
+
+echo "Checking..."
+
+# Выполняем вызов через curl
+response=$(curl -s $URL)
+
+# Проверяем ответ
+if echo "$response" | grep -q "Service is healthy"; then
+  echo "Service is healthy"
+else
+  echo "Service is not healthy"
+fi
+#---------------------------------------------------------------
 
 echo "Copying current nginx.conf to nginx.conf.back"
 cp ./nginx/conf.d/${SERVICE}.nginx.conf ./nginx/conf.d/${SERVICE}.conf.back 2>/dev/null
+cp ./nginx/conf.d/${SERVICE}.conf.template ./nginx/conf.d/${SERVICE}.nginx.conf 2>/dev/null
 
-echo "Checking nginx config for next service"
-docker exec -e NEXT_SERVICE=$NEXT_SERVICE \
--i nginx envsubst '$NEXT_SERVICE' < ./nginx/conf.d/${SERVICE}.conf.template > ./nginx/conf.d/${SERVICE}.nginx.conf \
-&& docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -t
+echo "Creating and checking nginx config for next service"
+sed -i "s|proxy_pass http://.*;|proxy_pass http://$NEXT_SERVICE:3333;|g" ./nginx/conf.d/${SERVICE}.nginx.conf
+docker compose exec -T nginx nginx -g 'daemon off; master_process on;' -t
 rv=$?
 if [ $rv != 0 ]; then
     cp ./nginx/conf.d/${SERVICE}.nginx.conf.back ./nginx/conf.d/${SERVICE}.nginx.conf 2>/dev/null
