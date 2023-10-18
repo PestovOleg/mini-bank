@@ -49,7 +49,7 @@ const docTemplate = `{
         },
         "/auth": {
             "post": {
-                "description": "Create a new authentication record using the provided details",
+                "description": "Create a new authentication record using the provided details.",
                 "consumes": [
                     "application/json"
                 ],
@@ -59,7 +59,7 @@ const docTemplate = `{
                 "tags": [
                     "auth-minibank"
                 ],
-                "summary": "Create a new authentication record",
+                "summary": "Create a new authentication record (inter-service interaction)",
                 "parameters": [
                     {
                         "description": "Authentication details for creation",
@@ -422,7 +422,7 @@ const docTemplate = `{
         },
         "/users": {
             "post": {
-                "description": "Create a new user using the provided details",
+                "description": "Create a new user using the provided details (inter-service interaction)",
                 "consumes": [
                     "application/json"
                 ],

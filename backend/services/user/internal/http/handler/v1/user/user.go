@@ -54,7 +54,7 @@ var validate *validator.Validate
 // @Version 1.0
 // @title CreateUser
 // @Summary Create a new user
-// @Description Create a new user using the provided details
+// @Description Create a new user using the provided details (inter-service interaction)
 // @tags user-minibank
 // @Accept  json
 // @Produce  json

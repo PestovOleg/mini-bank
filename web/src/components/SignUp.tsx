@@ -8,12 +8,19 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { Alert, Box, Container,  Link, Snackbar, TextField } from "@mui/material";
+import { Alert, Box, Container, Link, Snackbar, TextField } from "@mui/material";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import InputMask from "react-input-mask";
 import { formatDate } from "../utils/utils"
+import { DateField } from "@mui/x-date-pickers/DateField";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { deDE } from '@mui/x-date-pickers/locales';
+
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -33,8 +40,9 @@ export default function SignUpDialog() {
   const [patronymic, setPatronymic] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [birthday, setBirthday] = useState("");
   const [showAlert, setShowAlert] = React.useState(false);
+  const [birthday, setBirthday] = useState<dayjs.Dayjs | null>(null);
+
 
   let navigate = useNavigate();
   const handleClickOpen = () => {
@@ -49,8 +57,7 @@ export default function SignUpDialog() {
     event: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     event.preventDefault();
-    const b = new Date(birthday);
-    const formattedDate = formatDate(b);
+    const formattedBirthday = birthday ? birthday.format('DD.MM.YYYY') : null;
     if (
       firstName &&
       lastName &&
@@ -59,7 +66,7 @@ export default function SignUpDialog() {
       username &&
       password &&
       phone &&
-      birthday
+      formattedBirthday
     ) {
       await store.userStore.signup(
         firstName,
@@ -69,7 +76,7 @@ export default function SignUpDialog() {
         username,
         password,
         phone,
-        formattedDate
+        formattedBirthday
       );
 
       // Show the alert
@@ -82,25 +89,21 @@ export default function SignUpDialog() {
     }
   };
 
+
   const handleEmailChange = (value: string) => {
-
-    // Удалить все символы, кроме цифр и точки
+    // Remove all characters except digits, dots, lowercase, uppercase, and @
     value = value.replace(/[^0-9.^a-z^A-Z@]/g, "");
-
-    // Проверка на наличие более чем одной точки
-    const dotCount = value.split(".").length - 1;
-    if (dotCount > 1) {
-      value = value.slice(0, value.lastIndexOf("."));
-    }
-
-    // Проверка на наличие более чем одной собаки
-    const dogCount = value.split("@").length - 1;
-    if (dogCount > 1) {
-      value = value.slice(0, value.lastIndexOf("."));
-    }
 
     setEmail(value);
   };
+
+  const isEmailValid = (email: string) => {
+    if (email === "") return true;  // Don't flag an empty string as invalid
+  
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+  
 
   const handleLoginChange = (value: string) => {
     value = value.replace(/[^0-9^a-z^A-Z]/g, "");
@@ -215,6 +218,8 @@ export default function SignUpDialog() {
               margin="normal"
               required
               fullWidth
+              error={!isEmailValid(email)}
+              helperText={!isEmailValid(email) ? 'Invalid email!' : ' '}
               id="email"
               label="email"
               name="email"
@@ -239,18 +244,15 @@ export default function SignUpDialog() {
                 inputProps: { mask: "+7 (999) 999-99-99" },
               }}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              type="date"
-              id="birthday"
-              name="birthday"
-              value={birthday}
-              autoFocus
-              onChange={(e) => setBirthday(e.target.value)}
-            />
-
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='de'>
+              <DateField
+                format="DD.MM.YYYY"
+                onChange={(date) => setBirthday(date)}
+                fullWidth
+                required
+                defaultValue={dayjs('2022-04-17')}
+              />
+            </LocalizationProvider>
             <Button
               type="submit"
               fullWidth
@@ -264,9 +266,10 @@ export default function SignUpDialog() {
         {showAlert && (
           <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="info" sx={{ width: "100%" }}>
-              Регистрация завершена,выполните вход.
+              Регистрация завершена, выполните вход.
             </Alert>
           </Snackbar>
+
         )}
 
 

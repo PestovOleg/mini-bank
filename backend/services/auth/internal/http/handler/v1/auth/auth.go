@@ -51,8 +51,8 @@ var validate *validator.Validate
 // CreateAuth godoc
 // @Version 1.0
 // @title CreateAuth
-// @Summary Create a new authentication record
-// @Description Create a new authentication record using the provided details
+// @Summary Create a new authentication record (inter-service interaction)
+// @Description Create a new authentication record using the provided details.
 // @Tags auth-minibank
 // @Accept  json
 // @Produce  json
