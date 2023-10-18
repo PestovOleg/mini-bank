@@ -256,7 +256,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new authentication record using the provided details
+      description: Create a new authentication record using the provided details.
       parameters:
       - description: Authentication details for creation
         in: body
@@ -275,7 +275,7 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Create a new authentication record
+      summary: Create a new authentication record (inter-service interaction)
       tags:
       - auth-minibank
   /auth-minibank-health:
@@ -499,7 +499,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new user using the provided details
+      description: Create a new user using the provided details (inter-service interaction)
       parameters:
       - description: User details for creation
         in: body
