@@ -298,6 +298,36 @@ paths:
     delete:
       consumes:
       - application/json
+      description: Delete the authentication record using the provided user ID.
+      parameters:
+      - description: Auth ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted authentication record
+          schema:
+            type: string
+        "404":
+          description: Page not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Delete authentication record based on the provided ID.
+      tags:
+      - auth-minibank
+    put:
+      consumes:
+      - application/json
       description: Deactivate the authentication record using the provided user ID.
       parameters:
       - description: Auth ID

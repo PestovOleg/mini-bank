@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import store from "../store/store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { AppBar, Box, Button, Container, CssBaseline,  IconButton,  TextField, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Container, CssBaseline, IconButton, TextField, Toolbar, Typography } from "@mui/material";
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import SignUpDialog from "./SignUp";
 
@@ -35,7 +35,7 @@ function Login() {
         value = value.replace(/[^0-9^a-z^A-Z]/g, "");
         setUsername(value);
     };
-    
+
     return (
         <Container className="login" component="main" maxWidth="xs" >
             <CssBaseline />
@@ -65,8 +65,8 @@ function Login() {
 
                     </Toolbar>
                 </AppBar>
-                
-                <Box component="form" onSubmit={login} noValidate sx={{ mt: 1}}>
+
+                <Box component="form" onSubmit={login} noValidate sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         required
@@ -103,7 +103,7 @@ function Login() {
                     </Button>
 
                 </Box>
-               
+
                 {signUp()}
             </Box>
         </Container>

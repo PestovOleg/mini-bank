@@ -483,7 +483,7 @@ func (a *AccountHandler) ListAccountsByUserID() http.Handler {
 
 		if errors.Is(err, account.ErrNotFound) || data == nil {
 			a.logger.Error("Accounts not found")
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNotFound)
 
 			emptyJSON := make(map[string]interface{})
 
