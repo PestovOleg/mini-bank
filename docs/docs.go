@@ -191,7 +191,7 @@ const docTemplate = `{
             }
         },
         "/auth/{id}": {
-            "delete": {
+            "put": {
                 "security": [
                     {
                         "BasicAuth": []
@@ -208,6 +208,53 @@ const docTemplate = `{
                     "auth-minibank"
                 ],
                 "summary": "Deactivate authentication record based on the provided ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Auth ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted authentication record",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Page not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Delete the authentication record using the provided user ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth-minibank"
+                ],
+                "summary": "Delete authentication record based on the provided ID.",
                 "parameters": [
                     {
                         "type": "string",

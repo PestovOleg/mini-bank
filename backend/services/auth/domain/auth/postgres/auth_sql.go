@@ -134,7 +134,7 @@ func (r *AuthSQL) GetByUName(username string) (*auth.Auth, error) {
 	return &a, nil
 }
 
-func (r *AuthSQL) Delete(u *auth.Auth) error {
+func (r *AuthSQL) Update(u *auth.Auth) error {
 	rec, err := r.db.Prepare(`
 		update authentications set is_active=$1,updated_at=$2 where id=$3`)
 
@@ -149,6 +149,36 @@ func (r *AuthSQL) Delete(u *auth.Auth) error {
 	)
 	if err != nil {
 		return err
+	}
+
+	err = rec.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *AuthSQL) Delete(id uuid.UUID) error {
+	rec, err := r.db.Prepare(`
+		delete from authentications where id=$1`)
+
+	if err != nil {
+		return err
+	}
+
+	res, err := rec.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return auth.ErrNotFound
 	}
 
 	err = rec.Close()

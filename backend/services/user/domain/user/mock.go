@@ -25,3 +25,7 @@ func (m *MockRepository) Update(u *User) error {
 func (m *MockRepository) Get(id uuid.UUID) (*User, error) {
 	return nil, nil
 }
+
+func (m *MockRepository) Delete(id uuid.UUID) error {
+	return nil
+}

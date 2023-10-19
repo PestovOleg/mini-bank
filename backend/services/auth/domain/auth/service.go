@@ -22,6 +22,10 @@ func NewService(r Repository) *Service {
 
 // GetUserByID Поиск авторизации по id
 func (s *Service) GetAuthByID(id uuid.UUID) (*Auth, error) {
+	if id == uuid.Nil {
+		return nil, ErrIDMustBeEntered
+	}
+
 	u, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -36,6 +40,10 @@ func (s *Service) GetAuthByID(id uuid.UUID) (*Auth, error) {
 
 // GetUserByUName Поиск авторизации по username
 func (s *Service) GetUserByUName(username string) (*Auth, error) {
+	if username == "" {
+		return nil, ErrMustBeFilledIn
+	}
+
 	u, err := s.repo.GetByUName(username)
 	if err != nil {
 		return nil, err
@@ -62,8 +70,12 @@ func (s *Service) CreateAuth(
 	return s.repo.Create(u)
 }
 
-// DeleteUser Удалить авторизацию (установить признак isActive в false)
-func (s *Service) DeleteAuth(id uuid.UUID) error {
+// DeactivateAuth Удалить авторизацию (установить признак isActive в false)
+func (s *Service) DeactivateAuth(id uuid.UUID) error {
+	if id == uuid.Nil {
+		return ErrIDMustBeEntered
+	}
+
 	u, err := s.GetAuthByID(id)
 	if err != nil {
 		return err
@@ -76,13 +88,34 @@ func (s *Service) DeleteAuth(id uuid.UUID) error {
 	u.IsActive = false
 	u.UpdatedAt = time.Now()
 
-	return s.repo.Delete(u)
+	return s.repo.Update(u)
+}
+
+// DeleteAuth Удалить авторизацию (физически,для межсервисного взаимодействия)
+func (s *Service) DeleteAuth(id uuid.UUID) error {
+	if id == uuid.Nil {
+		return ErrIDMustBeEntered
+	}
+
+	return s.repo.Delete(id)
 }
 
 func (s *Service) AuthenticateUser(username, password string) (uuid.UUID, error) {
+	if username == "" {
+		return uuid.Nil, ErrEmptyUsername
+	}
+
+	if password == "" {
+		return uuid.Nil, ErrEmptyPassword
+	}
+
 	a, err := s.repo.GetByUName(username)
 	if err != nil {
 		return uuid.Nil, err
+	}
+
+	if !a.IsActive {
+		return uuid.Nil, ErrNotFound
 	}
 
 	err = a.VerifyPassword(password)
@@ -116,6 +149,18 @@ func (s *Service) AuthorizeUser(token string) error {
 	a, err := s.repo.GetByUName(username)
 	if err != nil {
 		return ErrUnauthorized
+	}
+
+	if username == "" {
+		return ErrEmptyUsername
+	}
+
+	if password == "" {
+		return ErrEmptyPassword
+	}
+
+	if !a.IsActive {
+		return ErrNotFound
 	}
 
 	err = a.VerifyPassword(password)

@@ -82,3 +82,16 @@ func (s *Service) UpdateUser(id uuid.UUID, email, phone string) error {
 
 	return s.repo.Update(u)
 }
+
+func (s *Service) DeleteUser(id uuid.UUID) error {
+	if id == uuid.Nil {
+		return ErrIDMustBeEntered
+	}
+
+	err := s.repo.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

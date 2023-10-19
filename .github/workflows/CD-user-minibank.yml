@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*.*.*"
+    branches:
+      - main
     paths:
       - 'backend/services/user/**'
       - '.github/workflows/CD-user*'
@@ -94,7 +96,7 @@ jobs:
             echo 'Переменные для миграции'
             export MIGRATE=YES
             export SERVICE=user-minibank
-            export MIGRATE_SERVICE=user-minibank
+            export MIGRATE_SERVICE=migrate-user
             USER_MINIBANK_DB=${{ secrets.USER_MINIBANK_DB }}
             USER_MINIBANK_USER=${{ secrets.USER_MINIBANK_USER }}
             USER_MINIBANK_PASSWORD=${{ secrets.USER_MINIBANK_PASSWORD }}
