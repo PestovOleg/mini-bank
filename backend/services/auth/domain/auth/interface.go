@@ -16,7 +16,8 @@ type Reader interface {
 // Delete - удалить запись
 type Writer interface {
 	Create(u *Auth) (uuid.UUID, error)
-	Delete(u *Auth) error
+	Update(u *Auth) error
+	Delete(id uuid.UUID) error
 }
 
 // Repository -композиция интерфейсов Writer и Reader
@@ -29,7 +30,8 @@ type Repository interface {
 // GetAuthByID - поиск пользователя по ID
 // GetAuthByUName - поиск пользователя по username
 // CreateAuth - создание записи
-// DeleteAuth - удаление записи(деактивация)
+// DeactivateAuth - удаление записи(деактивация)
+// DeleteAuth - удаление записи(физическое)
 // AuthenticateUser - аутентификация пользователя по username,password
 // AuthorizeUser - авторизация пользователя для доступа к сервису
 
@@ -39,5 +41,6 @@ type UseCase interface {
 	AuthenticateUser(username, password string) (uuid.UUID, error)
 	AuthorizeUser(token string) error
 	CreateAuth(username, password string) (uuid.UUID, error)
+	DeactivateAuth(id uuid.UUID) error
 	DeleteAuth(id uuid.UUID) error
 }

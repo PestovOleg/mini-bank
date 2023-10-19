@@ -121,3 +121,34 @@ func (r *UserSQL) Update(u *user.User) error {
 
 	return nil
 }
+
+func (r *UserSQL) Delete(id uuid.UUID) error {
+	rec, err := r.db.Prepare(`
+		delete from users from users where id=$1`)
+
+	if err != nil {
+		return err
+	}
+
+	res, err := rec.Exec(id)
+
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return user.ErrNotFound
+	}
+
+	err = rec.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

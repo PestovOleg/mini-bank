@@ -148,7 +148,7 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 	})
 }
 
-// DeleteAuth godoc
+// DeactivateAuth godoc
 // @title Deactivate Authentication record by ID
 // @version 1.0
 // @summary Deactivate authentication record based on the provided ID.
@@ -161,8 +161,8 @@ func (a *AuthHandler) CreateAuth() http.Handler {
 // @failure 500 {string} string "Internal server error"
 // @failure 404 {string} string "Page not found"
 // @Security BasicAuth
-// @router /auth/{id} [delete]
-func (a *AuthHandler) DeleteAuth() http.Handler {
+// @router /auth/{id} [put]
+func (a *AuthHandler) DeactivateAuth() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id, err := uuid.Parse(vars["id"])
@@ -177,18 +177,18 @@ func (a *AuthHandler) DeleteAuth() http.Handler {
 			return
 		}
 
-		err = a.service.DeleteAuth(id)
+		err = a.service.DeactivateAuth(id)
 		if err != nil {
 			a.logger.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte("Couldn't delete user: " + err.Error()))
+			_, err = w.Write([]byte("Couldn't deactivate user: " + err.Error()))
 			if err != nil {
 				a.logger.Error(err.Error())
 			}
 
 			return
 		}
-		a.logger.Sugar().Infof("Authentication record %v was deleted", id)
+		a.logger.Sugar().Infof("Authentication record %v was deactivated", id)
 	})
 }
 
@@ -263,4 +263,49 @@ func unauthorized(w http.ResponseWriter) {
 		logger := logger.GetLogger("API")
 		logger.Error(err.Error())
 	}
+}
+
+// DeleteAuth Delete Auth record, only inter-service communication
+// @title Delete Authentication record by ID
+// @version 1.0
+// @summary Delete authentication record based on the provided ID.
+// @description Delete the authentication record using the provided user ID.
+// @tags auth-minibank
+// @accept json
+// @produce json
+// @param id path string true "Auth ID"
+// @success 200 {string} string "Successfully deleted authentication record"
+// @failure 500 {string} string "Internal server error"
+// @failure 404 {string} string "Page not found"
+// @Security BasicAuth
+// @router /auth/{id} [delete]
+func (a *AuthHandler) DeleteAuth() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.logger.Debug("DeleteAuth was initiated")
+		vars := mux.Vars(r)
+		id, err := uuid.Parse(vars["id"])
+		if err != nil {
+			a.logger.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Couldn't parse ID:" + err.Error()))
+			if err != nil {
+				a.logger.Error(err.Error())
+			}
+
+			return
+		}
+
+		err = a.service.DeleteAuth(id)
+		if err != nil {
+			a.logger.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, err = w.Write([]byte("Couldn't delete auth record: " + err.Error()))
+			if err != nil {
+				a.logger.Error(err.Error())
+			}
+
+			return
+		}
+		a.logger.Info("Authentication record was deleted")
+	})
 }

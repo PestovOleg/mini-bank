@@ -11,24 +11,50 @@ type MockRepository struct {
 
 func (m *MockRepository) Create(u *Auth) (uuid.UUID, error) {
 	m.createdAuth = u
+
 	if m.errToReturn != nil {
 		return uuid.Nil, m.errToReturn
 	}
 
-	return uuid.New(), nil
+	return m.createdAuth.ID, nil
 }
 
 func (m *MockRepository) Update(u *Auth) error {
+	m.createdAuth = u
+
 	return nil
 }
 
-func (m *MockRepository) Delete(u *Auth) error {
+func (m *MockRepository) Delete(id uuid.UUID) error {
+	if m.createdAuth.ID != id {
+		return ErrNotFound
+	}
+
+	m.createdAuth = nil
+
 	return nil
 }
 
 func (m *MockRepository) GetByID(id uuid.UUID) (*Auth, error) {
-	return nil, nil
+	if id == uuid.Nil {
+		return nil, ErrIDMustBeEntered
+	}
+
+	if m.createdAuth.ID != id {
+		return nil, ErrNotFound
+	}
+
+	return m.createdAuth, nil
 }
+
 func (m *MockRepository) GetByUName(username string) (*Auth, error) {
-	return nil, nil
+	if username == "" {
+		return nil, ErrEmptyUsername
+	}
+
+	if m.createdAuth.Username != username {
+		return nil, ErrNotFound
+	}
+
+	return m.createdAuth, nil
 }

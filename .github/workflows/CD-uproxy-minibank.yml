@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*.*.*"
+    branches:
+      - main
     paths:
       - 'backend/services/uproxy/**'
       - '.github/workflows/CD-uproxy**'

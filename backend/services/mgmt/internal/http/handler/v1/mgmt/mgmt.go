@@ -243,13 +243,39 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 		if err != nil {
 			m.logger.Sugar().Error("Failed to send user HTTP request:", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			m.logger.Debug("Status code of response (user) = " + strconv.Itoa(resp.StatusCode))
 
 			return
 		}
 
-		// Если статус отличен от успешного - возвращаем ошибку
+		defer resp.Body.Close()
+
+		// Если статус отличен от успешного - возвращаем ошибку и удаляем запись в auth
 		if resp.StatusCode != http.StatusCreated {
-			m.logger.Debug("Status code of response (user) = " + strconv.Itoa(resp.StatusCode))
+			m.logger.Error("Status code of response (user) = " + strconv.Itoa(resp.StatusCode))
+
+			// удаление записи auth
+			authRequestDelete, err := http.NewRequestWithContext(
+				r.Context(),
+				http.MethodDelete,
+				authHost+"/"+authResp.ID, nil,
+			)
+			if err != nil {
+				m.logger.Sugar().Error("Failed to delete auth record:", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+				return
+			}
+
+			// делаем запрос в auth сервис
+			respAuth, err := client.Do(authRequestDelete)
+			if err != nil {
+				m.logger.Sugar().Error("Failed to send HTTP request to delete auth:", err)
+				defer respAuth.Body.Close()
+
+				return
+			}
+
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				m.logger.Sugar().Error("Failed to create user: %s", err.Error())
@@ -275,7 +301,6 @@ func (m *MgmtHandler) CreateUser() http.Handler {
 
 			return
 		}
-		resp.Body.Close()
 
 		w.WriteHeader(http.StatusCreated)
 
@@ -364,7 +389,7 @@ func (m *MgmtHandler) DeleteUser() http.Handler {
 		}
 
 		// Если статус отличен от успешного - возвращаем ошибку
-		if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNotFound {
 			m.logger.Debug("Status code of response (account) = " + strconv.Itoa(resp.StatusCode))
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -400,11 +425,15 @@ func (m *MgmtHandler) DeleteUser() http.Handler {
 
 		body, _ := io.ReadAll(resp.Body)
 
-		if err := json.Unmarshal(body, &accounts); err != nil {
-			m.logger.Error("Failed to get unmarshall account list, body:")
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		if resp.StatusCode != http.StatusNotFound {
+			if err := json.Unmarshal(body, &accounts); err != nil {
+				m.logger.Error("Failed to get unmarshall account list, body:")
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
 
-			return
+				return
+			} else {
+				m.logger.Info("Account' List is empty")
+			}
 		}
 		resp.Body.Close()
 
@@ -457,10 +486,10 @@ func (m *MgmtHandler) DeleteUser() http.Handler {
 			resp.Body.Close()
 		}
 
-		// Часть 3,удаляем самого клиента
+		// Часть 3,удаляем(деактивируем) самого клиента
 		userDeleteRequest, err := http.NewRequestWithContext(
 			r.Context(),
-			http.MethodDelete,
+			http.MethodPut,
 			authHost+"/"+userID.String(), nil,
 		)
 		if err != nil {
@@ -498,7 +527,8 @@ func (m *MgmtHandler) DeleteUser() http.Handler {
 
 			return
 		}
+
 		resp.Body.Close()
-		m.logger.Debug("User was deleted: " + userID.String())
+		m.logger.Debug("User was deactivated: " + userID.String())
 	})
 }

@@ -47,10 +47,14 @@ func BaseRoutes(s *Services) map[string]map[string]RouteConfig {
 			},
 		},
 		"/auth/{id}": {
-			http.MethodDelete: {
-				Handler:     auth.NewAuthHandler(s.AuthService).DeleteAuth(),
+			http.MethodPut: {
+				Handler:     auth.NewAuthHandler(s.AuthService).DeactivateAuth(),
 				Feature:     "DeleteUserToggle",
 				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware, middleware.BasicAuthMiddleware},
+			},
+			http.MethodDelete: {
+				Handler:     auth.NewAuthHandler(s.AuthService).DeleteAuth(),
+				Middlewares: []mux.MiddlewareFunc{middleware.LoggerMiddleware},
 			},
 		},
 	}

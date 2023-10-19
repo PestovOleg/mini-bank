@@ -15,9 +15,11 @@ type Reader interface {
 // Writer
 // Create - создать запись с пользователем
 // Update - обновить пользователя новыми значениями
+// Delete - удалить пользователя
 type Writer interface {
 	Create(u *User) (uuid.UUID, error)
 	Update(u *User) error
+	Delete(id uuid.UUID) error
 }
 
 // Repository -композиция интерфейсов Writer и Reader
@@ -27,8 +29,7 @@ type Repository interface {
 }
 
 // Usecase интерфейс
-// GetUserByID - поиск пользователя по ID
-// GetUserByUName - поиск пользователя по username
+// GetUser - поиск пользователя по ID
 // CreateUser - создание пользователя
 // UpdateUser - обновление данных пользователя
 // DeleteUser - удаление пользователя
@@ -37,4 +38,5 @@ type UseCase interface {
 	GetUser(id uuid.UUID) (*User, error)
 	CreateUser(id, email, phone, name, lastName, patronymic string, birthday time.Time) (uuid.UUID, error)
 	UpdateUser(id uuid.UUID, email, phone string) error
+	DeleteUser(id uuid.UUID) error
 }

@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*.*.*"
+    branches:
+      - main
     paths:
       - 'backend/services/account/**'
       - '.github/workflows/CD-account*'
@@ -93,7 +95,7 @@ jobs:
             export AUTH_VERIFY_HOST=${{secrets.AUTH_VERIFY_HOST}}
             echo 'Переменные для миграции'
             export MIGRATE=YES
-            export MIGRATE_SERVICE=account-minibank
+            export MIGRATE_SERVICE=migrate-account
             export SERVICE=account-minibank
             ACCOUNT_MINIBANK_DB=${{ secrets.ACCOUNT_MINIBANK_DB }}
             ACCOUNT_MINIBANK_USER=${{ secrets.ACCOUNT_MINIBANK_USER }}
